@@ -9,6 +9,8 @@ Feel free to add, modify, and expand this file. Below are starting points for th
 - Definitions of an ideal, prime ideal, and maximal ideal:
 ```lean
 def Mathlib.RingTheory.Ideal.Basic.Ideal (R : Type u) [Semiring R] := Submodule R R
+class Mathlib.RingTheory.Ideal.Basic.IsPrime (I : Ideal α) : Prop
+class IsMaximal (I : Ideal α) : Prop
 ```
 
 - Definition of a Spec of a ring: `Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic.PrimeSpectrum`
@@ -16,9 +18,14 @@ def Mathlib.RingTheory.Ideal.Basic.Ideal (R : Type u) [Semiring R] := Submodule 
 - Definition of a Noetherian and Artinian rings:
 ```lean
 class Mathlib.RingTheory.Noetherian.IsNoetherian (R M) [Semiring R] [AddCommMonoid M] [Module R M] : Prop
+class Mathlib.RingTheory.Artinian.IsArtinian (R M) [Semiring R] [AddCommMonoid M] [Module R M] : Prop
 ```
+- Definition of a polynomial ring: `Mathlib.RingTheory.Polynomial.Basic`
 
-- Definitions of a local ring and quotient ring
+- Definitions of a local ring and quotient ring: `Mathlib.RingTheory.Ideal.Quotient.?`
+```lean
+class Mathlib.RingTheory.Ideal.LocalRing.LocalRing (R : Type u) [Semiring R] extends Nontrivial R : Prop
+```
 
 - Definition of the chain of prime ideals and the length of these chains
 
@@ -31,7 +38,7 @@ Give Examples of each of the above cases for a particular instances of ring
 
 Theorem 0: Hilbert Basis Theorem:
 ```lean
-instance isNoetherianRing [Finite σ] [IsNoetherianRing R] : IsNoetherianRing (MvPolynomial σ R)
+theorem Mathlib.RingTheory.Polynomial.Basic.Polynomial.isNoetherianRing [inst : IsNoetherianRing R] : IsNoetherianRing R[X]
 ```
 
 Theorem 1: If A is a nonzero ring, then dim A[t] >= dim A +1
