@@ -11,21 +11,28 @@ Feel free to add, modify, and expand this file. Below are starting points for th
 def Mathlib.RingTheory.Ideal.Basic.Ideal (R : Type u) [Semiring R] := Submodule R R
 ```
 
-- Definition of a Spec of a ring
+- Definition of a Spec of a ring: `Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic.PrimeSpectrum`
 
-- Definition of a Noetherian and Artinian rings
+- Definition of a Noetherian and Artinian rings:
+```lean
+class Mathlib.RingTheory.Noetherian.IsNoetherian (R M) [Semiring R] [AddCommMonoid M] [Module R M] : Prop
+```
 
 - Definitions of a local ring and quotient ring
 
 - Definition of the chain of prime ideals and the length of these chains
 
-- Definition of the Krull dimension (supremum of the lengh of chain of prime ideal) 
+- Definition of the Krull dimension (supremum of the lengh of chain of prime ideal): `Mathlib.Order.KrullDimension.krullDim`
 
-- Definition of the height of prime ideal (dimension of A_p)
+- Definition of the height of prime ideal (dimension of A_p): `Mathlib.Order.KrullDimension.height`
+
 
 Give Examples of each of the above cases for a particular instances of ring
 
-Theorem 0: Hilbert Basis Theorem
+Theorem 0: Hilbert Basis Theorem:
+```lean
+instance isNoetherianRing [Finite σ] [IsNoetherianRing R] : IsNoetherianRing (MvPolynomial σ R)
+```
 
 Theorem 1: If A is a nonzero ring, then dim A[t] >= dim A +1
 
