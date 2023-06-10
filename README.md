@@ -31,6 +31,8 @@ class Mathlib.RingTheory.Ideal.LocalRing.LocalRing (R : Type u) [Semiring R] ext
 
 - Definition of the Krull dimension (supremum of the lengh of chain of prime ideal): `Mathlib.Order.KrullDimension.krullDim`
 
+- Krull dimension of a module
+
 - Definition of the height of prime ideal (dimension of A_p): `Mathlib.Order.KrullDimension.height`
 
 
@@ -46,5 +48,7 @@ Theorem 1: If A is a nonzero ring, then dim A[t] >= dim A +1
 Theorem 2: If A is a nonzero noetherian ring, then dim A[t] = dim A + 1
 
 Theorem 3: If A is nonzero ring then dim A_p + dim A/p <= dim A
+
+Lemma 0: A ring is artinian iff it is noetherian of dimension 0.
 
 Definition of a graded module
