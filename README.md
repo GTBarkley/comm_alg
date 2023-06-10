@@ -18,9 +18,14 @@ class IsMaximal (I : Ideal α) : Prop
 - Definition of a Noetherian and Artinian rings:
 ```lean
 class Mathlib.RingTheory.Noetherian.IsNoetherian (R M) [Semiring R] [AddCommMonoid M] [Module R M] : Prop
+class Mathlib.RingTheory.Artinian.IsArtinian (R M) [Semiring R] [AddCommMonoid M] [Module R M] : Prop
 ```
+- Definition of a polynomial ring: `Mathlib.RingTheory.Polynomial.Basic`
 
-- Definitions of a local ring and quotient ring
+- Definitions of a local ring and quotient ring: `Mathlib.RingTheory.Ideal.Quotient.?`
+```lean
+class Mathlib.RingTheory.Ideal.LocalRing.LocalRing (R : Type u) [Semiring R] extends Nontrivial R : Prop
+```
 
 - Definition of the chain of prime ideals and the length of these chains
 
