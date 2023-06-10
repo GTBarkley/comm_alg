@@ -6,19 +6,22 @@ We start the commutative algebra project with a list of important definitions an
 
 Feel free to add, modify, and expand this file. Below are starting points for the project:
 
-Definitions of an ideal, prime ideal, and maximal ideal
+- Definitions of an ideal, prime ideal, and maximal ideal:
+```lean
+def Mathlib.RingTheory.Ideal.Basic.Ideal (R : Type u) [Semiring R] := Submodule R R
+```
 
-Definition of a Spec of a ring
+- Definition of a Spec of a ring
 
-Definition of a Noetherian and Artinian rings
+- Definition of a Noetherian and Artinian rings
 
-Definitions of a local ring and quotient ring
+- Definitions of a local ring and quotient ring
 
-Definition of the chain of prime ideals and the length of these chains
+- Definition of the chain of prime ideals and the length of these chains
 
-Definition of the Krull dimension (supremum of the lengh of chain of prime ideal) 
+- Definition of the Krull dimension (supremum of the lengh of chain of prime ideal) 
 
-Definition of the height of prime ideal (dimension of A_p)
+- Definition of the height of prime ideal (dimension of A_p)
 
 Give Examples of each of the above cases for a particular instances of ring
 
