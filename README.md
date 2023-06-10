@@ -29,3 +29,5 @@ Theorem 1: If A is a nonzero ring, then dim A[t] >= dim A +1
 Theorem 2: If A is a nonzero noetherian ring, then dim A[t] = dim A + 1
 
 Theorem 3: If A is nonzero ring then dim A_p + dim A/p <= dim A
+
+Definition of a graded ring
