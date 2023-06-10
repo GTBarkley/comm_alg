@@ -1,9 +1,10 @@
-# comm_alg
-SLMath collaboration for adding Krull dimension and Hilbert polynomial to mathlib
+# Commutative algebra in Lean
 
-We start the comm algebra project by important definitions and theorems and go from there.
+Welcome to the repository for adding definitions and theorems related to Krull dimension and Hilbert polynomials to mathlib.
 
-Feel free to add, modify, and expand this file. Below are starting point for the project:
+We start the commutative algebra project with a list of important definitions and theorems and go from there.
+
+Feel free to add, modify, and expand this file. Below are starting points for the project:
 
 Definitions of an ideal, prime ideal, and maximal ideal
 
