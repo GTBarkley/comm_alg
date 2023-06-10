@@ -8,6 +8,7 @@ import Mathlib.RingTheory.Ideal.Basic
 import Mathlib.RingTheory.Noetherian
 import Mathlib.RingTheory.Artinian
 import Mathlib.Order.Height
+import Mathlib.RingTheory.MvPolynomial.Basic
 
 variable {R M : Type _} [CommRing R] [AddCommGroup M] [Module R M]
 
@@ -38,3 +39,9 @@ variable (I : Ideal R)
 
 --Here's the main defintion that will be helpful
 #check Set.chainHeight
+
+--this is the polynomial ring R[x]
+#check Polynomial R
+--this is the polynomial ring with variables indexed by ℕ
+#check MvPolynomial ℕ R
+--hopefully there's good communication between them
