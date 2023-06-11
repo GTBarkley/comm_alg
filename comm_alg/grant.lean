@@ -37,3 +37,6 @@ lemma twoHeights : s ≠ ∅ → (some (Set.chainHeight s) : WithBot (WithTop �
     sorry
   -- norm_cast
   sorry
+
+def krullDimGE (R : Type _) [CommRing R] (n : ℕ) :=
+  ∃ c : List (PrimeSpectrum R), c.Chain' (· < ·) ∧ c.length = n + 1
