@@ -18,6 +18,14 @@ import Mathlib.Order.Height
 
 variable {α : Type _} [Preorder α] (s : Set α)
 
+def finFun_to_list {n : ℕ} : (Fin n → α) → List α := by sorry
+
+def series_to_chain : StrictSeries s → s.subchain
+| ⟨length, toFun, strictMono⟩ => 
+    ⟨ finFun_to_list (fun x => toFun x),
+      sorry⟩
+
+
 -- there should be a coercion from WithTop ℕ to WithBot (WithTop ℕ) but it doesn't seem to work
 -- it looks like this might be because someone changed the instance from CoeCT to Coe during the port
 lemma twoHeights : s ≠ ∅ → (some (Set.chainHeight s) : WithBot (WithTop ℕ)) = krullDim s := by
