@@ -65,7 +65,7 @@ variable (I : Ideal R)
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Preadditive
 
 variable {𝒜 : Type _} [Category 𝒜] [Abelian 𝒜]
-variable {A B C A': 𝒜} {f : A ⟶ B} {g : B ⟶ C}
+variable {A B C : 𝒜} {f : A ⟶ B} {g : B ⟶ C} {h : LeftSplit f g} {h' : RightSplit f g}
 
 #check ShortExact
 #check ShortExact f g
@@ -75,4 +75,9 @@ variable {A B C A': 𝒜} {f : A ⟶ B} {g : B ⟶ C}
 #check LeftSplit f g
 -- And there is a theorem that left split implies splitting
 #check LeftSplit.splitting
+#check LeftSplit.splitting h
 -- Similar things are there for RightSplit as well
+#check RightSplit.splitting
+#check RightSplit.splitting h'
+-- There's also a theorem about ismorphisms between short exact sequences
+#check isIso_of_shortExact_of_isIso_of_isIso
