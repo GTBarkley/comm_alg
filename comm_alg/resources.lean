@@ -7,6 +7,7 @@ useful lemmas and definitions
 import Mathlib.RingTheory.Ideal.Basic
 import Mathlib.RingTheory.Noetherian
 import Mathlib.RingTheory.Artinian
+import Mathlib.RingTheory.FiniteType
 import Mathlib.Order.Height
 import Mathlib.RingTheory.MvPolynomial.Basic
 import Mathlib.RingTheory.Ideal.Over
@@ -58,6 +59,11 @@ variable (I : Ideal R)
 #check PrimeSpectrum.localization_comap_range
 --Theorems relating primes of a ring to primes of a quotient
 #check PrimeSpectrum.range_comap_of_surjective
+
+--There's a lot of theorems about finite-type algebras
+#check Algebra.FiniteType.polynomial
+#check Algebra.FiniteType.mvPolynomial
+#check Algebra.FiniteType.of_surjective
 
 -- There is a notion of short exact sequences but the number of theorems are lacking
 -- For example, I couldn't find anything saying that for a ses 0 -> A -> B -> C -> 0
