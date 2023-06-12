@@ -11,6 +11,7 @@ import Mathlib.Order.Height
 import Mathlib.RingTheory.MvPolynomial.Basic
 import Mathlib.RingTheory.Ideal.Over
 import Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic
+import Mathlib.Algebra.Homology.ShortExact.Abelian
 
 variable {R M : Type _} [CommRing R] [AddCommGroup M] [Module R M]
 
@@ -57,3 +58,21 @@ variable (I : Ideal R)
 #check PrimeSpectrum.localization_comap_range
 --Theorems relating primes of a ring to primes of a quotient
 #check PrimeSpectrum.range_comap_of_surjective
+
+-- There is a notion of short exact sequences but the number of theorems are lacking
+-- For example, I couldn't find anything saying that for a ses 0 -> A -> B -> C -> 0
+-- of R-modules, A and C being FG implies that B is FG
+open CategoryTheory CategoryTheory.Limits CategoryTheory.Preadditive
+
+variable {𝒜 : Type _} [Category 𝒜] [Abelian 𝒜]
+variable {A B C A': 𝒜} {f : A ⟶ B} {g : B ⟶ C}
+
+#check ShortExact
+#check ShortExact f g
+-- There are some notion of splitting as well
+#check Splitting
+#check LeftSplit
+#check LeftSplit f g
+-- And there is a theorem that left split implies splitting
+#check LeftSplit.splitting
+-- Similar things are there for RightSplit as well
