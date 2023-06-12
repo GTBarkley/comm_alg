@@ -9,17 +9,7 @@ import Mathlib.Order.ConditionallyCompleteLattice.Basic
 -- import Mathlib.Data.ENat.Lattice
 -- import Mathlib.Order.OrderIsoNat
 -- import Mathlib.Tactic.TFAE
-
 namespace Ideal
-
--- def foo : List Nat := [1, 2, 3, 4, 5]
-
--- #check List.Chain'
-
--- example : List.Chain' (· < ·) foo := by
---   repeat { constructor; norm_num }
-  
-  
 
 example (x : Nat) : List.Chain' (· < ·)  [x] := by
   constructor
@@ -36,10 +26,8 @@ lemma height_def : height I = Set.chainHeight {J : PrimeSpectrum R | J < I} := r
 lemma krullDim_def (R : Type) [CommRing R] : krullDim R = (⨆ (I : PrimeSpectrum R), height I : WithBot ℕ∞) := rfl
 lemma krullDim_def' (R : Type) [CommRing R] : krullDim R = iSup (λ I : PrimeSpectrum R => (height I : WithBot ℕ∞)) := rfl
 
-variable {K : Type _} [Field K]
-
-lemma dim_field_eq_zero : krullDim K = 0 := by
-  have prime_bot (P : Ideal K) : IsPrime P ↔ P = ⊥ := by
+@[simp]
+lemma field_prime_bot {K: Type _} [Field K] (P : Ideal K) : IsPrime P ↔ P = ⊥ := by
       constructor
       · intro primeP
         obtain T := eq_bot_or_top P
@@ -48,9 +36,8 @@ lemma dim_field_eq_zero : krullDim K = 0 := by
       · intro botP
         rw [botP]
         exact bot_prime
-  unfold krullDim
-  have height_zero : ∀ P : PrimeSpectrum K, height P = 0 := by
-    intro P
+
+lemma field_prime_height_zero {K: Type _} [Field K] (P : PrimeSpectrum K) : height P = 0 := by
     unfold height
     simp
     by_contra spec
@@ -59,9 +46,12 @@ lemma dim_field_eq_zero : krullDim K = 0 := by
     obtain ⟨J, JlP : J < P⟩ := spec
     have P0 : IsPrime P.asIdeal := P.IsPrime
     have J0 : IsPrime J.asIdeal := J.IsPrime
-    rw [prime_bot] at P0 J0
+    rw [field_prime_bot] at P0 J0
     have : J.asIdeal = P.asIdeal := Eq.trans J0 (Eq.symm P0)
     have JeqP : J = P := PrimeSpectrum.ext J P this
     have JneqP : J ≠ P := ne_of_lt JlP
     contradiction
-  simp [height_zero]
+
+lemma dim_field_eq_zero {K : Type _} [Field K] : krullDim K = 0 := by
+  unfold krullDim
+  simp [field_prime_height_zero]
