@@ -1,4 +1,5 @@
-import Mathlib.RingTheory.Ideal.Basic
+import Mathlib.RingTheory.Ideal.Operations
+import Mathlib.RingTheory.FiniteType
 import Mathlib.Order.Height
 import Mathlib.RingTheory.PrincipalIdealDomain
 import Mathlib.RingTheory.DedekindDomain.Basic
@@ -33,10 +34,11 @@ noncomputable instance : CompleteLattice (WithBot (ℕ∞)) := WithBot.WithTop.c
 
 lemma krullDim_le_iff (R : Type) [CommRing R] (n : ℕ) :
   iSup (λ I : PrimeSpectrum R => (height I : WithBot ℕ∞)) ≤ n ↔
-  ∀ I : PrimeSpectrum R, (height I : WithBot ℕ∞) ≤ ↑n := by
-    convert @iSup_le_iff (WithBot ℕ∞) (PrimeSpectrum R) inferInstance _ (↑n)
+  ∀ I : PrimeSpectrum R, (height I : WithBot ℕ∞) ≤ ↑n := iSup_le_iff (α := WithBot ℕ∞)
 
 --some propositions that would be nice to be able to eventually
+
+lemma dim_eq_bot_iff : krullDim R = ⊥ ↔ Subsingleton R := sorry
 
 lemma dim_eq_zero_iff_field [IsDomain R] : krullDim R = 0 ↔ IsField R := by sorry
 
