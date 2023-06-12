@@ -20,7 +20,7 @@ namespace Ideal
 
 variable {R : Type _} [CommRing R] (I : PrimeSpectrum R)
 
-noncomputable def height : ℕ∞ := Set.chainHeight {J : PrimeSpectrum R | J ≤ I} - 1
+noncomputable def height : ℕ∞ := Set.chainHeight {J : PrimeSpectrum R | J < I}
 
 noncomputable def krull_dim (R : Type) [CommRing R]: WithBot ℕ∞ := ⨆ (I : PrimeSpectrum R), height I
 
