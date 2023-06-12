@@ -1,4 +1,5 @@
-import Mathlib.RingTheory.Ideal.Basic
+import Mathlib.RingTheory.Ideal.Operations
+import Mathlib.RingTheory.FiniteType
 import Mathlib.Order.Height
 import Mathlib.RingTheory.PrincipalIdealDomain
 import Mathlib.RingTheory.DedekindDomain.Basic
@@ -18,6 +19,7 @@ import Mathlib.Order.ConditionallyCompleteLattice.Basic
 -/
 
 namespace Ideal
+open LocalRing
 
 variable {R : Type _} [CommRing R] (I : PrimeSpectrum R)
 
@@ -31,12 +33,36 @@ lemma krullDim_def' (R : Type) [CommRing R] : krullDim R = iSup (λ I : PrimeSpe
 
 noncomputable instance : CompleteLattice (WithBot (ℕ∞)) := WithBot.WithTop.completeLattice
 
-lemma krullDim_le_iff (R : Type) [CommRing R] (n : ℕ) :
-  iSup (λ I : PrimeSpectrum R => (height I : WithBot ℕ∞)) ≤ n ↔
-  ∀ I : PrimeSpectrum R, (height I : WithBot ℕ∞) ≤ ↑n := by
-    convert @iSup_le_iff (WithBot ℕ∞) (PrimeSpectrum R) inferInstance _ (↑n)
+lemma height_le_of_le {I J : PrimeSpectrum R} (I_le_J : I ≤ J) : height I ≤ height J := by
+  apply Set.chainHeight_mono
+  intro J' hJ'
+  show J' < J
+  exact lt_of_lt_of_le hJ' I_le_J
 
+lemma krullDim_le_iff (R : Type) [CommRing R] (n : ℕ) :
+  krullDim R ≤ n ↔ ∀ I : PrimeSpectrum R, (height I : WithBot ℕ∞) ≤ ↑n := iSup_le_iff (α := WithBot ℕ∞)
+
+lemma krullDim_le_iff' (R : Type) [CommRing R] (n : ℕ∞) :
+  krullDim R ≤ n ↔ ∀ I : PrimeSpectrum R, (height I : WithBot ℕ∞) ≤ ↑n := iSup_le_iff (α := WithBot ℕ∞)
+
+@[simp]
+lemma height_le_krullDim (I : PrimeSpectrum R) : height I ≤ krullDim R := 
+  le_iSup (λ I : PrimeSpectrum R => (height I : WithBot ℕ∞)) I
+
+lemma krullDim_eq_height [LocalRing R] : krullDim R = height (closedPoint R) := by
+  apply le_antisymm
+  . rw [krullDim_le_iff']
+    intro I
+    apply WithBot.coe_mono
+    apply height_le_of_le
+    apply le_maximalIdeal
+    exact I.2.1
+  . simp
+
+#check height_le_krullDim
 --some propositions that would be nice to be able to eventually
+
+lemma dim_eq_bot_iff : krullDim R = ⊥ ↔ Subsingleton R := sorry
 
 lemma dim_eq_zero_iff_field [IsDomain R] : krullDim R = 0 ↔ IsField R := by sorry
 
