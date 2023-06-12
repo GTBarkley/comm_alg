@@ -2,6 +2,7 @@ import Mathlib.Order.KrullDimension
 import Mathlib.Order.JordanHolder
 import Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic
 import Mathlib.Order.Height
+import CommAlg.krull
 
 
 #check (p q : PrimeSpectrum _) → (p ≤ q)
@@ -9,6 +10,9 @@ import Mathlib.Order.Height
 
 -- Dimension of a ring
 #check krullDim (PrimeSpectrum _)
+
+
+#check Set.chainHeight {M' : Submodule _ _ | M' < _}
 
 -- Length of a module
 #check krullDim (Submodule _ _)
@@ -39,22 +43,14 @@ lemma twoHeights : s ≠ ∅ → (some (Set.chainHeight s) : WithBot (WithTop �
   -- norm_cast
   sorry
 
-namespace Ideal
-noncomputable def krullDim (R : Type _) [CommRing R] := 
-  Set.chainHeight (Set.univ : Set (PrimeSpectrum R))
-
-def krullDimGE (R : Type _) [CommRing R] (n : ℕ) :=
-  ∃ c : List (PrimeSpectrum R), c.Chain' (· < ·) ∧ c.length = n + 1
-
-def krullDimLE (R : Type _) [CommRing R] (n : ℕ) :=
-  ∀ c : List (PrimeSpectrum R), c.Chain' (· < ·) → c.length ≤ n + 1
-
-end Ideal
-
 open Ideal
 
-lemma krullDim_le (R : Type _) [CommRing R] : krullDimLE R n ↔ Ideal.krullDim R ≤ n := sorry
-lemma krullDim_ge (R : Type _) [CommRing R] : krullDimGE R n ↔ Ideal.krullDim R ≥ n := sorry
+lemma krullDim_le_iff' (R : Type _) [CommRing R] : 
+  Ideal.krullDim R ≤ n ↔ (∀ c : List (PrimeSpectrum R), c.Chain' (· < ·) → c.length ≤ n + 1) := by
+    sorry
+
+lemma krullDim_ge_iff' (R : Type _) [CommRing R] : 
+  Ideal.krullDim R ≥ n ↔ ∃ c : List (PrimeSpectrum R), c.Chain' (· < ·) ∧ c.length = n + 1 := sorry
 
 
 -- #check ((4 : ℕ∞) : WithBot (WithTop ℕ))
