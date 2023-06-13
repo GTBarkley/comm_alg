@@ -45,6 +45,12 @@ lemma krullDim_le_iff (R : Type) [CommRing R] (n : ℕ) :
 lemma krullDim_le_iff' (R : Type) [CommRing R] (n : ℕ∞) :
   krullDim R ≤ n ↔ ∀ I : PrimeSpectrum R, (height I : WithBot ℕ∞) ≤ ↑n := iSup_le_iff (α := WithBot ℕ∞)
 
+lemma le_krullDim_iff (R : Type) [CommRing R] (n : ℕ) :
+  n ≤ krullDim R ↔ ∃ I : PrimeSpectrum R, n ≤ (height I : WithBot ℕ∞) := by sorry
+
+lemma le_krullDim_iff' (R : Type) [CommRing R] (n : ℕ∞) :
+  n ≤ krullDim R ↔ ∃ I : PrimeSpectrum R, n ≤ (height I : WithBot ℕ∞) := by sorry
+
 @[simp]
 lemma height_le_krullDim (I : PrimeSpectrum R) : height I ≤ krullDim R := 
   le_iSup (λ I : PrimeSpectrum R => (height I : WithBot ℕ∞)) I
