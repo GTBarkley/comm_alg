@@ -39,7 +39,7 @@ lemma height_le_of_le {I J : PrimeSpectrum R} (I_le_J : I ≤ J) : height I ≤ 
   show J' < J
   exact lt_of_lt_of_le hJ' I_le_J
 
-lemma krullDim_le_iff (R : Type) [CommRing R] (n : ℕ) :
+lemma krullDim_le_iff (R : Type _) [CommRing R] (n : ℕ) :
   krullDim R ≤ n ↔ ∀ I : PrimeSpectrum R, (height I : WithBot ℕ∞) ≤ ↑n := iSup_le_iff (α := WithBot ℕ∞)
 
 lemma krullDim_le_iff' (R : Type) [CommRing R] (n : ℕ∞) :
@@ -94,6 +94,11 @@ lemma dim_eq_bot_iff : krullDim R = ⊥ ↔ Subsingleton R := by
   . rw [h.forall_iff]
     trivial
 
+lemma krullDim_nonneg_of_nontrivial [Nontrivial R] : ∃ n : ℕ∞, Ideal.krullDim R = n := by
+  have h := dim_eq_bot_iff.not.mpr (not_subsingleton R)
+  lift (Ideal.krullDim R) to ℕ∞ using h with k
+  use k
+  
 @[simp]
 lemma field_prime_bot {K: Type _} [Field K] (P : Ideal K) : IsPrime P ↔ P = ⊥ := by
       constructor
