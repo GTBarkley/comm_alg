@@ -6,9 +6,7 @@ import Mathlib.RingTheory.Ideal.Quotient
 import Mathlib.RingTheory.Localization.AtPrime
 import Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic
 import Mathlib.Order.ConditionallyCompleteLattice.Basic
--- import Mathlib.Data.ENat.Lattice
--- import Mathlib.Order.OrderIsoNat
--- import Mathlib.Tactic.TFAE
+
 namespace Ideal
 
 example (x : Nat) : List.Chain' (· < ·)  [x] := by
@@ -17,9 +15,7 @@ example (x : Nat) : List.Chain' (· < ·)  [x] := by
 
   
 variable {R : Type _} [CommRing R] (I : PrimeSpectrum R)
-
 noncomputable def height : ℕ∞ := Set.chainHeight {J : PrimeSpectrum R | J < I}
-
 noncomputable def krullDim (R : Type) [CommRing R] : WithBot ℕ∞ := ⨆ (I : PrimeSpectrum R), height I
 
 lemma height_def : height I = Set.chainHeight {J : PrimeSpectrum R | J < I} := rfl
@@ -48,10 +44,28 @@ lemma field_prime_height_zero {K: Type _} [Field K] (P : PrimeSpectrum K) : heig
     have J0 : IsPrime J.asIdeal := J.IsPrime
     rw [field_prime_bot] at P0 J0
     have : J.asIdeal = P.asIdeal := Eq.trans J0 (Eq.symm P0)
-    have JeqP : J = P := PrimeSpectrum.ext J P this
-    have JneqP : J ≠ P := ne_of_lt JlP
+    have : J = P := PrimeSpectrum.ext J P this
+    have : J ≠ P := ne_of_lt JlP
     contradiction
 
 lemma dim_field_eq_zero {K : Type _} [Field K] : krullDim K = 0 := by
   unfold krullDim
   simp [field_prime_height_zero]
+
+lemma isField.dim_zero {D: Type _} [CommRing D] [IsDomain D] (h: krullDim D = 0) : IsField D := by
+  unfold krullDim at h
+  simp [height] at h
+  by_contra x
+  rw [Ring.not_isField_iff_exists_prime] at x
+  obtain ⟨P, ⟨h, primeP⟩⟩ := x
+  have PgtBot : P > ⊥ := Ne.bot_lt h
+  sorry
+
+lemma dim_eq_zero_iff_field {D: Type _} [CommRing D] [IsDomain D] : krullDim D = 0 ↔ IsField D := by
+  constructor
+  · exact isField.dim_zero
+  · intro fieldD
+    have : Field D := IsField.toField fieldD
+    -- Not exactly sure why this is failing
+    -- apply @dim_field_eq_zero D _
+    sorry
