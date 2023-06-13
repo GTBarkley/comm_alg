@@ -95,7 +95,7 @@ lemma krullDim_nonneg_of_nontrivial [Nontrivial R] : ∃ n : ℕ∞, Ideal.krull
 -- lemma krullDim_ge_iff' (R : Type _) [CommRing R] {n : WithBot ℕ∞} : 
 --   Ideal.krullDim R ≥ n ↔ ∃ c : List (PrimeSpectrum R), c.Chain' (· < ·) ∧ c.length = n + 1 := sorry
 
-lemma prime_elim_of_subsingleton (x : PrimeSpectrum R) [Subsingleton R] : False :=
+lemma primeSpectrum_empty_of_subsingleton (x : PrimeSpectrum R) [Subsingleton R] : False :=
   x.1.ne_top_iff_one.1 x.2.1 <| Eq.substr (Subsingleton.elim 1 (0 : R)) x.1.zero_mem
 
 lemma primeSpectrum_empty_iff : IsEmpty (PrimeSpectrum R) ↔ Subsingleton R := by
@@ -107,15 +107,16 @@ lemma primeSpectrum_empty_iff : IsEmpty (PrimeSpectrum R) ↔ Subsingleton R := 
     by_contra hneg
     rw [not_isEmpty_iff] at hneg
     rcases hneg with ⟨a, ha⟩
-    exact prime_elim_of_subsingleton R ⟨a, ha⟩
+    exact primeSpectrum_empty_of_subsingleton R ⟨a, ha⟩
 
+/-- A ring has Krull dimension -∞ if and only if it is the zero ring -/
 lemma dim_eq_bot_iff : krullDim R = ⊥ ↔ Subsingleton R := by
   unfold Ideal.krullDim
   rw [←primeSpectrum_empty_iff, iSup_eq_bot]
   constructor <;> intro h
   . rw [←not_nonempty_iff]
     rintro ⟨a, ha⟩
-    specialize h ⟨a, ha⟩
+    -- specialize h ⟨a, ha⟩
     tauto
   . rw [h.forall_iff]
     trivial
