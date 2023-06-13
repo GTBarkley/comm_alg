@@ -13,6 +13,7 @@ import Mathlib.RingTheory.DedekindDomain.Basic
 import Mathlib.RingTheory.Localization.AtPrime
 import Mathlib.Order.ConditionallyCompleteLattice.Basic
 import Mathlib.Algebra.Ring.Pi
+import Mathlib.Topology.NoetherianSpace
 
 -- copy from krull.lean; the name of Krull dimension for rings is changed to krullDim' since krullDim already exists in the librrary
 namespace Ideal
@@ -36,7 +37,8 @@ lemma dim_zero_Noetherian_iff_Artinian (R : Type _) [CommRing R] :
 -- Repeats the definition of the length of a module by Monalisa
 variable (M : Type _) [AddCommMonoid M] [Module R M]
 
-noncomputable def length := krullDim (Submodule R M)
+-- change the definition of length
+noncomputable def length := Set.chainHeight {M' : Submodule R M | M' < ⊤}
 
 #check length
 -- Stacks Lemma 10.53.6: R is Artinian iff R has finite length as an R-mod
@@ -64,9 +66,24 @@ end Ideal
 -- its maximal ideals. Also, all primes are maximal
 
 lemma product_of_localization_at_maximal_ideal : Finite (MaximalSpectrum R)
-     ∧ Ideal.IsLocallyNilpotent (Ideal.jacobson (⊤ : Ideal R)) →  Localization.AtPrime R I
+     ∧ Ideal.IsLocallyNilpotent (Ideal.jacobson (⊤ : Ideal R)) → Pi.commRing (MaximalSpectrum R) Localization.AtPrime R I
+      := by sorry
+-- Haven't finished this.
+
+-- Stacks Lemma 10.31.5: R is Noetherian iff Spec(R) is a Noetherian space
+lemma ring_Noetherian_iff_spec_Noetherian : IsNoetherianRing R 
+    ↔ TopologicalSpace.NoetherianSpace (PrimeSpectrum R) := by sorry
+-- Use TopologicalSpace.NoetherianSpace.exists_finset_irreducible :
+-- Every closed subset of a noetherian space is a finite union 
+-- of irreducible closed subsets.
 
 
+-- Stacks Lemma 10.26.1 (Should already exists)
+-- (1) The closure of a prime P is V(P)
+-- (2) the irreducible closed subsets are V(P) for P prime
+-- (3) the irreducible components are V(P) for P minimal prime
+
+-- Stacks Lemma 10.32.5: R Noetherian. I,J ideals. If J ⊂ √I, then J ^ n ⊂ I for some n  
 
 -- how to use namespace
 
