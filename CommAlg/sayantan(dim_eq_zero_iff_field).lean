@@ -68,7 +68,7 @@ lemma isField.dim_zero {D: Type _} [CommRing D] [IsDomain D] (h: krullDim D = 0)
     have : {J | J < P'}.Nonempty := Set.nonempty_of_mem this
     rw [←Set.one_le_chainHeight_iff] at this
     exact not_le_of_gt (Iff.mp ENat.one_le_iff_pos this)
-  have zero_height : (Set.chainHeight {J | J < P'}) ≤ 0 := by
+  have nonpos_height : (Set.chainHeight {J | J < P'}) ≤ 0 := by
     have : (⨆ (I : PrimeSpectrum D), (Set.chainHeight {J | J < I} : WithBot ℕ∞)) ≤ 0 := h.le
     rw [iSup_le_iff] at this
     exact Iff.mp WithBot.coe_le_zero (this P')
