@@ -57,9 +57,19 @@ lemma isField.dim_zero {D: Type _} [CommRing D] [IsDomain D] (h: krullDim D = 0)
   simp [height] at h
   by_contra x
   rw [Ring.not_isField_iff_exists_prime] at x
-  obtain ⟨P, ⟨h, primeP⟩⟩ := x
-  have PgtBot : P > ⊥ := Ne.bot_lt h
-  sorry
+  obtain ⟨P, ⟨h1, primeP⟩⟩ := x
+  have PgtBot : P > ⊥ := Ne.bot_lt h1
+  have pos_height : ↑(Set.chainHeight {J | J < P}) > 0 := by
+    have : ⊥ ∈ {J | J < P} := PgtBot
+    have : {J | J < P}.Nonempty := Set.nonempty_of_mem this
+    -- have : {J | J < P} ≠ ∅ := Set.Nonempty.ne_empty this
+    rw [←Set.one_le_chainHeight_iff] at this
+    exact Iff.mp ENat.one_le_iff_pos this
+  have zero_height : ↑(Set.chainHeight {J | J < P}) = 0 := by
+    -- Probably need to use Sup_le or something here
+    sorry
+  have : ↑(Set.chainHeight {J | J < P}) ≠ 0 := Iff.mp pos_iff_ne_zero pos_height
+  contradiction
 
 lemma dim_eq_zero_iff_field {D: Type _} [CommRing D] [IsDomain D] : krullDim D = 0 ↔ IsField D := by
   constructor
