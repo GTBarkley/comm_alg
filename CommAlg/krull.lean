@@ -88,7 +88,7 @@ lemma dim_eq_bot_iff : krullDim R = ⊥ ↔ Subsingleton R := by
   . rw [h.forall_iff]
     trivial
 
-lemma dim_eq_zero_iff_field [IsDomain R] : krullDim R = 0 ↔ IsField R := by sorry
+lemma dim_eq_zero_iff_field [IsDomain R] : krullDim R = 0 ↔ IsField R := by sorry -- It's been done in another file
 
 #check Ring.DimensionLEOne
 lemma dim_le_one_iff : krullDim R ≤ 1 ↔ Ring.DimensionLEOne R := sorry
