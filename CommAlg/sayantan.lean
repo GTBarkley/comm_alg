@@ -9,11 +9,6 @@ import Mathlib.Order.ConditionallyCompleteLattice.Basic
 
 namespace Ideal
 
-example (x : Nat) : List.Chain' (· < ·)  [x] := by
-  constructor
-
-
-  
 variable {R : Type _} [CommRing R] (I : PrimeSpectrum R)
 noncomputable def height : ℕ∞ := Set.chainHeight {J : PrimeSpectrum R | J < I}
 noncomputable def krullDim (R : Type) [CommRing R] : WithBot ℕ∞ := ⨆ (I : PrimeSpectrum R), height I
@@ -52,30 +47,36 @@ lemma dim_field_eq_zero {K : Type _} [Field K] : krullDim K = 0 := by
   unfold krullDim
   simp [field_prime_height_zero]
 
+noncomputable
+instance : CompleteLattice (WithBot ℕ∞) :=
+  inferInstanceAs <| CompleteLattice (WithBot (WithTop ℕ))
+
 lemma isField.dim_zero {D: Type _} [CommRing D] [IsDomain D] (h: krullDim D = 0) : IsField D := by
   unfold krullDim at h
   simp [height] at h
   by_contra x
   rw [Ring.not_isField_iff_exists_prime] at x
   obtain ⟨P, ⟨h1, primeP⟩⟩ := x
-  have PgtBot : P > ⊥ := Ne.bot_lt h1
-  have pos_height : ↑(Set.chainHeight {J | J < P}) > 0 := by
-    have : ⊥ ∈ {J | J < P} := PgtBot
-    have : {J | J < P}.Nonempty := Set.nonempty_of_mem this
-    -- have : {J | J < P} ≠ ∅ := Set.Nonempty.ne_empty this
+  let P' : PrimeSpectrum D := PrimeSpectrum.mk P primeP
+  have h2 : P' ≠ ⊥ := by
+    by_contra a
+    have : P = ⊥ := by rwa [PrimeSpectrum.ext_iff] at a
+    contradiction
+  have PgtBot : P' > ⊥ := Ne.bot_lt h2
+  have pos_height : ¬ ↑(Set.chainHeight {J | J < P'}) ≤ 0  := by
+    have : ⊥ ∈ {J | J < P'} := PgtBot
+    have : {J | J < P'}.Nonempty := Set.nonempty_of_mem this
     rw [←Set.one_le_chainHeight_iff] at this
-    exact Iff.mp ENat.one_le_iff_pos this
-  have zero_height : ↑(Set.chainHeight {J | J < P}) = 0 := by
-    -- Probably need to use Sup_le or something here
-    sorry
-  have : ↑(Set.chainHeight {J | J < P}) ≠ 0 := Iff.mp pos_iff_ne_zero pos_height
+    exact not_le_of_gt (Iff.mp ENat.one_le_iff_pos this)
+  have zero_height : (Set.chainHeight {J | J < P'}) ≤ 0 := by
+    have : (⨆ (I : PrimeSpectrum D), (Set.chainHeight {J | J < I} : WithBot ℕ∞)) ≤ 0 := h.le
+    rw [iSup_le_iff] at this
+    exact Iff.mp WithBot.coe_le_zero (this P')
   contradiction
 
 lemma dim_eq_zero_iff_field {D: Type _} [CommRing D] [IsDomain D] : krullDim D = 0 ↔ IsField D := by
   constructor
   · exact isField.dim_zero
   · intro fieldD
-    have : Field D := IsField.toField fieldD
-    -- Not exactly sure why this is failing
-    -- apply @dim_field_eq_zero D _
-    sorry
+    let h : Field D := IsField.toField fieldD
+    exact dim_field_eq_zero
