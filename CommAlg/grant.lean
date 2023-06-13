@@ -52,10 +52,10 @@ open Ideal
 -- chain of primes 
 #check height 
 
--- lemma height_ge_iff {𝔭 : PrimeSpectrum R} {n : ℕ∞} :
---   height 𝔭 ≥ n ↔ := sorry
+lemma lt_height_iff {𝔭 : PrimeSpectrum R} {n : ℕ∞} :
+  height 𝔭 > n ↔ ∃ c : List (PrimeSpectrum R), c ∈ {I : PrimeSpectrum R | I < 𝔭}.subchain ∧ c.length = n + 1 := sorry
 
-lemma height_ge_iff' {𝔭 : PrimeSpectrum R} {n : ℕ∞} : 
+lemma lt_height_iff' {𝔭 : PrimeSpectrum R} {n : ℕ∞} : 
 height 𝔭 > n ↔ ∃ c : List (PrimeSpectrum R), c.Chain' (· < ·) ∧ (∀ 𝔮 ∈ c, 𝔮 < 𝔭) ∧ c.length = n + 1 := by
   rcases n with _ | n
   . constructor <;> intro h <;> exfalso
@@ -88,13 +88,38 @@ lemma krullDim_nonneg_of_nontrivial [Nontrivial R] : ∃ n : ℕ∞, Ideal.krull
   lift (Ideal.krullDim R) to ℕ∞ using h with k
   use k
 
-lemma krullDim_le_iff' (R : Type _) [CommRing R] {n : WithBot ℕ∞} : 
-  Ideal.krullDim R ≤ n ↔ (∀ c : List (PrimeSpectrum R), c.Chain' (· < ·) → c.length ≤ n + 1) := by
-    sorry
+-- lemma krullDim_le_iff' (R : Type _) [CommRing R] {n : WithBot ℕ∞} : 
+--   Ideal.krullDim R ≤ n ↔ (∀ c : List (PrimeSpectrum R), c.Chain' (· < ·) → c.length ≤ n + 1) := by
+--     sorry
 
-lemma krullDim_ge_iff' (R : Type _) [CommRing R] {n : WithBot ℕ∞} : 
-  Ideal.krullDim R ≥ n ↔ ∃ c : List (PrimeSpectrum R), c.Chain' (· < ·) ∧ c.length = n + 1 := sorry
+-- lemma krullDim_ge_iff' (R : Type _) [CommRing R] {n : WithBot ℕ∞} : 
+--   Ideal.krullDim R ≥ n ↔ ∃ c : List (PrimeSpectrum R), c.Chain' (· < ·) ∧ c.length = n + 1 := sorry
 
+lemma primeSpectrum_empty_of_subsingleton (x : PrimeSpectrum R) [Subsingleton R] : False :=
+  x.1.ne_top_iff_one.1 x.2.1 <| Eq.substr (Subsingleton.elim 1 (0 : R)) x.1.zero_mem
+
+lemma primeSpectrum_empty_iff : IsEmpty (PrimeSpectrum R) ↔ Subsingleton R := by
+  constructor
+  . contrapose
+    rw [not_isEmpty_iff, ←not_nontrivial_iff_subsingleton, not_not]
+    apply PrimeSpectrum.instNonemptyPrimeSpectrum
+  . intro h
+    by_contra hneg
+    rw [not_isEmpty_iff] at hneg
+    rcases hneg with ⟨a, ha⟩
+    exact primeSpectrum_empty_of_subsingleton R ⟨a, ha⟩
+
+/-- A ring has Krull dimension -∞ if and only if it is the zero ring -/
+lemma dim_eq_bot_iff : krullDim R = ⊥ ↔ Subsingleton R := by
+  unfold Ideal.krullDim
+  rw [←primeSpectrum_empty_iff, iSup_eq_bot]
+  constructor <;> intro h
+  . rw [←not_nonempty_iff]
+    rintro ⟨a, ha⟩
+    -- specialize h ⟨a, ha⟩
+    tauto
+  . rw [h.forall_iff]
+    trivial
 
 
 #check (sorry : False)
