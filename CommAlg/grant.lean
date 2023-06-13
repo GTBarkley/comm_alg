@@ -73,7 +73,7 @@ height 𝔭 > n ↔ ∃ c : List (PrimeSpectrum R), c.Chain' (· < ·) ∧ (∀ 
   show ((↑(n + 1):ℕ∞) ≤ _) ↔ ∃c, _ ∧ _ ∧ ((_ : WithTop ℕ) = (_:ℕ∞))
   rw [{J | J < 𝔭}.le_chainHeight_iff]
   show (∃ c, (List.Chain' _ c ∧ ∀𝔮, 𝔮 ∈ c → 𝔮 < 𝔭) ∧ _) ↔ _
-  have h := fun (c : List (PrimeSpectrum R)) => (@WithTop.coe_eq_coe _ (List.length c) n) 
+  -- have h := fun (c : List (PrimeSpectrum R)) => (@WithTop.coe_eq_coe _ (List.length c) n) 
   constructor <;> rintro ⟨c, hc⟩ <;> use c --<;> tauto--<;> exact ⟨hc.1, by tauto⟩
   . --rw [and_assoc]
     -- show _ ∧ _ ∧ _
@@ -83,12 +83,19 @@ height 𝔭 > n ↔ ∃ c : List (PrimeSpectrum R), c.Chain' (· < ·) ∧ (∀ 
     norm_cast at hc
     tauto
 
+lemma krullDim_nonneg_of_nontrivial [Nontrivial R] : ∃ n : ℕ∞, Ideal.krullDim R = n := by
+  have h := dim_eq_bot_iff.not.mpr (not_subsingleton R)
+  lift (Ideal.krullDim R) to ℕ∞ using h with k
+  use k
+
 lemma krullDim_le_iff' (R : Type _) [CommRing R] {n : WithBot ℕ∞} : 
   Ideal.krullDim R ≤ n ↔ (∀ c : List (PrimeSpectrum R), c.Chain' (· < ·) → c.length ≤ n + 1) := by
     sorry
 
 lemma krullDim_ge_iff' (R : Type _) [CommRing R] {n : WithBot ℕ∞} : 
   Ideal.krullDim R ≥ n ↔ ∃ c : List (PrimeSpectrum R), c.Chain' (· < ·) ∧ c.length = n + 1 := sorry
+
+
 
 #check (sorry : False)
 #check (sorryAx)
