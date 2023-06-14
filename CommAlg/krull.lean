@@ -197,7 +197,8 @@ height 𝔭 > (n : WithBot ℕ∞) ↔ ∃ c : List (PrimeSpectrum R), c.Chain' 
 
 /-- The converse of this is false, because the definition of "dimension ≤ 1" in mathlib
   applies only to dimension zero rings and domains of dimension 1. -/
-lemma dim_le_one_of_dimLEOne :  Ring.DimensionLEOne R → krullDim R ≤ (1 : ℕ) := by
+lemma dim_le_one_of_dimLEOne :  Ring.DimensionLEOne R → krullDim R ≤ 1 := by
+  show _ → ((_ : WithBot ℕ∞) ≤ (1 : ℕ))
   rw [krullDim_le_iff R 1]
   intro H p
   apply le_of_not_gt
