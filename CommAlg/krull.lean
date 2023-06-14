@@ -63,7 +63,7 @@ lemma krullDim_eq_height [LocalRing R] : krullDim R = height (closedPoint R) := 
     apply height_le_of_le
     apply le_maximalIdeal
     exact I.2.1
-  . simp
+  . simp only [height_le_krullDim]
 
 #check height_le_krullDim
 --some propositions that would be nice to be able to eventually

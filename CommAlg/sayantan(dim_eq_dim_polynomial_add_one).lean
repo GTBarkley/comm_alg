@@ -42,16 +42,21 @@ lemma dim_eq_dim_polynomial_add_one [Nontrivial R] [IsNoetherianRing R] :
         have PleP' : P ≤ P' := PleM
         have : height P ≤ height P' := height_le_of_le PleP'
         simp only [WithBot.coe_le_coe]
-        sorry
+        have : ∃ (I : PrimeSpectrum R), height P' ≤ height I + 1 := by
+
+          sorry
+        obtain ⟨I, h⟩ := this
+        use I
+        exact ge_trans h this
       obtain ⟨I, IP⟩ := this
       have : (↑(height I + 1) : WithBot ℕ∞) ≤ ⨆ (I : PrimeSpectrum R), ↑(height I + 1) := by
         apply @le_iSup (WithBot ℕ∞) _ _ _ I
-      apply ge_trans this IP
+      exact ge_trans this IP
     have oneOut : (⨆ (I : PrimeSpectrum R), (height I : WithBot ℕ∞) + 1) ≤ (⨆ (I : PrimeSpectrum R), ↑(height I)) + 1 := by
       have : ∀ P : PrimeSpectrum R, (height P : WithBot ℕ∞) + 1 ≤ (⨆ (I : PrimeSpectrum R), ↑(height I)) + 1 :=
         fun P ↦ (by apply add_le_add_right (@le_iSup (WithBot ℕ∞) _ _ _ P) 1)
       apply iSup_le
       apply this
-    simp
+    simp only [iSup_le_iff]
     intro P
     exact ge_trans oneOut (htPBdd P)
