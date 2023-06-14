@@ -58,11 +58,10 @@ section
 open GradedMonoid.GSmul
 open DirectSum
 
+-- Definition of polynomail of type d 
+def PolyType (f : ℤ → ℤ) (d : ℕ) := ∃ Poly : Polynomial ℚ, ∃ (N : ℤ), ∀ (n : ℤ), N ≤ n → f n = Polynomial.eval (n : ℚ) Poly ∧ d = Polynomial.degree Poly
 noncomputable def length ( A : Type _) (M : Type _)
  [CommRing A] [AddCommGroup M] [Module A M] :=  Set.chainHeight {M' : Submodule A M | M' < ⊤}
---theorem monotone_stabilizes_iff_noetherian :
--- (∀ f : ℕ →o Submodule R M, ∃ n, ∀ m, n ≤ m → f n = f m) ↔ IsNoetherian R M := by
--- rw [isNoetherian_iff_wellFounded, WellFounded.monotone_chain_condition]
 
 -- Make instance of M_i being an R_0-module
 instance tada1 (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]  [DirectSum.GCommRing 𝒜]
@@ -103,17 +102,17 @@ end
 --   [DirectSum.GCommRing 𝒜]
 --   [DirectSum.Gmodule 𝒜 𝓜] (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) : ∃ ( I : Ideal ((⨁ i, 𝒜 i))),(HomogeneousMax 𝒜 I) := sorry
 
-
- def Ideal.IsHomogeneous' (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)]
-  [DirectSum.GCommRing 𝒜] (I : Ideal (⨁ i, 𝒜 i)) := ∀ (i : ℤ ) ⦃r : (⨁ i, 𝒜 i)⦄, r ∈ I → DirectSum.of _ i ( r i : 𝒜 i) ∈ I 
+-- Definition(s) of homogeneous ideals
+def Ideal.IsHomogeneous' (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜] (I : Ideal (⨁ i, 𝒜 i)) := ∀ (i : ℤ ) ⦃r : (⨁ i, 𝒜 i)⦄, r ∈ I → DirectSum.of _ i ( r i : 𝒜 i) ∈ I 
 def HomogeneousPrime (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜] (I : Ideal (⨁ i, 𝒜 i)):= (Ideal.IsPrime I) ∧ (Ideal.IsHomogeneous' 𝒜 I)
 def HomogeneousMax (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜] (I : Ideal (⨁ i, 𝒜 i)):= (Ideal.IsMaximal I) ∧ (Ideal.IsHomogeneous' 𝒜 I)
 
--- Definition of polynomail of type d 
-def PolyType (f : ℤ → ℤ) (d : ℕ) := ∃ Poly : Polynomial ℚ, ∃ (N : ℤ), ∀ (n : ℤ), N ≤ n → f n = Polynomial.eval (n : ℚ) Poly ∧ d = Polynomial.degree Poly
+--theorem monotone_stabilizes_iff_noetherian :
+-- (∀ f : ℕ →o Submodule R M, ∃ n, ∀ m, n ≤ m → f n = f m) ↔ IsNoetherian R M := by
+-- rw [isNoetherian_iff_wellFounded, WellFounded.monotone_chain_condition]
+
 
 end
-
 
 
 
@@ -154,14 +153,13 @@ theorem hilbert_polynomial_0 (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [�
 
 
 
--- @Existence of a chain of submodules of graded submoduels of f.g graded R-mod M
+-- @Existence of a chain of submodules of graded submoduels of a f.g graded R-mod M
 lemma Exist_chain_of_graded_submodules (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) 
 [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
   [DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜] 
   (fingen : IsNoetherian (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
-  : true := by
+  : ∃ (c : List (Submodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))), c.Chain' (· < ·) ∧ ∀ M ∈ c, Ture := by
   sorry
-
 
 
 
@@ -178,4 +176,25 @@ lemma Associated_prime_of_graded_is_graded
   sorry
 
 
+-- instance gyhoiu
+-- (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
+-- (p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p)
+--   : (𝒫 : ℤ → Type _) [∀ i, AddCommGroup (𝒫 i)] [DirectSum.GCommRing 𝒫] → Gmodule (⊕ i, 𝒜 i)   := by
+--   sorry
 
+
+instance sdfasdf
+(𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
+(p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p)
+  : ∀ i, AddCommGroup (p i) := by
+  sorry
+
+-- @ Quotient of a graded ring R by a graded ideal p is a graded R-Mod, preserving each component
+instance Quotient_of_graded_is_graded
+(𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
+(p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p)
+  : Gmodule (⨁ i, 𝒜 i) (⨁ i, (𝒜 i)⧸(p i)) := by
+  sorry
+
+
+  
