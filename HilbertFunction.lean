@@ -1,30 +1,9 @@
 import Mathlib.Order.KrullDimension
-import Mathlib.Order.JordanHolder
 import Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic
-import Mathlib.Order.Height
-import Mathlib.RingTheory.Ideal.Basic
-import Mathlib.RingTheory.Ideal.Operations
-import Mathlib.LinearAlgebra.Finsupp
-import Mathlib.RingTheory.GradedAlgebra.Basic
-import Mathlib.RingTheory.GradedAlgebra.HomogeneousIdeal
 import Mathlib.Algebra.Module.GradedModule
 import Mathlib.RingTheory.Ideal.AssociatedPrime
-import Mathlib.RingTheory.Noetherian
 import Mathlib.RingTheory.Artinian
-import Mathlib.Algebra.Module.GradedModule
-import Mathlib.RingTheory.Noetherian
-import Mathlib.RingTheory.Finiteness
-import Mathlib.RingTheory.Ideal.Operations
-import Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic
-import Mathlib.RingTheory.FiniteType
 import Mathlib.Order.Height
-import Mathlib.RingTheory.PrincipalIdealDomain
-import Mathlib.RingTheory.DedekindDomain.Basic
-import Mathlib.RingTheory.Ideal.Quotient
-import Mathlib.RingTheory.Localization.AtPrime
-import Mathlib.Order.ConditionallyCompleteLattice.Basic
-import Mathlib.Algebra.DirectSum.Ring
-import Mathlib.RingTheory.Ideal.LocalRing
 
 -- Setting for "library_search"
 set_option maxHeartbeats 0
@@ -126,7 +105,6 @@ end
 
 
 
-
 -- @[BH, 4.1.3] when d ≥ 1
 -- If M is a finite graed R-Mod of dimension d ≥ 1, then the Hilbert function H(M, n) is of polynomial type (d - 1)
 theorem hilbert_polynomial_ge1 (d : ℕ) (d1 : 1 ≤ d) (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
@@ -194,9 +172,11 @@ lemma Associated_prime_of_graded_is_graded
 --   sorry
 
 
-def Component_of_graded_as_addsubgroup (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
-(p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p) (i : ℤ) : AddSubgroup (𝒜 i) := sorry
 
+def Component_of_graded_as_addsubgroup (𝒜 : ℤ → Type _) 
+[∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
+(p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p) (i : ℤ) : AddSubgroup (𝒜 i) := by
+  sorry
 
 
 -- @ Quotient of a graded ring R by a graded ideal p is a graded R-Mod, preserving each component
@@ -207,4 +187,9 @@ instance Quotient_of_graded_is_graded
   sorry
 
 -- @Graded submodule
+instance Graded_submodule
+(𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
+(p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p)
+  : DirectSum.Gmodule 𝒜 (fun i => (𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)) := by
+  sorry
 
