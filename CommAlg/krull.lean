@@ -25,11 +25,11 @@ variable {R : Type _} [CommRing R] (I : PrimeSpectrum R)
 
 noncomputable def height : ℕ∞ := Set.chainHeight {J : PrimeSpectrum R | J < I}
 
-noncomputable def krullDim (R : Type) [CommRing R] : WithBot ℕ∞ := ⨆ (I : PrimeSpectrum R), height I
+noncomputable def krullDim (R : Type _) [CommRing R] : WithBot ℕ∞ := ⨆ (I : PrimeSpectrum R), height I
 
 lemma height_def : height I = Set.chainHeight {J : PrimeSpectrum R | J < I} := rfl
-lemma krullDim_def (R : Type) [CommRing R] : krullDim R = (⨆ (I : PrimeSpectrum R), height I : WithBot ℕ∞) := rfl
-lemma krullDim_def' (R : Type) [CommRing R] : krullDim R = iSup (λ I : PrimeSpectrum R => (height I : WithBot ℕ∞)) := rfl
+lemma krullDim_def (R : Type _) [CommRing R] : krullDim R = (⨆ (I : PrimeSpectrum R), height I : WithBot ℕ∞) := rfl
+lemma krullDim_def' (R : Type _) [CommRing R] : krullDim R = iSup (λ I : PrimeSpectrum R => (height I : WithBot ℕ∞)) := rfl
 
 noncomputable instance : CompleteLattice (WithBot (ℕ∞)) := WithBot.WithTop.completeLattice
 
@@ -42,13 +42,13 @@ lemma height_le_of_le {I J : PrimeSpectrum R} (I_le_J : I ≤ J) : height I ≤ 
 lemma krullDim_le_iff (R : Type _) [CommRing R] (n : ℕ) :
   krullDim R ≤ n ↔ ∀ I : PrimeSpectrum R, (height I : WithBot ℕ∞) ≤ ↑n := iSup_le_iff (α := WithBot ℕ∞)
 
-lemma krullDim_le_iff' (R : Type) [CommRing R] (n : ℕ∞) :
+lemma krullDim_le_iff' (R : Type _) [CommRing R] (n : ℕ∞) :
   krullDim R ≤ n ↔ ∀ I : PrimeSpectrum R, (height I : WithBot ℕ∞) ≤ ↑n := iSup_le_iff (α := WithBot ℕ∞)
 
-lemma le_krullDim_iff (R : Type) [CommRing R] (n : ℕ) :
+lemma le_krullDim_iff (R : Type _) [CommRing R] (n : ℕ) :
   n ≤ krullDim R ↔ ∃ I : PrimeSpectrum R, n ≤ (height I : WithBot ℕ∞) := by sorry
 
-lemma le_krullDim_iff' (R : Type) [CommRing R] (n : ℕ∞) :
+lemma le_krullDim_iff' (R : Type _) [CommRing R] (n : ℕ∞) :
   n ≤ krullDim R ↔ ∃ I : PrimeSpectrum R, n ≤ (height I : WithBot ℕ∞) := by sorry
 
 @[simp]
@@ -94,10 +94,16 @@ lemma dim_eq_bot_iff : krullDim R = ⊥ ↔ Subsingleton R := by
   . rw [h.forall_iff]
     trivial
 
-lemma krullDim_nonneg_of_nontrivial [Nontrivial R] : ∃ n : ℕ∞, Ideal.krullDim R = n := by
+lemma krullDim_nonneg_of_nontrivial (R : Type _) [CommRing R] [Nontrivial R] : ∃ n : ℕ∞, Ideal.krullDim R = n := by
   have h := dim_eq_bot_iff.not.mpr (not_subsingleton R)
   lift (Ideal.krullDim R) to ℕ∞ using h with k
   use k
+
+lemma dim_eq_zero_iff [Nontrivial R] : krullDim R = 0 ↔ ∀ I : PrimeSpectrum R, IsMaximal I.asIdeal := by
+  constructor <;> intro h
+  . intro I
+    sorry
+  . sorry
   
 @[simp]
 lemma field_prime_bot {K: Type _} [Field K] (P : Ideal K) : IsPrime P ↔ P = ⊥ := by
