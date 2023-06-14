@@ -122,6 +122,11 @@ lemma Poly_constant (F : Polynomial ℚ) (c : ℚ) :
     simp
   · sorry
 
+
+-- Shifting doesn't change the polynomial type
+lemma Poly_shifting (f : ℤ → ℤ) (g : ℤ → ℤ) (hf : PolyType f d) (s : ℤ) (hfg : ∀ (n : ℤ), f (n + s) = g (n)) : PolyType g d := by
+  sorry
+
 -- PolyType 0 = constant function
 lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N : ℤ), ∀ (n : ℤ), (N ≤ n → f n = c) ∧ c ≠ 0) := by
   constructor
@@ -227,6 +232,8 @@ lemma b_to_a (f : ℤ → ℤ) (d : ℕ) : PolyType f d → (∃ (c : ℤ), ∃ 
     exact this
   exact this1
 end
+
+
 
 -- @Additive lemma of length for a SES
 -- Given a SES 0 → A → B → C → 0, then length (A) - length (B) + length (C) = 0 
