@@ -106,24 +106,27 @@ end
 
 
 -- @[BH, 4.1.3] when d ≥ 1
+-- If M is a finite graed R-Mod of dimension d ≥ 1, then the Hilbert function H(M, n) is of polynomial type (d - 1)
 theorem hilbert_polynomial_ge1 (d : ℕ) (d1 : 1 ≤ d) (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
 [DirectSum.GCommRing 𝒜]
 [DirectSum.Gmodule 𝒜 𝓜] (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) 
 (fingen : IsNoetherian (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
-(findim :  dimensionmodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i) = d) (hilb : ℤ → ℤ)
- (Hhilb: hilbert_function 𝒜 𝓜 hilb)
+(findim :  dimensionmodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i) = d)
+(hilb : ℤ → ℤ) (Hhilb: hilbert_function 𝒜 𝓜 hilb)
 : PolyType hilb (d - 1) := by
   sorry
 
 
 
 -- @[BH, 4.1.3] when d = 0
+-- If M is a finite graed R-Mod of dimension zero, then the Hilbert function H(M, n) = 0 for n >> 0 
 theorem hilbert_polynomial_0 (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
 [DirectSum.GCommRing 𝒜]
 [DirectSum.Gmodule 𝒜 𝓜] (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) 
 (fingen : IsNoetherian (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
-(findim :  dimensionmodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i) = 0) (hilb : ℤ → ℤ)
-: true := by
+(findim :  dimensionmodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i) = 0)
+(hilb : ℤ → ℤ) (Hhilb : hilbert_function 𝒜 𝓜 hilb)
+: (∃ (N : ℤ), ∀ (n : ℤ), n ≥ N → hilb n = 0) := by
   sorry
 
 
