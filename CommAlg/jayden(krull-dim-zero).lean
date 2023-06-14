@@ -15,6 +15,9 @@ import Mathlib.RingTheory.Localization.AtPrime
 import Mathlib.Order.ConditionallyCompleteLattice.Basic
 import Mathlib.Algebra.Ring.Pi
 import Mathlib.RingTheory.Finiteness
+import Mathlib.Util.PiNotation
+
+open PiNotation
 
 
 namespace Ideal
@@ -26,6 +29,8 @@ noncomputable def height : ℕ∞ := Set.chainHeight {J : PrimeSpectrum R | J < 
 noncomputable def krullDim (R : Type) [CommRing R] :
      WithBot ℕ∞ := ⨆ (I : PrimeSpectrum R), height R I
 
+--variable {R}
+
 -- Stacks Lemma 10.26.1 (Should already exists)
 -- (1) The closure of a prime P is V(P)
 -- (2) the irreducible closed subsets are V(P) for P prime
@@ -33,7 +38,7 @@ noncomputable def krullDim (R : Type) [CommRing R] :
 
 -- Stacks Definition 10.32.1: An ideal is locally nilpotent
 -- if every element is nilpotent
-class IsLocallyNilpotent (I : Ideal R) : Prop :=
+class IsLocallyNilpotent {R : Type _} [CommRing R] (I : Ideal R) : Prop :=
     h : ∀ x ∈ I, IsNilpotent x
 #check Ideal.IsLocallyNilpotent
 end Ideal
@@ -89,6 +94,10 @@ lemma containment_radical_power_containment :
 -- Ideal.exists_pow_le_of_le_radical_of_fG
 
 
+-- Stacks Lemma 10.52.5: R → S is a ring map.  M is an S-mod. 
+-- Then length_R M ≥ length_S M. 
+-- Stacks Lemma 10.52.5': equality holds if R → S is surjective.
+
 -- Stacks Lemma 10.52.6: I is a maximal ideal and IM = 0. Then length of M is
 -- the same as the dimension as a vector space over R/I,
 lemma length_eq_dim_if_maximal_annihilates {I : Ideal R} [Ideal.IsMaximal I] 
@@ -96,48 +105,53 @@ lemma length_eq_dim_if_maximal_annihilates {I : Ideal R} [Ideal.IsMaximal I]
      → Module.length R M = Module.rank R⧸I M⧸(I • (⊤ : Submodule R M)) := by sorry
 
 -- Does lean know that M/IM is a R/I module?
+-- Use 10.52.5
 
 -- Stacks Lemma 10.52.8: I is a finitely generated maximal ideal of R.
 -- M is a finite R-mod and I^nM=0. Then length of M is finite.
-lemma power_zero_finite_length : Ideal.FG I → Ideal.IsMaximal I → Module.Finite R M
-    → (∃ n : ℕ, (I ^ n) • (⊤ : Submodule R M) = 0)
-    → (∃ m : ℕ, Module.length R M ≤ m) := by
-    intro IisFG IisMaximal MisFinite power
-    rcases power with ⟨n, npower⟩
+lemma power_zero_finite_length [Ideal.IsMaximal I] (h₁ : Ideal.FG I) [Module.Finite R M]
+    (h₂ : (∃ n : ℕ, (I ^ n) • (⊤ : Submodule R M) = 0)) :
+     (∃ m : ℕ, Module.length R M ≤ m) := by sorry
+    -- intro IisFG IisMaximal MisFinite power
+    -- rcases power with ⟨n, npower⟩
     -- how do I get a generating set?
 
 
 -- Stacks Lemma 10.53.3: R is Artinian iff R has finitely many maximal ideals
-lemma IsArtinian_iff_finite_max_ideal : 
-    IsArtinianRing R ↔ Finite (MaximalSpectrum R) := by sorry
+lemma Artinian_has_finite_max_ideal 
+    [IsArtinianRing R] : Finite (MaximalSpectrum R) := by 
+    by_contra infinite
+    simp only [not_finite_iff_infinite] at infinite
+    
 
 -- Stacks Lemma 10.53.4: R Artinian => Jacobson ideal of R is nilpotent
-lemma Jacobson_of_Artinian_is_nilpotent : 
-    IsArtinianRing R → IsNilpotent (Ideal.jacobson (⊤ : Ideal R)) := by sorry
+lemma Jacobson_of_Artinian_is_nilpotent 
+    [IsArtinianRing R] : IsNilpotent (Ideal.jacobson (⊥ : Ideal R)) := by 
+    have J := Ideal.jacobson (⊥ : Ideal R)
+    
 
 -- Stacks Lemma 10.53.5: If R has finitely many maximal ideals and 
 -- locally nilpotent Jacobson radical, then R is the product of its localizations at 
 -- its maximal ideals. Also, all primes are maximal
+abbrev Prod_of_localization :=
+  Π I : MaximalSpectrum R, Localization.AtPrime I.1
 
--- lemma product_of_localization_at_maximal_ideal : Finite (MaximalSpectrum R)
---      ∧ 
+-- instance : CommRing (Prod_of_localization R) := by
+--   unfold Prod_of_localization
+--   infer_instance
+     
+def foo : Prod_of_localization R →+* R where
+  toFun := sorry
+  invFun := sorry
+  left_inv := sorry
+  right_inv := sorry
+  map_mul' := sorry
+  map_add' := sorry
 
-def jaydensRing : Type _ := sorry
-  -- ∀ I : MaximalSpectrum R, Localization.AtPrime R I
 
-instance : CommRing jaydensRing := sorry -- this should come for free, don't even need to state it
-
-def foo : jaydensRing ≃+* R where
-  toFun := _
-  invFun := _
-  left_inv := _
-  right_inv := _
-  map_mul' := _
-  map_add' := _
-      -- Ideal.IsLocallyNilpotent (Ideal.jacobson (⊤ : Ideal R)) → 
-      --  Pi.commRing (MaximalSpectrum R) Localization.AtPrime R I
-      -- := by sorry
--- Haven't finished this.
+def product_of_localization_at_maximal_ideal [Finite (MaximalSpectrum R)]
+    (h : Ideal.IsLocallyNilpotent (Ideal.jacobson (⊥ : Ideal R))) :
+    Prod_of_localization R ≃+* R := by sorry
 
 -- Stacks Lemma 10.53.6: R is Artinian iff R has finite length as an R-mod
 lemma IsArtinian_iff_finite_length : 
@@ -148,8 +162,8 @@ lemma finite_length_is_Noetherian :
     (∃ n : ℕ, Module.length R R ≤ n) → IsNoetherianRing R := by sorry 
 
 -- Lemma: if R is Artinian then all the prime ideals are maximal
-lemma primes_of_Artinian_are_maximal : 
-    IsArtinianRing R → Ideal.IsPrime I → Ideal.IsMaximal I := by sorry
+lemma primes_of_Artinian_are_maximal
+    [IsArtinianRing R] [Ideal.IsPrime I] : Ideal.IsMaximal I := by sorry
 
 -- Lemma: Krull dimension of a ring is the supremum of height of maximal ideals
 
