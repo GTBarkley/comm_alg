@@ -77,12 +77,25 @@ lemma containment_radical_power_containment :
     rintro ⟨RisNoetherian, containment⟩ 
     rw [isNoetherianRing_iff_ideal_fg] at RisNoetherian
     specialize RisNoetherian (Ideal.radical I)
-    rcases RisNoetherian with ⟨S, Sgenerates⟩
+    -- rcases RisNoetherian with ⟨S, Sgenerates⟩
+    have containment2 : ∃ n : ℕ,  (Ideal.radical I) ^ n ≤ I := by
+      apply Ideal.exists_radical_pow_le_of_fg I RisNoetherian
+    cases' containment2 with n containment2'
+    have containment3 : J ^ n ≤ (Ideal.radical I) ^ n := by 
+      apply Ideal.pow_mono containment
+    use n
+    apply le_trans containment3 containment2'
+-- The above can be proven using the following quicker theorem that is in the wrong place.
+-- Ideal.exists_pow_le_of_le_radical_of_fG
 
-    -- how to I get a generating set?
 
 -- Stacks Lemma 10.52.6: I is a maximal ideal and IM = 0. Then length of M is
--- 
+-- the same as the dimension as a vector space over R/I,
+lemma length_eq_dim_if_maximal_annihilates {I : Ideal R} [Ideal.IsMaximal I] 
+    : I • (⊤ : Submodule R M) = 0
+     → Module.length R M = Module.rank R⧸I M⧸(I • (⊤ : Submodule R M)) := by sorry
+
+-- Does lean know that M/IM is a R/I module?
 
 -- Stacks Lemma 10.52.8: I is a finitely generated maximal ideal of R.
 -- M is a finite R-mod and I^nM=0. Then length of M is finite.
