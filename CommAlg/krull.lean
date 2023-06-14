@@ -65,6 +65,34 @@ lemma krullDim_eq_height [LocalRing R] : krullDim R = height (closedPoint R) := 
     exact I.2.1
   . simp
 
+lemma lt_height_iff' {𝔭 : PrimeSpectrum R} {n : ℕ∞} : 
+height 𝔭 > n ↔ ∃ c : List (PrimeSpectrum R), c.Chain' (· < ·) ∧ (∀ 𝔮 ∈ c, 𝔮 < 𝔭) ∧ c.length = n + 1 := by
+  rcases n with _ | n
+  . constructor <;> intro h <;> exfalso
+    . exact (not_le.mpr h) le_top
+    . tauto
+  have (m : ℕ∞) : m > some n ↔ m ≥ some (n + 1) := by
+    symm
+    show (n + 1 ≤ m ↔ _ )
+    apply ENat.add_one_le_iff
+    exact ENat.coe_ne_top _
+  rw [this]
+  unfold Ideal.height
+  show ((↑(n + 1):ℕ∞) ≤ _) ↔ ∃c, _ ∧ _ ∧ ((_ : WithTop ℕ) = (_:ℕ∞))
+  rw [{J | J < 𝔭}.le_chainHeight_iff]
+  show (∃ c, (List.Chain' _ c ∧ ∀𝔮, 𝔮 ∈ c → 𝔮 < 𝔭) ∧ _) ↔ _
+  constructor <;> rintro ⟨c, hc⟩ <;> use c
+  . tauto
+  . change _ ∧ _ ∧ (List.length c : ℕ∞) = n + 1 at hc
+    norm_cast at hc
+    tauto
+
+lemma lt_height_iff'' {𝔭 : PrimeSpectrum R} {n : ℕ∞} : 
+height 𝔭 > (n : WithBot ℕ∞) ↔ ∃ c : List (PrimeSpectrum R), c.Chain' (· < ·) ∧ (∀ 𝔮 ∈ c, 𝔮 < 𝔭) ∧ c.length = n + 1 := by
+  show (_ < _) ↔ _
+  rw [WithBot.coe_lt_coe]
+  exact lt_height_iff'
+
 #check height_le_krullDim
 --some propositions that would be nice to be able to eventually
 
@@ -98,6 +126,47 @@ lemma krullDim_nonneg_of_nontrivial (R : Type _) [CommRing R] [Nontrivial R] : �
   have h := dim_eq_bot_iff.not.mpr (not_subsingleton R)
   lift (Ideal.krullDim R) to ℕ∞ using h with k
   use k
+
+lemma not_maximal_of_lt_prime {p : Ideal R} {q : Ideal R} (hq : IsPrime q) (h : p < q) : ¬IsMaximal p := by
+  intro hp
+  apply IsPrime.ne_top hq
+  apply (IsCoatom.lt_iff hp.out).mp
+  exact h
+
+lemma dim_le_zero_iff : krullDim R ≤ 0 ↔ ∀ I : PrimeSpectrum R, IsMaximal I.asIdeal := by
+  show ((_ : WithBot ℕ∞) ≤ (0 : ℕ)) ↔ _
+  rw [krullDim_le_iff R 0]
+  constructor <;> intro h I
+  . contrapose! h
+    have ⟨𝔪, h𝔪⟩ := I.asIdeal.exists_le_maximal (IsPrime.ne_top I.IsPrime)
+    let 𝔪p := (⟨𝔪, IsMaximal.isPrime h𝔪.1⟩ : PrimeSpectrum R)
+    have hstrct : I < 𝔪p := by
+      apply lt_of_le_of_ne h𝔪.2
+      intro hcontr
+      rw [hcontr] at h
+      exact h h𝔪.1
+    use 𝔪p
+    show (_ : WithBot ℕ∞) > (0 : ℕ∞)
+    rw [lt_height_iff'']
+    use [I]
+    constructor
+    . exact List.chain'_singleton _
+    . constructor
+      . intro I' hI'
+        simp at hI'
+        rwa [hI']
+      . simp
+  . contrapose! h
+    change (_ : WithBot ℕ∞) > (0 : ℕ∞) at h
+    rw [lt_height_iff''] at h
+    obtain ⟨c, _, hc2, hc3⟩ := h
+    norm_cast at hc3
+    rw [List.length_eq_one] at hc3
+    obtain ⟨𝔮, h𝔮⟩ := hc3
+    use 𝔮
+    specialize hc2 𝔮 (h𝔮 ▸ (List.mem_singleton.mpr rfl))
+    apply not_maximal_of_lt_prime I.IsPrime
+    exact hc2
 
 lemma dim_eq_zero_iff [Nontrivial R] : krullDim R = 0 ↔ ∀ I : PrimeSpectrum R, IsMaximal I.asIdeal := by
   constructor <;> intro h
@@ -166,34 +235,6 @@ lemma dim_eq_zero_iff_field {D: Type _} [CommRing D] [IsDomain D] : krullDim D =
 #check Ring.DimensionLEOne
 -- This lemma is false!
 lemma dim_le_one_iff : krullDim R ≤ 1 ↔ Ring.DimensionLEOne R := sorry
-
-lemma lt_height_iff' {𝔭 : PrimeSpectrum R} {n : ℕ∞} : 
-height 𝔭 > n ↔ ∃ c : List (PrimeSpectrum R), c.Chain' (· < ·) ∧ (∀ 𝔮 ∈ c, 𝔮 < 𝔭) ∧ c.length = n + 1 := by
-  rcases n with _ | n
-  . constructor <;> intro h <;> exfalso
-    . exact (not_le.mpr h) le_top
-    . tauto
-  have (m : ℕ∞) : m > some n ↔ m ≥ some (n + 1) := by
-    symm
-    show (n + 1 ≤ m ↔ _ )
-    apply ENat.add_one_le_iff
-    exact ENat.coe_ne_top _
-  rw [this]
-  unfold Ideal.height
-  show ((↑(n + 1):ℕ∞) ≤ _) ↔ ∃c, _ ∧ _ ∧ ((_ : WithTop ℕ) = (_:ℕ∞))
-  rw [{J | J < 𝔭}.le_chainHeight_iff]
-  show (∃ c, (List.Chain' _ c ∧ ∀𝔮, 𝔮 ∈ c → 𝔮 < 𝔭) ∧ _) ↔ _
-  constructor <;> rintro ⟨c, hc⟩ <;> use c
-  . tauto
-  . change _ ∧ _ ∧ (List.length c : ℕ∞) = n + 1 at hc
-    norm_cast at hc
-    tauto
-
-lemma lt_height_iff'' {𝔭 : PrimeSpectrum R} {n : ℕ∞} : 
-height 𝔭 > (n : WithBot ℕ∞) ↔ ∃ c : List (PrimeSpectrum R), c.Chain' (· < ·) ∧ (∀ 𝔮 ∈ c, 𝔮 < 𝔭) ∧ c.length = n + 1 := by
-  show (_ < _) ↔ _
-  rw [WithBot.coe_lt_coe]
-  exact lt_height_iff'
 
 /-- The converse of this is false, because the definition of "dimension ≤ 1" in mathlib
   applies only to dimension zero rings and domains of dimension 1. -/
