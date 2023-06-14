@@ -169,11 +169,16 @@ lemma dim_le_zero_iff : krullDim R ≤ 0 ↔ ∀ I : PrimeSpectrum R, IsMaximal 
     exact hc2
 
 lemma dim_eq_zero_iff [Nontrivial R] : krullDim R = 0 ↔ ∀ I : PrimeSpectrum R, IsMaximal I.asIdeal := by
-  constructor <;> intro h
-  . intro I
-    sorry
-  . sorry
-  
+  rw [←dim_le_zero_iff]
+  obtain ⟨n, hn⟩ := krullDim_nonneg_of_nontrivial R
+  have : n ≥ 0 := zero_le n
+  change _ ≤ _ at this
+  rw [←WithBot.coe_le_coe,←hn] at this
+  change (0 : WithBot ℕ∞) ≤ _ at this
+  constructor <;> intro h'
+  rw [h']
+  exact le_antisymm h' this
+
 @[simp]
 lemma field_prime_bot {K: Type _} [Field K] (P : Ideal K) : IsPrime P ↔ P = ⊥ := by
       constructor
