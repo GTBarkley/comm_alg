@@ -87,19 +87,15 @@ theorem hilbert_polynomial_0 (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [�
 : true := by
   sorry
 
-lemma ass_graded (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) 
-[∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
-[DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜]
-(p : associatedPrimes (⨁ i, 𝒜 i) (⨁ i, 𝓜 i)) : (HomogeneousMax 𝒜 p) := by
-sorry
-
 lemma Associated_prime_of_graded_is_graded
 (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) 
 [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
 [DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜]
 (p : associatedPrimes (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
-  : (Ideal.IsHomogeneous' 𝒜 p) ∧ ((∃ (i : ℤ ), ∃ (x :  𝒜 i), p = (Submodule.span (⨁ i, 𝒜 i) {DirectSum.of x i}).annihilator)) := by
+  : (Ideal.IsHomogeneous' 𝒜 p) ∧ ((∃ (i : ℤ ), ∃ (x :  𝒜 i), p = (Submodule.span (⨁ i, 𝒜 i) {DirectSum.of _ i x}).annihilator)) := by
   sorry
 
 
-def standard_graded (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜] (I : Ideal (⨁ i, 𝒜 i)) := (⨁ i, 𝒜 i)
+-- def standard_graded {𝒜 : ℤ → Type _} [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜] (n : ℕ) :
+--     Prop :=
+--   ∃ J, Ideal.IsHomogeneous' 𝒜 J (J :Nonempty ((⨁ i, 𝒜 i) ≃+* (MvPolynomial (Fin n) (𝒜 0)) ⧸ J)

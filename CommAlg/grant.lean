@@ -171,6 +171,48 @@ lemma dim_le_one_of_dimLEOne :  Ring.DimensionLEOne R → krullDim R ≤ (1 : �
   apply (IsCoatom.lt_iff H.out).mp
   exact hc2
   --refine Iff.mp radical_eq_top (?_ (id (Eq.symm hc3))) 
+
+lemma not_maximal_of_lt_prime {p : Ideal R} {q : Ideal R} (hq : IsPrime q) (h : p < q) : ¬IsMaximal p := by
+  intro hp
+  apply IsPrime.ne_top hq
+  apply (IsCoatom.lt_iff hp.out).mp
+  exact h
+
+lemma dim_le_zero_iff : krullDim R ≤ 0 ↔ ∀ I : PrimeSpectrum R, IsMaximal I.asIdeal := by
+  show ((_ : WithBot ℕ∞) ≤ (0 : ℕ)) ↔ _
+  rw [krullDim_le_iff R 0]
+  constructor <;> intro h I
+  . contrapose! h
+    have ⟨𝔪, h𝔪⟩ := I.asIdeal.exists_le_maximal (IsPrime.ne_top I.IsPrime)
+    let 𝔪p := (⟨𝔪, IsMaximal.isPrime h𝔪.1⟩ : PrimeSpectrum R)
+    have hstrct : I < 𝔪p := by
+      apply lt_of_le_of_ne h𝔪.2
+      intro hcontr
+      rw [hcontr] at h
+      exact h h𝔪.1
+    use 𝔪p
+    show (_ : WithBot ℕ∞) > (0 : ℕ∞)
+    rw [_root_.lt_height_iff'']
+    use [I]
+    constructor
+    . exact List.chain'_singleton _
+    . constructor
+      . intro I' hI'
+        simp at hI'
+        rwa [hI']
+      . simp
+  . contrapose! h
+    change (_ : WithBot ℕ∞) > (0 : ℕ∞) at h
+    rw [_root_.lt_height_iff''] at h
+    obtain ⟨c, _, hc2, hc3⟩ := h
+    norm_cast at hc3
+    rw [List.length_eq_one] at hc3
+    obtain ⟨𝔮, h𝔮⟩ := hc3
+    use 𝔮
+    specialize hc2 𝔮 (h𝔮 ▸ (List.mem_singleton.mpr rfl))
+    apply not_maximal_of_lt_prime _ I.IsPrime
+    exact hc2
+
 end Krull
 
 section iSupWithBot
