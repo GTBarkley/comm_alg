@@ -1,31 +1,9 @@
 import Mathlib.Order.KrullDimension
 import Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic
-import Mathlib.RingTheory.Ideal.Operations
-import Mathlib.LinearAlgebra.Finsupp
-import Mathlib.RingTheory.GradedAlgebra.Basic
-import Mathlib.RingTheory.GradedAlgebra.HomogeneousIdeal
 import Mathlib.Algebra.Module.GradedModule
 import Mathlib.RingTheory.Ideal.AssociatedPrime
-import Mathlib.RingTheory.Noetherian
 import Mathlib.RingTheory.Artinian
-import Mathlib.RingTheory.FiniteType
 import Mathlib.Order.Height
-import Mathlib.RingTheory.PrincipalIdealDomain
-import Mathlib.RingTheory.DedekindDomain.Basic
-import Mathlib.RingTheory.Ideal.Quotient
-import Mathlib.RingTheory.Localization.AtPrime
-import Mathlib.Order.ConditionallyCompleteLattice.Basic
-import Mathlib.Algebra.DirectSum.Ring
-import Mathlib.RingTheory.Ideal.LocalRing
---import Mathlib
-import Mathlib.Algebra.MonoidAlgebra.Basic
-import Mathlib.Data.Finset.Sort
-import Mathlib.Order.JordanHolder
-import Mathlib.RingTheory.Ideal.Basic
-import Mathlib.RingTheory.Finiteness
-
-
-
 
 noncomputable def length ( A : Type _) (M : Type _)
  [CommRing A] [AddCommGroup M] [Module A M] :=  Set.chainHeight {M' : Submodule A M | M' < ⊤}
