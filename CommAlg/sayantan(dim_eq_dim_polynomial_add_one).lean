@@ -34,13 +34,19 @@ lemma dim_eq_dim_polynomial_add_one [Nontrivial R] [IsNoetherianRing R] :
   constructor
   · exact dim_le_dim_polynomial_add_one
   · unfold krullDim
-    have htPBdd : ∀ (P : PrimeSpectrum (Polynomial R)), (height P: WithBot ℕ∞) ≤ (⨆ (I : PrimeSpectrum R), ↑(height I + 1)) := by
+    have htPBdd : ∀ (P : PrimeSpectrum (Polynomial R)), (height P : WithBot ℕ∞) ≤ (⨆ (I : PrimeSpectrum R), ↑(height I + 1)) := by
       intro P
-      unfold height
-      sorry
-    have : (⨆ (I : PrimeSpectrum R), ↑(height I) + 1) ≤ (⨆ (I : PrimeSpectrum R), ↑(height I)) + 1 := by
-      have : ∀ P : PrimeSpectrum R, ↑(height P) + 1 ≤ (⨆ (I : PrimeSpectrum R), ↑(height I)) + 1 :=
-        fun _ ↦ add_le_add_right (le_iSup height _) 1
+      have : ∃ (I : PrimeSpectrum R), (height P : WithBot ℕ∞) ≤ ↑(height I + 1) := by
+        sorry
+      obtain ⟨I, IP⟩ := this
+      have : (↑(height I + 1) : WithBot ℕ∞) ≤ ⨆ (I : PrimeSpectrum R), ↑(height I + 1) := by
+        apply @le_iSup (WithBot ℕ∞) _ _ _ I
+      apply ge_trans this IP
+    have oneOut : (⨆ (I : PrimeSpectrum R), (height I : WithBot ℕ∞) + 1) ≤ (⨆ (I : PrimeSpectrum R), ↑(height I)) + 1 := by
+      have : ∀ P : PrimeSpectrum R, (height P : WithBot ℕ∞) + 1 ≤ (⨆ (I : PrimeSpectrum R), ↑(height I)) + 1 :=
+        fun P ↦ (by apply add_le_add_right (@le_iSup (WithBot ℕ∞) _ _ _ P) 1)
       apply iSup_le
-      exact this
-    sorry
+      apply this
+    simp
+    intro P
+    exact ge_trans oneOut (htPBdd P)
