@@ -25,11 +25,11 @@ variable {R : Type _} [CommRing R] (I : PrimeSpectrum R)
 
 noncomputable def height : ℕ∞ := Set.chainHeight {J : PrimeSpectrum R | J < I}
 
-noncomputable def krullDim (R : Type) [CommRing R] : WithBot ℕ∞ := ⨆ (I : PrimeSpectrum R), height I
+noncomputable def krullDim (R : Type _) [CommRing R] : WithBot ℕ∞ := ⨆ (I : PrimeSpectrum R), height I
 
 lemma height_def : height I = Set.chainHeight {J : PrimeSpectrum R | J < I} := rfl
-lemma krullDim_def (R : Type) [CommRing R] : krullDim R = (⨆ (I : PrimeSpectrum R), height I : WithBot ℕ∞) := rfl
-lemma krullDim_def' (R : Type) [CommRing R] : krullDim R = iSup (λ I : PrimeSpectrum R => (height I : WithBot ℕ∞)) := rfl
+lemma krullDim_def (R : Type _) [CommRing R] : krullDim R = (⨆ (I : PrimeSpectrum R), height I : WithBot ℕ∞) := rfl
+lemma krullDim_def' (R : Type _) [CommRing R] : krullDim R = iSup (λ I : PrimeSpectrum R => (height I : WithBot ℕ∞)) := rfl
 
 noncomputable instance : CompleteLattice (WithBot (ℕ∞)) := WithBot.WithTop.completeLattice
 
@@ -42,13 +42,13 @@ lemma height_le_of_le {I J : PrimeSpectrum R} (I_le_J : I ≤ J) : height I ≤ 
 lemma krullDim_le_iff (R : Type _) [CommRing R] (n : ℕ) :
   krullDim R ≤ n ↔ ∀ I : PrimeSpectrum R, (height I : WithBot ℕ∞) ≤ ↑n := iSup_le_iff (α := WithBot ℕ∞)
 
-lemma krullDim_le_iff' (R : Type) [CommRing R] (n : ℕ∞) :
+lemma krullDim_le_iff' (R : Type _) [CommRing R] (n : ℕ∞) :
   krullDim R ≤ n ↔ ∀ I : PrimeSpectrum R, (height I : WithBot ℕ∞) ≤ ↑n := iSup_le_iff (α := WithBot ℕ∞)
 
-lemma le_krullDim_iff (R : Type) [CommRing R] (n : ℕ) :
+lemma le_krullDim_iff (R : Type _) [CommRing R] (n : ℕ) :
   n ≤ krullDim R ↔ ∃ I : PrimeSpectrum R, n ≤ (height I : WithBot ℕ∞) := by sorry
 
-lemma le_krullDim_iff' (R : Type) [CommRing R] (n : ℕ∞) :
+lemma le_krullDim_iff' (R : Type _) [CommRing R] (n : ℕ∞) :
   n ≤ krullDim R ↔ ∃ I : PrimeSpectrum R, n ≤ (height I : WithBot ℕ∞) := by sorry
 
 @[simp]
@@ -94,10 +94,16 @@ lemma dim_eq_bot_iff : krullDim R = ⊥ ↔ Subsingleton R := by
   . rw [h.forall_iff]
     trivial
 
-lemma krullDim_nonneg_of_nontrivial [Nontrivial R] : ∃ n : ℕ∞, Ideal.krullDim R = n := by
+lemma krullDim_nonneg_of_nontrivial (R : Type _) [CommRing R] [Nontrivial R] : ∃ n : ℕ∞, Ideal.krullDim R = n := by
   have h := dim_eq_bot_iff.not.mpr (not_subsingleton R)
   lift (Ideal.krullDim R) to ℕ∞ using h with k
   use k
+
+lemma dim_eq_zero_iff [Nontrivial R] : krullDim R = 0 ↔ ∀ I : PrimeSpectrum R, IsMaximal I.asIdeal := by
+  constructor <;> intro h
+  . intro I
+    sorry
+  . sorry
   
 @[simp]
 lemma field_prime_bot {K: Type _} [Field K] (P : Ideal K) : IsPrime P ↔ P = ⊥ := by
@@ -158,7 +164,57 @@ lemma dim_eq_zero_iff_field {D: Type _} [CommRing D] [IsDomain D] : krullDim D =
     exact dim_field_eq_zero
 
 #check Ring.DimensionLEOne
+-- This lemma is false!
 lemma dim_le_one_iff : krullDim R ≤ 1 ↔ Ring.DimensionLEOne R := sorry
+
+lemma lt_height_iff' {𝔭 : PrimeSpectrum R} {n : ℕ∞} : 
+height 𝔭 > n ↔ ∃ c : List (PrimeSpectrum R), c.Chain' (· < ·) ∧ (∀ 𝔮 ∈ c, 𝔮 < 𝔭) ∧ c.length = n + 1 := by
+  rcases n with _ | n
+  . constructor <;> intro h <;> exfalso
+    . exact (not_le.mpr h) le_top
+    . tauto
+  have (m : ℕ∞) : m > some n ↔ m ≥ some (n + 1) := by
+    symm
+    show (n + 1 ≤ m ↔ _ )
+    apply ENat.add_one_le_iff
+    exact ENat.coe_ne_top _
+  rw [this]
+  unfold Ideal.height
+  show ((↑(n + 1):ℕ∞) ≤ _) ↔ ∃c, _ ∧ _ ∧ ((_ : WithTop ℕ) = (_:ℕ∞))
+  rw [{J | J < 𝔭}.le_chainHeight_iff]
+  show (∃ c, (List.Chain' _ c ∧ ∀𝔮, 𝔮 ∈ c → 𝔮 < 𝔭) ∧ _) ↔ _
+  constructor <;> rintro ⟨c, hc⟩ <;> use c
+  . tauto
+  . change _ ∧ _ ∧ (List.length c : ℕ∞) = n + 1 at hc
+    norm_cast at hc
+    tauto
+
+lemma lt_height_iff'' {𝔭 : PrimeSpectrum R} {n : ℕ∞} : 
+height 𝔭 > (n : WithBot ℕ∞) ↔ ∃ c : List (PrimeSpectrum R), c.Chain' (· < ·) ∧ (∀ 𝔮 ∈ c, 𝔮 < 𝔭) ∧ c.length = n + 1 := by
+  show (_ < _) ↔ _
+  rw [WithBot.coe_lt_coe]
+  exact lt_height_iff'
+
+/-- The converse of this is false, because the definition of "dimension ≤ 1" in mathlib
+  applies only to dimension zero rings and domains of dimension 1. -/
+lemma dim_le_one_of_dimLEOne :  Ring.DimensionLEOne R → krullDim R ≤ (1 : ℕ) := by
+  rw [krullDim_le_iff R 1]
+  intro H p
+  apply le_of_not_gt
+  intro h
+  rcases (lt_height_iff''.mp h) with ⟨c, ⟨hc1, hc2, hc3⟩⟩
+  norm_cast at hc3
+  rw [List.chain'_iff_get] at hc1
+  specialize hc1 0 (by rw [hc3]; simp)
+  set q0 : PrimeSpectrum R := List.get c { val := 0, isLt := _ }
+  set q1 : PrimeSpectrum R := List.get c { val := 1, isLt := _ } 
+  specialize hc2 q1 (List.get_mem _ _ _)
+  change q0.asIdeal < q1.asIdeal at hc1
+  have q1nbot := Trans.trans (bot_le : ⊥ ≤ q0.asIdeal) hc1
+  specialize H q1.asIdeal (bot_lt_iff_ne_bot.mp q1nbot) q1.IsPrime
+  apply IsPrime.ne_top p.IsPrime
+  apply (IsCoatom.lt_iff H.out).mp
+  exact hc2
 
 lemma dim_le_one_of_pid [IsDomain R] [IsPrincipalIdealRing R] : krullDim R ≤ 1 := by
   rw [dim_le_one_iff]
