@@ -22,11 +22,7 @@ noncomputable instance : CompleteLattice (WithBot (ℕ∞)) := WithBot.WithTop.c
 lemma dim_le_dim_polynomial_add_one [Nontrivial R] :
   krullDim R + 1 ≤ krullDim (Polynomial R) := sorry -- Others are working on it
 
--- private lemma sum_succ_of_succ_sum {ι : Type} (a : ℕ∞) [inst : Nonempty ι] :
---       (⨆ (x : ι), a + 1) = (⨆ (x : ι), a) + 1 := by
---   have : a + 1 = (⨆ (x : ι), a) + 1 := by rw [ciSup_const]
---   have : a + 1 = (⨆ (x : ι), a + 1) := Eq.symm ciSup_const
---   simp
+lemma height_le_of_le {I J : PrimeSpectrum R} (I_le_J : I ≤ J) : height I ≤ height J := sorry -- Already done in main file
 
 lemma dim_eq_dim_polynomial_add_one [Nontrivial R] [IsNoetherianRing R] :
   krullDim R + 1 = krullDim (Polynomial R) := by
@@ -37,6 +33,15 @@ lemma dim_eq_dim_polynomial_add_one [Nontrivial R] [IsNoetherianRing R] :
     have htPBdd : ∀ (P : PrimeSpectrum (Polynomial R)), (height P : WithBot ℕ∞) ≤ (⨆ (I : PrimeSpectrum R), ↑(height I + 1)) := by
       intro P
       have : ∃ (I : PrimeSpectrum R), (height P : WithBot ℕ∞) ≤ ↑(height I + 1) := by
+        have : ∃ M, Ideal.IsMaximal M ∧ P.asIdeal ≤ M := by
+          apply exists_le_maximal
+          apply IsPrime.ne_top
+          apply P.IsPrime
+        obtain ⟨M, maxM, PleM⟩ := this
+        let P' : PrimeSpectrum (Polynomial R) := PrimeSpectrum.mk M (IsMaximal.isPrime maxM)
+        have PleP' : P ≤ P' := PleM
+        have : height P ≤ height P' := height_le_of_le PleP'
+        simp only [WithBot.coe_le_coe]
         sorry
       obtain ⟨I, IP⟩ := this
       have : (↑(height I + 1) : WithBot ℕ∞) ≤ ⨆ (I : PrimeSpectrum R), ↑(height I + 1) := by
