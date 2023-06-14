@@ -90,21 +90,27 @@ instance tada3 (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGr
 
   -- (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0))
 
-noncomputable def hilbert_function (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
+noncomputable def dummyhil_function (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
   [DirectSum.GCommRing 𝒜]
   [DirectSum.Gmodule 𝒜 𝓜] (hilb : ℤ → ℕ∞) := ∀ i, hilb i = (length (𝒜 0) (𝓜 i))
+
 
 lemma hilbertz (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
   [DirectSum.GCommRing 𝒜]
   [DirectSum.Gmodule 𝒜 𝓜] 
   (finlen : ∀ i, (length (𝒜 0) (𝓜 i)) < ⊤ ) : ℤ → ℤ := by
   intro i
-  let h := hilbert_function 𝒜 𝓜
+  let h := dummyhil_function 𝒜 𝓜
   simp  at h 
   let n : ℤ → ℕ := fun i ↦ WithTop.untop _ (finlen i).ne
   have hn : ∀ i, (n i : ℕ∞) = length (𝒜 0) (𝓜 i) := fun i ↦ WithTop.coe_untop _ _
   have' := hn i
   exact ((n i) : ℤ )
+
+
+noncomputable def hilbert_function (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
+  [DirectSum.GCommRing 𝒜]
+  [DirectSum.Gmodule 𝒜 𝓜] (hilb : ℤ → ℤ) := ∀ i, hilb i = (ENat.toNat (length (𝒜 0) (𝓜 i)))
 
 
 
