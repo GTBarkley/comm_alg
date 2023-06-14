@@ -58,7 +58,7 @@ noncomputable def dimensionring { A: Type _}
 noncomputable def dimensionmodule ( A : Type _) (M : Type _)
  [CommRing A] [AddCommGroup M] [Module A M] := krullDim (PrimeSpectrum (A ⧸ ((⊤ : Submodule A M).annihilator)) )
 
--- (∃ (i : ℤ ), ∃ (x :  𝒜 i), p = (Submodule.span (⨁ i, 𝒜 i) {x}).annihilator ) 
+ 
 
 --  lemma graded_local (𝒜 : ℤ → Type _) [SetLike (⨁ i, 𝒜 i)] (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
 --   [DirectSum.GCommRing 𝒜]
@@ -98,4 +98,25 @@ lemma Associated_prime_of_graded_is_graded
 
 -- def standard_graded {𝒜 : ℤ → Type _} [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜] (n : ℕ) :
 --     Prop :=
---   ∃ J, Ideal.IsHomogeneous' 𝒜 J (J :Nonempty ((⨁ i, 𝒜 i) ≃+* (MvPolynomial (Fin n) (𝒜 0)) ⧸ J)
+
+def Component_of_graded_as_addsubgroup (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
+(p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p) (i : ℤ) : AddSubgroup (𝒜 i) := sorry
+
+
+
+-- @ Quotient of a graded ring R by a graded ideal p is a graded R-Mod, preserving each component
+instance Quotient_of_graded_is_graded
+(𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
+(p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p)
+  : DirectSum.Gmodule 𝒜 (fun i => (𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)) := by
+  sorry
+
+instance graded_submodule
+(𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) (𝓝 : ℤ → Type _)
+[∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)] [∀ i, AddCommGroup (𝓝 i)]
+[DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜][DirectSum.Gmodule 𝒜 𝓝]
+(opn : Submodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i)) (opnis : opn = (⨁ i, 𝓝 i))
+ : (𝓝 i : Submodule (𝒜 0) (𝓜 i)) := by
+  sorry
+ 
+
