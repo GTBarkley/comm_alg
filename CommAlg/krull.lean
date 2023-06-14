@@ -130,8 +130,6 @@ lemma dim_field_eq_zero {K : Type _} [Field K] : krullDim K = 0 := by
   simp [field_prime_height_zero]
 
 lemma isField.dim_zero {D: Type _} [CommRing D] [IsDomain D] (h: krullDim D = 0) : IsField D := by
-  unfold krullDim at h
-  simp [height] at h
   by_contra x
   rw [Ring.not_isField_iff_exists_prime] at x
   obtain ⟨P, ⟨h1, primeP⟩⟩ := x
@@ -140,16 +138,16 @@ lemma isField.dim_zero {D: Type _} [CommRing D] [IsDomain D] (h: krullDim D = 0)
     by_contra a
     have : P = ⊥ := by rwa [PrimeSpectrum.ext_iff] at a
     contradiction
-  have PgtBot : P' > ⊥ := Ne.bot_lt h2
-  have pos_height : ¬ ↑(Set.chainHeight {J | J < P'}) ≤ 0  := by
-    have : ⊥ ∈ {J | J < P'} := PgtBot
+  have pos_height : ¬ (height P') ≤ 0  := by
+    have : ⊥ ∈ {J | J < P'} := Ne.bot_lt h2
     have : {J | J < P'}.Nonempty := Set.nonempty_of_mem this
+    unfold height
     rw [←Set.one_le_chainHeight_iff] at this
     exact not_le_of_gt (Iff.mp ENat.one_le_iff_pos this)
-  have nonpos_height : (Set.chainHeight {J | J < P'}) ≤ 0 := by
-    have : (⨆ (I : PrimeSpectrum D), (Set.chainHeight {J | J < I} : WithBot ℕ∞)) ≤ 0 := h.le
-    rw [iSup_le_iff] at this
-    exact Iff.mp WithBot.coe_le_zero (this P')
+  have nonpos_height : height P' ≤ 0 := by
+    have := height_le_krullDim P'
+    rw [h] at this
+    aesop
   contradiction
 
 lemma dim_eq_zero_iff_field {D: Type _} [CommRing D] [IsDomain D] : krullDim D = 0 ↔ IsField D := by
@@ -167,10 +165,10 @@ lemma dim_le_one_of_pid [IsDomain R] [IsPrincipalIdealRing R] : krullDim R ≤ 1
   exact Ring.DimensionLEOne.principal_ideal_ring R
 
 lemma dim_le_dim_polynomial_add_one [Nontrivial R] :
-  krullDim R ≤ krullDim (Polynomial R) + 1 := sorry
+  krullDim R + 1 ≤ krullDim (Polynomial R) := sorry
 
 lemma dim_eq_dim_polynomial_add_one [Nontrivial R] [IsNoetherianRing R] :
-  krullDim R = krullDim (Polynomial R) + 1 := sorry
+  krullDim R + 1 = krullDim (Polynomial R) := sorry
 
 lemma height_eq_dim_localization :
   height I = krullDim (Localization.AtPrime I.asIdeal) := sorry
