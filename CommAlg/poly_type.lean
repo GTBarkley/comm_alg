@@ -1,24 +1,6 @@
-import Mathlib
-import Mathlib.Algebra.MonoidAlgebra.Basic
-import Mathlib.Data.Finset.Sort
 import Mathlib.Order.Height
-import Mathlib.Order.KrullDimension
-import Mathlib.Order.JordanHolder
 import Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic
-import Mathlib.Order.Height
-import Mathlib.RingTheory.Ideal.Basic
-import Mathlib.RingTheory.Ideal.Operations
-import Mathlib.LinearAlgebra.Finsupp
-import Mathlib.RingTheory.GradedAlgebra.Basic
-import Mathlib.RingTheory.GradedAlgebra.HomogeneousIdeal
-import Mathlib.Algebra.Module.GradedModule
-import Mathlib.RingTheory.Ideal.AssociatedPrime
-import Mathlib.RingTheory.Noetherian
-import Mathlib.RingTheory.Artinian
-import Mathlib.Algebra.Module.GradedModule
-import Mathlib.RingTheory.Noetherian
-import Mathlib.RingTheory.Finiteness
-import Mathlib.RingTheory.Ideal.Operations
+
 
 -- Setting for "library_search"
 set_option maxHeartbeats 0
