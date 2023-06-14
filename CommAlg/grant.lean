@@ -83,6 +83,16 @@ height 𝔭 > n ↔ ∃ c : List (PrimeSpectrum R), c.Chain' (· < ·) ∧ (∀ 
     norm_cast at hc
     tauto
 
+lemma lt_height_iff'' {𝔭 : PrimeSpectrum R} {n : ℕ∞} : 
+height 𝔭 > (n : WithBot ℕ∞) ↔ ∃ c : List (PrimeSpectrum R), c.Chain' (· < ·) ∧ (∀ 𝔮 ∈ c, 𝔮 < 𝔭) ∧ c.length = n + 1 := by
+  show (_ < _) ↔ _
+  rw [WithBot.coe_lt_coe]
+  exact lt_height_iff' _
+
+lemma height_le_iff {𝔭 : PrimeSpectrum R} {n : ℕ∞} : 
+  height 𝔭 ≤ n ↔ ∀ c : List (PrimeSpectrum R), c ∈ {I : PrimeSpectrum R | I < 𝔭}.subchain ∧ c.length = n + 1 := by
+  sorry
+
 lemma krullDim_nonneg_of_nontrivial [Nontrivial R] : ∃ n : ℕ∞, Ideal.krullDim R = n := by
   have h := dim_eq_bot_iff.not.mpr (not_subsingleton R)
   lift (Ideal.krullDim R) to ℕ∞ using h with k
@@ -116,19 +126,103 @@ lemma dim_eq_bot_iff : krullDim R = ⊥ ↔ Subsingleton R := by
   constructor <;> intro h
   . rw [←not_nonempty_iff]
     rintro ⟨a, ha⟩
-    -- specialize h ⟨a, ha⟩
+    specialize h ⟨a, ha⟩
     tauto
   . rw [h.forall_iff]
     trivial
-
 
 #check (sorry : False)
 #check (sorryAx)
 #check (4 : WithBot ℕ∞)
 #check List.sum
+#check (_ ∈ (_ : List _))
+variable (α : Type ) 
+#synth Membership α (List α)
+#check bot_lt_iff_ne_bot
 -- #check ((4 : ℕ∞) : WithBot (WithTop ℕ))
 -- #check ( (Set.chainHeight s) : WithBot (ℕ∞))
 
-variable (P : PrimeSpectrum R)
+/-- The converse of this is false, because the definition of "dimension ≤ 1" in mathlib
+  applies only to dimension zero rings and domains of dimension 1. -/
+lemma dim_le_one_of_dimLEOne :  Ring.DimensionLEOne R → krullDim R ≤ (1 : ℕ) := by
+  rw [krullDim_le_iff R 1]
+  -- unfold Ring.DimensionLEOne
+  intro H p
+  -- have Hp := H p.asIdeal
+  -- have Hp := fun h => (Hp h) p.IsPrime
+  apply le_of_not_gt
+  intro h
+  rcases ((lt_height_iff'' R).mp h) with ⟨c, ⟨hc1, hc2, hc3⟩⟩
+  norm_cast at hc3
+  rw [List.chain'_iff_get] at hc1
+  specialize hc1 0 (by rw [hc3]; simp)
+  -- generalize hq0 : List.get _ _ = q0 at hc1
+  set q0 : PrimeSpectrum R := List.get c { val := 0, isLt := _ }
+  set q1 : PrimeSpectrum R := List.get c { val := 1, isLt := _ } 
+  -- have hq0 : q0 ∈ c := List.get_mem _ _ _ 
+  -- have hq1 : q1 ∈ c := List.get_mem _ _ _
+  specialize hc2 q1 (List.get_mem _ _ _)
+  -- have aa := (bot_le : (⊥ : Ideal R) ≤ q0.asIdeal)
+  change q0.asIdeal < q1.asIdeal at hc1
+  have q1nbot := Trans.trans (bot_le : ⊥ ≤ q0.asIdeal) hc1
+  specialize H q1.asIdeal (bot_lt_iff_ne_bot.mp q1nbot) q1.IsPrime
+  -- change q1.asIdeal < p.asIdeal at hc2
+  apply IsPrime.ne_top p.IsPrime
+  apply (IsCoatom.lt_iff H.out).mp
+  exact hc2
+  --refine Iff.mp radical_eq_top (?_ (id (Eq.symm hc3))) 
+end Krull
 
-#check {J | J < P}.le_chainHeight_iff (n := 4)
+section iSupWithBot
+
+variable {α : Type _} [CompleteSemilatticeSup α] {I : Type _} (f : I → α)
+
+#synth SupSet (WithBot ℕ∞)
+
+protected lemma WithBot.iSup_ge_coe_iff {a : α} : 
+  (a ≤ ⨆ i : I, (f i : WithBot α) ) ↔ ∃ i : I, f i ≥ a := by
+  rw [WithBot.coe_le_iff]
+  sorry
+
+end iSupWithBot
+
+section myGreatElab
+open Lean Meta Elab
+
+syntax (name := lhsStx) "lhs% " term:max : term
+syntax (name := rhsStx) "rhs% " term:max : term
+
+@[term_elab lhsStx, term_elab rhsStx]
+def elabLhsStx : Term.TermElab := fun stx expectedType? =>
+  match stx with
+  | `(lhs% $t) => do
+    let (lhs, _, eq) ← mkExpected expectedType?
+    discard <| Term.elabTermEnsuringType t eq
+    return lhs
+  | `(rhs% $t) => do
+    let (_, rhs, eq) ← mkExpected expectedType?
+    discard <| Term.elabTermEnsuringType t eq
+    return rhs
+  | _ => throwUnsupportedSyntax
+where
+  mkExpected expectedType? := do
+    let α ←
+      if let some expectedType := expectedType? then
+        pure expectedType
+      else
+        mkFreshTypeMVar
+    let lhs ← mkFreshExprMVar α
+    let rhs ← mkFreshExprMVar α
+    let u ← getLevel α
+    let eq := mkAppN (.const ``Eq [u]) #[α, lhs, rhs]
+    return (lhs, rhs, eq)
+
+#check lhs% (add_comm 1 2)
+#check rhs% (add_comm 1 2)
+#check lhs% (add_comm _ _ : _ = 1 + 2)
+
+example (x y : α) (h : x = y) : lhs% h = rhs% h := h
+
+def lhsOf {α : Sort _} {x y : α} (h : x = y) : α := x
+
+#check lhsOf (add_comm 1 2)
