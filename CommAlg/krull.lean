@@ -176,8 +176,8 @@ lemma dim_eq_zero_iff [Nontrivial R] : krullDim R = 0 ↔ ∀ I : PrimeSpectrum 
   rw [←WithBot.coe_le_coe,←hn] at this
   change (0 : WithBot ℕ∞) ≤ _ at this
   constructor <;> intro h'
-  rw [h']
-  exact le_antisymm h' this
+  . rw [h']
+  . exact le_antisymm h' this
 
 @[simp]
 lemma field_prime_bot {K: Type _} [Field K] (P : Ideal K) : IsPrime P ↔ P = ⊥ := by
@@ -259,9 +259,7 @@ lemma dim_le_one_of_dimLEOne :  Ring.DimensionLEOne R → krullDim R ≤ 1 := by
   change q0.asIdeal < q1.asIdeal at hc1
   have q1nbot := Trans.trans (bot_le : ⊥ ≤ q0.asIdeal) hc1
   specialize H q1.asIdeal (bot_lt_iff_ne_bot.mp q1nbot) q1.IsPrime
-  apply IsPrime.ne_top p.IsPrime
-  apply (IsCoatom.lt_iff H.out).mp
-  exact hc2
+  exact (not_maximal_of_lt_prime p.IsPrime hc2) H
 
 lemma dim_le_one_of_pid [IsDomain R] [IsPrincipalIdealRing R] : krullDim R ≤ 1 := by
   rw [dim_le_one_iff]
