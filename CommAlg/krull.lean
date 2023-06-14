@@ -94,6 +94,17 @@ lemma dim_eq_bot_iff : krullDim R = ⊥ ↔ Subsingleton R := by
   . rw [h.forall_iff]
     trivial
 
+lemma krullDim_nonneg_of_nontrivial (R : Type _) [CommRing R] [Nontrivial R] : ∃ n : ℕ∞, Ideal.krullDim R = n := by
+  have h := dim_eq_bot_iff.not.mpr (not_subsingleton R)
+  lift (Ideal.krullDim R) to ℕ∞ using h with k
+  use k
+
+lemma dim_eq_zero_iff [Nontrivial R] : krullDim R = 0 ↔ ∀ I : PrimeSpectrum R, IsMaximal I.asIdeal := by
+  constructor <;> intro h
+  . intro I
+    sorry
+  . sorry
+
 lemma dim_eq_zero_iff_field [IsDomain R] : krullDim R = 0 ↔ IsField R := by sorry
 
 #check Ring.DimensionLEOne
@@ -104,10 +115,10 @@ lemma dim_le_one_of_pid [IsDomain R] [IsPrincipalIdealRing R] : krullDim R ≤ 1
   exact Ring.DimensionLEOne.principal_ideal_ring R
 
 lemma dim_le_dim_polynomial_add_one [Nontrivial R] :
-  krullDim R ≤ krullDim (Polynomial R) + 1 := sorry
+  krullDim R + 1 ≤ krullDim (Polynomial R) := sorry
 
 lemma dim_eq_dim_polynomial_add_one [Nontrivial R] [IsNoetherianRing R] :
-  krullDim R = krullDim (Polynomial R) + 1 := sorry
+  krullDim R + 1 = krullDim (Polynomial R) := sorry
 
 lemma height_eq_dim_localization :
   height I = krullDim (Localization.AtPrime I.asIdeal) := sorry
