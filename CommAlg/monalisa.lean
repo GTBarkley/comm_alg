@@ -4,8 +4,6 @@ import Mathlib.Algebra.Module.GradedModule
 import Mathlib.RingTheory.Ideal.AssociatedPrime
 import Mathlib.RingTheory.Artinian
 import Mathlib.Order.Height
-import Mathlib.Order.ConditionallyCompleteLattice.Basic
-import Mathlib.RingTheory.FiniteType
 
 noncomputable def length ( A : Type _) (M : Type _)
  [CommRing A] [AddCommGroup M] [Module A M] :=  Set.chainHeight {M' : Submodule A M | M' < ⊤}
