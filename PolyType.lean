@@ -128,7 +128,7 @@ def f (n : ℤ) := n
 end section
 
 
--- Constant polynomial function = constant function
+-- (NO need to prove) Constant polynomial function = constant function
 lemma Poly_constant (F : Polynomial ℚ) (c : ℚ) : 
   (F = Polynomial.C c) ↔ (∀ r : ℚ, (Polynomial.eval r F) = c) := by
   constructor

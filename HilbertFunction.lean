@@ -106,7 +106,7 @@ end
 
 
 -- @[BH, 4.1.3] when d ≥ 1
-theorem hilbert_polynomial (d : ℕ) (d1 : 1 ≤ d) (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
+theorem hilbert_polynomial_ge1 (d : ℕ) (d1 : 1 ≤ d) (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
 [DirectSum.GCommRing 𝒜]
 [DirectSum.Gmodule 𝒜 𝓜] (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) 
 (fingen : IsNoetherian (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
@@ -118,26 +118,31 @@ theorem hilbert_polynomial (d : ℕ) (d1 : 1 ≤ d) (𝒜 : ℤ → Type _) (�
 
 
 -- @[BH, 4.1.3] when d = 0
-theorem hilbert_polynomial (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
+theorem hilbert_polynomial_0 (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
 [DirectSum.GCommRing 𝒜]
 [DirectSum.Gmodule 𝒜 𝓜] (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) 
 (fingen : IsNoetherian (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
 (findim :  dimensionmodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i) = 0) (hilb : ℤ → ℤ)
-
+: true := by
+  sorry
 
 
 -- @[BH, 1.5.6 (b)(ii)]
 -- An associated prime of a graded R-Mod M is graded
-lemma Associated_prime_of_graded_is_graded (𝒜 : ℤ → Type _) 
-  (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
-  [DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜] (p : associatedPrimes (⨁ i, 𝒜 i) (⨁ i, 𝓜 i)) 
+lemma Associated_prime_of_graded_is_graded
+(𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) 
+[∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
+[DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜]
+(p : associatedPrimes (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
   : true := by
-  -- Ideal.IsHomogeneous 𝒜 p
   sorry
+  -- Ideal.IsHomogeneous 𝒜 p
 
 -- @Existence of a chain of submodules of graded submoduels of f.g graded R-mod M
-lemma Exist_chain_of_graded_submodules (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
-  [DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜] (fingen : IsNoetherian (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
+lemma Exist_chain_of_graded_submodules (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) 
+[∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
+  [DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜] 
+  (fingen : IsNoetherian (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
   : true := by
   sorry
 
