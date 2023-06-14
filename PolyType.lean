@@ -1,24 +1,5 @@
-import Mathlib
-import Mathlib.Algebra.MonoidAlgebra.Basic
-import Mathlib.Data.Finset.Sort
 import Mathlib.Order.Height
-import Mathlib.Order.KrullDimension
-import Mathlib.Order.JordanHolder
 import Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic
-import Mathlib.Order.Height
-import Mathlib.RingTheory.Ideal.Basic
-import Mathlib.RingTheory.Ideal.Operations
-import Mathlib.LinearAlgebra.Finsupp
-import Mathlib.RingTheory.GradedAlgebra.Basic
-import Mathlib.RingTheory.GradedAlgebra.HomogeneousIdeal
-import Mathlib.Algebra.Module.GradedModule
-import Mathlib.RingTheory.Ideal.AssociatedPrime
-import Mathlib.RingTheory.Noetherian
-import Mathlib.RingTheory.Artinian
-import Mathlib.Algebra.Module.GradedModule
-import Mathlib.RingTheory.Noetherian
-import Mathlib.RingTheory.Finiteness
-import Mathlib.RingTheory.Ideal.Operations
 
 -- Setting for "library_search"
 set_option maxHeartbeats 0
@@ -85,6 +66,7 @@ example : Polynomial.eval (100 : ℚ) F = (2 : ℚ) := by
 
 
 end section
+
 
 -- @[BH, 4.1.2]
 -- All the polynomials are in ℚ[X], all the functions are considered as ℤ → ℤ
@@ -247,6 +229,7 @@ lemma b_to_a (f : ℤ → ℤ) (d : ℕ) : PolyType f d → (∃ (c : ℤ), ∃ 
 end
 
 -- @Additive lemma of length for a SES
+-- Given a SES 0 → A → B → C → 0, then length (A) - length (B) + length (C) = 0 
 section
 -- variable {R M N : Type _} [CommRing R] [AddCommGroup M] [AddCommGroup N] [Module R M] [Module R N]
 --   (f : M →[R] N)
@@ -297,7 +280,6 @@ lemma length_Additive (R A B C : Type _) [CommRing R] [AddCommGroup A] [AddCommG
   sorry
 
 end section
-
 
 
 
