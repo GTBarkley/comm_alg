@@ -52,7 +52,6 @@ macro "obviously" : tactic =>
 
 
 
-
 -- @Definitions (to be classified)
 section
 open GradedMonoid.GSmul
@@ -102,8 +101,13 @@ end
 --   [DirectSum.GCommRing 𝒜]
 --   [DirectSum.Gmodule 𝒜 𝓜] (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) : ∃ ( I : Ideal ((⨁ i, 𝒜 i))),(HomogeneousMax 𝒜 I) := sorry
 
+
 -- Definition(s) of homogeneous ideals
-def Ideal.IsHomogeneous' (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜] (I : Ideal (⨁ i, 𝒜 i)) := ∀ (i : ℤ ) ⦃r : (⨁ i, 𝒜 i)⦄, r ∈ I → DirectSum.of _ i ( r i : 𝒜 i) ∈ I 
+def Ideal.IsHomogeneous' (𝒜 : ℤ → Type _) 
+[∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜] 
+(I : Ideal (⨁ i, 𝒜 i)) := ∀ (i : ℤ ) 
+⦃r : (⨁ i, 𝒜 i)⦄, r ∈ I → DirectSum.of _ i ( r i : 𝒜 i) ∈ I
+
 def HomogeneousPrime (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜] (I : Ideal (⨁ i, 𝒜 i)):= (Ideal.IsPrime I) ∧ (Ideal.IsHomogeneous' 𝒜 I)
 def HomogeneousMax (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜] (I : Ideal (⨁ i, 𝒜 i)):= (Ideal.IsMaximal I) ∧ (Ideal.IsHomogeneous' 𝒜 I)
 
@@ -172,7 +176,7 @@ lemma Associated_prime_of_graded_is_graded
 [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
 [DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜]
 (p : associatedPrimes (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
-  : Ideal.IsHomogeneous' 𝒜 p := by
+  : (Ideal.IsHomogeneous' 𝒜 p) ∧ ((∃ (i : ℤ ), ∃ (x :  𝒜 i), p = (Submodule.span (⨁ i, 𝒜 i) {DirectSum.of _ i x}).annihilator)) := by
   sorry
 
 
@@ -183,18 +187,24 @@ lemma Associated_prime_of_graded_is_graded
 --   sorry
 
 
-instance sdfasdf
-(𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
-(p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p)
-  : ∀ i, AddCommGroup (p i) := by
-  sorry
+-- instance sdfasdf
+-- (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
+-- (p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p)
+--   : ∀ i, AddCommGroup (p i) := by
+--   sorry
+
+
+def Component_of_graded_as_addsubgroup (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
+(p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p) (i : ℤ) : AddSubgroup (𝒜 i) := sorry
+
+
 
 -- @ Quotient of a graded ring R by a graded ideal p is a graded R-Mod, preserving each component
 instance Quotient_of_graded_is_graded
 (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
 (p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p)
-  : Gmodule (⨁ i, 𝒜 i) (⨁ i, (𝒜 i)⧸(p i)) := by
+  : DirectSum.Gmodule 𝒜 (fun i => (𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)) := by
   sorry
 
+-- @Graded submodule
 
-  
