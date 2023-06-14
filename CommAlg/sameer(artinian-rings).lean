@@ -6,7 +6,9 @@ import Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic
 import Mathlib.RingTheory.DedekindDomain.DVR
 
 
-lemma FieldisArtinian (R : Type _) [CommRing R] (IsField : ):= by sorry
+lemma FieldisArtinian (R : Type _) [CommRing R] (h: IsField R) : 
+  IsArtinianRing R := by sorry
+
 
 
 lemma ArtinianDomainIsField (R : Type _) [CommRing R] [IsDomain R]
@@ -47,8 +49,7 @@ lemma isArtinianRing_of_quotient_of_artinian (R : Type _) [CommRing R]
 lemma IsPrimeMaximal (R : Type _) [CommRing R] (P : Ideal R) 
 (IsArt : IsArtinianRing R) (isPrime : Ideal.IsPrime P) : Ideal.IsMaximal P := 
 by 
--- if R is Artinian and P is prime then R/P is Integral Domain 
--- which is Artinian Domain 
+-- if R is Artinian and P is prime then R/P is Artinian Domain 
 -- R⧸P is a field by the above lemma
 -- P is maximal
 
@@ -56,13 +57,13 @@ by
   have artRP : IsArtinianRing (R⧸P) := by
     exact isArtinianRing_of_quotient_of_artinian R P IsArt
   
-
+  have artRPField : IsField (R⧸P) := by
+    exact ArtinianDomainIsField (R⧸P) artRP
+  
+  have h := Ideal.Quotient.maximal_of_isField P artRPField
+  exact h
+  
 -- Then R/I is Artinian 
  --  have' : IsArtinianRing R ∧ Ideal.IsPrime I → IsDomain (R⧸I) := by
 
 -- R⧸I.IsArtinian → monotone_stabilizes_iff_artinian.R⧸I
-
-
-
-
--- Use Stacks project proof since it's broken into lemmas

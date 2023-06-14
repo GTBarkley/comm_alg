@@ -63,7 +63,7 @@ lemma krullDim_eq_height [LocalRing R] : krullDim R = height (closedPoint R) := 
     apply height_le_of_le
     apply le_maximalIdeal
     exact I.2.1
-  . simp
+  . simp only [height_le_krullDim]
 
 #check height_le_krullDim
 --some propositions that would be nice to be able to eventually
@@ -135,7 +135,7 @@ lemma dim_field_eq_zero {K : Type _} [Field K] : krullDim K = 0 := by
   unfold krullDim
   simp [field_prime_height_zero]
 
-lemma isField.dim_zero {D: Type _} [CommRing D] [IsDomain D] (h: krullDim D = 0) : IsField D := by
+lemma domain_dim_zero.isField {D: Type _} [CommRing D] [IsDomain D] (h: krullDim D = 0) : IsField D := by
   by_contra x
   rw [Ring.not_isField_iff_exists_prime] at x
   obtain ⟨P, ⟨h1, primeP⟩⟩ := x
@@ -156,9 +156,9 @@ lemma isField.dim_zero {D: Type _} [CommRing D] [IsDomain D] (h: krullDim D = 0)
     aesop
   contradiction
 
-lemma dim_eq_zero_iff_field {D: Type _} [CommRing D] [IsDomain D] : krullDim D = 0 ↔ IsField D := by
+lemma domain_dim_eq_zero_iff_field {D: Type _} [CommRing D] [IsDomain D] : krullDim D = 0 ↔ IsField D := by
   constructor
-  · exact isField.dim_zero
+  · exact domain_dim_zero.isField
   · intro fieldD
     let h : Field D := IsField.toField fieldD
     exact dim_field_eq_zero
@@ -226,7 +226,11 @@ lemma dim_le_dim_polynomial_add_one [Nontrivial R] :
 lemma dim_eq_dim_polynomial_add_one [Nontrivial R] [IsNoetherianRing R] :
   krullDim R + 1 = krullDim (Polynomial R) := sorry
 
+lemma dim_mvPolynomial [Field K] (n : ℕ) : krullDim (MvPolynomial (Fin n) K) = n := sorry
+
 lemma height_eq_dim_localization :
   height I = krullDim (Localization.AtPrime I.asIdeal) := sorry
+
+lemma dim_quotient_le_dim : height I + krullDim (R ⧸ I.asIdeal) ≤ krullDim R := sorry
 
 lemma height_add_dim_quotient_le_dim : height I + krullDim (R ⧸ I.asIdeal) ≤ krullDim R := sorry
