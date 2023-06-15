@@ -4,6 +4,18 @@ import Mathlib.Algebra.Module.GradedModule
 import Mathlib.RingTheory.Ideal.AssociatedPrime
 import Mathlib.RingTheory.Artinian
 import Mathlib.Order.Height
+import Mathlib.Algebra.Algebra.Subalgebra.Basic
+import Mathlib.Algebra.Module.LinearMap
+
+instance {𝒜 : ℤ → Type _} [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜] :
+    Algebra (𝒜 0) (⨁ i, 𝒜 i) :=
+  Algebra.ofModule'
+  (by
+    intro r x
+    sorry)
+  (by
+    intro r x
+    sorry)
 
 noncomputable def length ( A : Type _) (M : Type _)
  [CommRing A] [AddCommGroup M] [Module A M] :=  Set.chainHeight {M' : Submodule A M | M' < ⊤}
@@ -96,11 +108,26 @@ lemma Associated_prime_of_graded_is_graded
   sorry
 
 
--- def standard_graded {𝒜 : ℤ → Type _} [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜] (n : ℕ) :
---     Prop :=
+class StandardGraded {𝒜 : ℤ → Type _} [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜] : Prop where
+  gen_in_first_piece :
+    Algebra.adjoin (𝒜 0) (DirectSum.of _ 1 : 𝒜 1 →+ ⨁ i, 𝒜 i).range = (⊤ : Subalgebra (𝒜 0) (⨁ i, 𝒜 i))
 
 def Component_of_graded_as_addsubgroup (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
 (p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p) (i : ℤ) : AddSubgroup (𝒜 i) := sorry
+
+
+def graded_morphism (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) (𝓝 : ℤ → Type _)
+[∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)] [∀ i, AddCommGroup (𝓝 i)]
+[DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜][DirectSum.Gmodule 𝒜 𝓝] (f : (⨁ i, 𝓜 i) → (⨁ i, 𝓝 i)) : ∀ i, ∀ (r : 𝓜 i), ∀ j, (j ≠ i → f (DirectSum.of _ i r) j = 0) ∧ (IsLinearMap (⨁ i, 𝒜 i) f) := by sorry
+
+
+def graded_submodule
+(𝒜 : ℤ → Type _) (𝓜 : ℤ → Type u) (𝓝 : ℤ → Type u)
+[∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)] [∀ i, AddCommGroup (𝓝 i)]
+[DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜][DirectSum.Gmodule 𝒜 𝓝]
+(opn : Submodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i)) (opnis : opn = (⨁ i, 𝓝 i)) (i : ℤ )
+ : ∃(piece : Submodule (𝒜 0) (𝓜 i)), piece = 𝓝 i := by
+  sorry
 
 
 
@@ -111,12 +138,13 @@ instance Quotient_of_graded_is_graded
   : DirectSum.Gmodule 𝒜 (fun i => (𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)) := by
   sorry
 
-instance graded_submodule
-(𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) (𝓝 : ℤ → Type _)
-[∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)] [∀ i, AddCommGroup (𝓝 i)]
-[DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜][DirectSum.Gmodule 𝒜 𝓝]
-(opn : Submodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i)) (opnis : opn = (⨁ i, 𝓝 i))
- : (𝓝 i : Submodule (𝒜 0) (𝓜 i)) := by
+theorem quotient_hilbert_polynomial (d : ℕ) (d1 : 1 ≤ d) (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
+[DirectSum.GCommRing 𝒜]
+[DirectSum.Gmodule 𝒜 𝓜] (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) (p : Ideal (⨁ i, 𝒜 i)) 
+(findim :  dimensionmodule (⨁ i, 𝒜 i) (⨁ i, ((𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)) = d) (hilb : ℤ → ℤ)
+ (Hhilb: hilbert_function 𝒜 𝓜 hilb) (homprime: HomogeneousPrime 𝒜 p)
+: PolyType hilb (d - 1) := by
   sorry
+
  
 
