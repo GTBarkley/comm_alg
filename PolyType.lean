@@ -127,7 +127,6 @@ lemma Poly_constant (F : Polynomial ℚ) (c : ℚ) :
 
 
 
-
 -- Shifting doesn't change the polynomial type
 lemma Poly_shifting (f : ℤ → ℤ) (g : ℤ → ℤ) (hf : PolyType f d) (s : ℤ) (hfg : ∀ (n : ℤ), f (n + s) = g (n)) : PolyType g d := by
   simp only [PolyType]

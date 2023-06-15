@@ -115,46 +115,11 @@ instance Quotient_of_graded_is_graded
 
 
 
-
 -- If A_0 is Artinian and local, then A is graded local
 lemma Graded_local_if_zero_component_Artinian_and_local (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) 
 [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
 [DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜] (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) : ∃ ( I : Ideal ((⨁ i, 𝒜 i))),(HomogeneousMax 𝒜 I) := by
   sorry
-
-
-
-
-
-
--- @[BH, 4.1.3] when d ≥ 1
--- If M is a finite graed R-Mod of dimension d ≥ 1, then the Hilbert function H(M, n) is of polynomial type (d - 1)
-theorem Hilbert_polynomial_ge1 (d : ℕ) (d1 : 1 ≤ d) (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
-[DirectSum.GCommRing 𝒜]
-[DirectSum.Gmodule 𝒜 𝓜] (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) 
-(fingen : IsNoetherian (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
-(findim :  dimensionmodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i) = d)
-(hilb : ℤ → ℤ) (Hhilb: hilbert_function 𝒜 𝓜 hilb)
-: PolyType hilb (d - 1) := by
-  sorry
-
-
-
-
--- @[BH, 4.1.3] when d = 0
--- If M is a finite graed R-Mod of dimension zero, then the Hilbert function H(M, n) = 0 for n >> 0 
-theorem Hilbert_polynomial_0 (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
-[DirectSum.GCommRing 𝒜]
-[DirectSum.Gmodule 𝒜 𝓜] (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) 
-(fingen : IsNoetherian (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
-(findim :  dimensionmodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i) = 0)
-(hilb : ℤ → ℤ) (Hhilb : hilbert_function 𝒜 𝓜 hilb)
-: (∃ (N : ℤ), ∀ (n : ℤ), n ≥ N → hilb n = 0) := by
-  sorry
-
-
-
-
 
 
 -- @Existence of a chain of submodules of graded submoduels of a f.g graded R-mod M
@@ -164,7 +129,6 @@ lemma Exist_chain_of_graded_submodules (𝒜 : ℤ → Type _) (𝓜 : ℤ → T
   (fingen : IsNoetherian (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
   : ∃ (c : List (Submodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))), c.Chain' (· < ·) ∧ ∀ M ∈ c, Ture := by
   sorry
-
 
 
 
@@ -185,6 +149,75 @@ lemma Associated_prime_of_graded_is_graded
 
 
 
-def Graded_homo : true := by
+-- @[BH, 4.1.3] when d ≥ 1
+-- If M is a finite graed R-Mod of dimension d ≥ 1, then the Hilbert function H(M, n) is of polynomial type (d - 1)
+theorem Hilbert_polynomial_d_ge_1 (d : ℕ) (d1 : 1 ≤ d) (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
+[DirectSum.GCommRing 𝒜]
+[DirectSum.Gmodule 𝒜 𝓜] (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) 
+(fingen : IsNoetherian (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
+(findim :  dimensionmodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i) = d)
+(hilb : ℤ → ℤ) (Hhilb: hilbert_function 𝒜 𝓜 hilb)
+: PolyType hilb (d - 1) := by
   sorry
+
+
+-- (reduced version) [BH, 4.1.3] when d ≥ 1
+-- If M is a finite graed R-Mod of dimension d ≥ 1, and M = R⧸ 𝓅 for a graded prime ideal 𝓅, then the Hilbert function H(M, n) is of polynomial type (d - 1)
+theorem Hilbert_polynomial_d_ge_1_reduced 
+(d : ℕ) (d1 : 1 ≤ d)
+(𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
+[DirectSum.GCommRing 𝒜]
+[DirectSum.Gmodule 𝒜 𝓜] (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0))
+(fingen : IsNoetherian (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
+(findim :  dimensionmodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i) = d)
+(hilb : ℤ → ℤ) (Hhilb: hilbert_function 𝒜 𝓜 hilb)
+(p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p)
+(hm : 𝓜 = (fun i => (𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)))
+: PolyType hilb (d - 1) := by
+  sorry
+
+
+-- @[BH, 4.1.3] when d = 0
+-- If M is a finite graed R-Mod of dimension zero, then the Hilbert function H(M, n) = 0 for n >> 0 
+theorem Hilbert_polynomial_d_0 (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
+[DirectSum.GCommRing 𝒜]
+[DirectSum.Gmodule 𝒜 𝓜] (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) 
+(fingen : IsNoetherian (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
+(findim :  dimensionmodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i) = 0)
+(hilb : ℤ → ℤ) (Hhilb : hilbert_function 𝒜 𝓜 hilb)
+: (∃ (N : ℤ), ∀ (n : ℤ), n ≥ N → hilb n = 0) := by
+  sorry
+
+
+-- (reduced version) [BH, 4.1.3] when d = 0
+-- If M is a finite graed R-Mod of dimension zero, and M = R⧸ 𝓅 for a graded prime ideal 𝓅, then the Hilbert function H(M, n) = 0 for n >> 0 
+theorem Hilbert_polynomial_d_0_reduced
+(𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
+[DirectSum.GCommRing 𝒜]
+[DirectSum.Gmodule 𝒜 𝓜] (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) 
+(fingen : IsNoetherian (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
+(findim :  dimensionmodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i) = 0)
+(hilb : ℤ → ℤ) (Hhilb : hilbert_function 𝒜 𝓜 hilb)
+(p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p)
+(hm : 𝓜 = (fun i => (𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)))
+: (∃ (N : ℤ), ∀ (n : ℤ), n ≥ N → hilb n = 0) := by
+  sorry
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
