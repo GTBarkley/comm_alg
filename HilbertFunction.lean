@@ -109,7 +109,7 @@ instance {𝒜 : ℤ → Type _} [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GComm
 
 
 
-class StandardGraded {𝒜 : ℤ → Type _} [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜] : Prop where
+class StandardGraded (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜] : Prop where
   gen_in_first_piece :
     Algebra.adjoin (𝒜 0) (DirectSum.of _ 1 : 𝒜 1 →+ ⨁ i, 𝒜 i).range = (⊤ : Subalgebra (𝒜 0) (⨁ i, 𝒜 i))
 
@@ -188,10 +188,11 @@ lemma Associated_prime_of_graded_is_graded
 -- If M is a finite graed R-Mod of dimension d ≥ 1, then the Hilbert function H(M, n) is of polynomial type (d - 1)
 theorem Hilbert_polynomial_d_ge_1 (d : ℕ) (d1 : 1 ≤ d) (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
 [DirectSum.GCommRing 𝒜]
-[DirectSum.Gmodule 𝒜 𝓜] (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) 
+[DirectSum.Gmodule 𝒜 𝓜] (st: StandardGraded 𝒜) (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) 
 (fingen : IsNoetherian (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
 (findim :  dimensionmodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i) = d)
 (hilb : ℤ → ℤ) (Hhilb: hilbert_function 𝒜 𝓜 hilb)
+
 : PolyType hilb (d - 1) := by
   sorry
 
