@@ -19,7 +19,6 @@ import Mathlib.Util.PiNotation
 
 open PiNotation
 
-
 namespace Ideal
 
 variable (R : Type _) [CommRing R] (P : PrimeSpectrum R)
@@ -116,13 +115,30 @@ lemma power_zero_finite_length [Ideal.IsMaximal I] (h₁ : Ideal.FG I) [Module.F
     -- rcases power with ⟨n, npower⟩
     -- how do I get a generating set?
 
+open Finset
 
 -- Stacks Lemma 10.53.3: R is Artinian iff R has finitely many maximal ideals
 lemma Artinian_has_finite_max_ideal 
     [IsArtinianRing R] : Finite (MaximalSpectrum R) := by 
     by_contra infinite
     simp only [not_finite_iff_infinite] at infinite
-    
+    let m' : ℕ ↪ MaximalSpectrum R := Infinite.natEmbedding (MaximalSpectrum R)
+    have m'inj := m'.injective
+    let m'' : ℕ → Ideal R := fun n : ℕ ↦ ⨅ k ∈ range n, (m' k).asIdeal
+    have comaximal : ∀ i j : ℕ, i ≠ j → (m' i).asIdeal ⊔ (m' j).asIdeal =
+      (⊤ : Ideal R) := by 
+      intro i j distinct
+      apply Ideal.IsMaximal.coprime_of_ne
+      sorry
+      sorry
+      --  by_contra equal
+      have : (m' i) ≠ (m' j) := by 
+        exact Function.Injective.ne m'inj distinct
+      intro h
+      apply this
+      exact MaximalSpectrum.ext _ _ h
+    -- let g :`= Ideal.quotientInfRingEquivPiQuotient m' comaximal
+
 
 -- Stacks Lemma 10.53.4: R Artinian => Jacobson ideal of R is nilpotent
 lemma Jacobson_of_Artinian_is_nilpotent 
