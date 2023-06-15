@@ -70,7 +70,7 @@ end section
 noncomputable section
 -- Polynomial type of degree d
 @[simp]
-def PolyType (f : ℤ → ℤ) (d : ℕ) := ∃ Poly : Polynomial ℚ, ∃ (N : ℤ), ∀ (n : ℤ), (N ≤ n → f n = Polynomial.eval (n : ℚ) Poly) ∧ d = Polynomial.degree Poly
+def PolyType (f : ℤ → ℤ) (d : ℕ) := ∃ Poly : Polynomial ℚ, ∃ (N : ℤ), (∀ (n : ℤ), N ≤ n → f n = Polynomial.eval (n : ℚ) Poly) ∧ d = Polynomial.degree Poly
 section
 -- structure PolyType (f : ℤ → ℤ) where
 --   Poly : Polynomial ℤ
@@ -107,7 +107,7 @@ def f (n : ℤ) := n
 end section
 
 
--- (NO NEED TO PROVE) Constant polynomial function = constant function
+-- (NO need to prove another direction) Constant polynomial function = constant function
 lemma Poly_constant (F : Polynomial ℚ) (c : ℚ) : 
   (F = Polynomial.C (c : ℚ)) ↔ (∀ r : ℚ, (Polynomial.eval r F) = (c : ℚ)) := by
   constructor
@@ -132,6 +132,8 @@ lemma Poly_shifting (f : ℤ → ℤ) (g : ℤ → ℤ) (hf : PolyType f d) (s :
 
 
 
+
+
 -- set_option pp.all true in
 -- PolyType 0 = constant function
 lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N : ℤ), ∀ (n : ℤ), (N ≤ n → f n = c) ∧ (c ≠ 0)) := by
@@ -139,10 +141,9 @@ lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N :
   · intro h
     rcases h with ⟨Poly, hN⟩
     rcases hN with ⟨N, hh⟩
-    have H1 := λ n=> (hh n).left
-    have H2 := λ n=> (hh n).right
-    clear hh
-    specialize H2 (N + 1)
+    rcases hh with ⟨H1, H2⟩
+    -- have H1 := λ n=> (hh n).left
+    -- have H2 := λ n=> (hh n).right
     have this1 : Polynomial.degree Poly = 0 := by
       have : N ≤ N + 1 := by
         norm_num
@@ -170,7 +171,6 @@ lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N :
     constructor
     · intro HH1
       -- have H6 := H1 HH1
-    --
       have this3 : f n = Polynomial.eval (n : ℚ) Poly := by
         tauto
       have this4 : Polynomial.eval (n : ℚ) Poly = c := by
@@ -179,7 +179,6 @@ lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N :
       have this5 : f n = (c : ℚ) := by
         rw [←this4, this3]
       exact Iff.mp (Rat.coe_int_inj (f n) c) this5
-    --
     
     · intro c0
       -- have H7 := H2 (by norm_num)
@@ -189,27 +188,46 @@ lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N :
 
 
   · intro h
-    rcases h with ⟨c, N, aaa⟩
-    let (Poly : Polynomial ℚ) := Polynomial.C (c : ℚ)
+    rcases h with ⟨c, N, hh⟩
+    let Poly := Polynomial.C (c : ℚ)
+    --unfold PolyType
     use Poly
+    --simp at Poly
     use N
-    intro n
-    specialize aaa n
-    have this1 : c ≠ 0 →  f n = c := by
-      tauto
-    rcases aaa with ⟨A, B⟩
-    have this1 : f n = c := by
-      tauto
+    have H1 := λ n=> (hh n).left
+    have H22 := λ n=> (hh n).right
+    have H2 : c ≠ 0 := by
+      exact H22 0
+    clear H22
     constructor
-    clear A
-    · have this2 : ∀ (t : ℚ), (Polynomial.eval t Poly) = (c : ℚ) := by
-        rw [← Poly_constant Poly (c : ℚ)]
-        sorry
-      specialize this2 n
-      rw [this2]
-      tauto
-    · sorry 
-      -- apply Polynomial.degree_C c
+    · intro n Nn
+      specialize H1 n
+      have this : f n = c := by
+        tauto
+      rw [this]
+      have this2 : Polynomial.eval (n : ℚ) Poly = (c : ℚ) := by
+        have this3 : ∀ r : ℚ, (Polynomial.eval r Poly) = (c : ℚ) :=  (Poly_constant Poly (c : ℚ)).mp rfl
+        exact this3 n
+      exact this2.symm
+    
+
+    · sorry
+    -- intro n
+    -- specialize aaa n
+    -- have this1 : c ≠ 0 →  f n = c := by
+    --   sorry
+    -- rcases aaa with ⟨A, B⟩
+    -- have this1 : f n = c := by
+    --   tauto
+    -- constructor
+    -- clear A
+    -- · have this2 : ∀ (t : ℚ), (Polynomial.eval t Poly) = (c : ℚ) := by
+    --     rw [← Poly_constant Poly (c : ℚ)]
+    --     sorry
+    --   specialize this2 n
+    --   rw [this2]
+    --   tauto
+    -- · sorry
 
 
 
@@ -244,9 +262,7 @@ lemma Δ_PolyType_d_to_PolyType_0 (f : ℤ → ℤ) (d : ℕ): PolyType f d → 
   intro h
   rcases h with ⟨Poly, hN⟩
   rcases hN with ⟨N, hh⟩
-  have H1 := λ n => (hh n).left
-  have H2 := λ n => (hh n).right
-  clear hh
+  rcases hh with ⟨H1, H2⟩
   have HH2 : d = Polynomial.degree Poly := by
     sorry
   induction' d with d hd
