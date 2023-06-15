@@ -108,7 +108,6 @@ instance {𝒜 : ℤ → Type _} [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GComm
     sorry)
 
 
-
 class StandardGraded (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜] : Prop where
   gen_in_first_piece :
     Algebra.adjoin (𝒜 0) (DirectSum.of _ 1 : 𝒜 1 →+ ⨁ i, 𝒜 i).range = (⊤ : Subalgebra (𝒜 0) (⨁ i, 𝒜 i))
@@ -123,7 +122,27 @@ def Component_of_graded_as_addsubgroup (𝒜 : ℤ → Type _)
 
 def graded_morphism (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) (𝓝 : ℤ → Type _)
 [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)] [∀ i, AddCommGroup (𝓝 i)]
-[DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜][DirectSum.Gmodule 𝒜 𝓝] (f : (⨁ i, 𝓜 i) → (⨁ i, 𝓝 i)) : ∀ i, ∀ (r : 𝓜 i), ∀ j, (j ≠ i → f (DirectSum.of _ i r) j = 0) ∧ (IsLinearMap (⨁ i, 𝒜 i) f) := by sorry
+[DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜][DirectSum.Gmodule 𝒜 𝓝]
+(f : (⨁ i, 𝓜 i) →ₗ[(⨁ i, 𝒜 i)] (⨁ i, 𝓝 i)) 
+: ∀ i, ∀ (r : 𝓜 i), ∀ j, (j ≠ i → f (DirectSum.of _ i r) j = 0) 
+∧ (IsLinearMap (⨁ i, 𝒜 i) f) := by
+  sorry
+
+#check graded_morphism
+
+def graded_isomorphism (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) (𝓝 : ℤ → Type _)
+[∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)] [∀ i, AddCommGroup (𝓝 i)]
+[DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜][DirectSum.Gmodule 𝒜 𝓝]
+(f : (⨁ i, 𝓜 i) →ₗ[(⨁ i, 𝒜 i)] (⨁ i, 𝓝 i))
+(hf : graded_morphism (fun i => (𝒜 i)) (fun i => (𝓜 i)) (fun i => (𝓝 i)) f)
+: (f : (⨁ i, 𝓜 i) ≃ₗ[(⨁ i, 𝒜 i)] (⨁ i, 𝓝 i)) := by
+  sorry
+
+
+-- (⊕ i, 𝒜 i) (⨁ i, 𝓜 i) (⊕ i, 𝓝 i)
+
+#check graded_isomorphism
+
 
 
 def graded_submodule
@@ -142,12 +161,20 @@ end
 
 
 
+
 -- @Quotient of a graded ring R by a graded ideal p is a graded R-Mod, preserving each component
 instance Quotient_of_graded_is_graded
 (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
 (p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p)
   : DirectSum.Gmodule 𝒜 (fun i => (𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)) := by
   sorry
+
+-- 
+lemma sss
+  : true := by
+  sorry
+
+
 
 
 -- If A_0 is Artinian and local, then A is graded local
@@ -238,6 +265,9 @@ theorem Hilbert_polynomial_d_0_reduced
 (hm : 𝓜 = (fun i => (𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)))
 : (∃ (N : ℤ), ∀ (n : ℤ), n ≥ N → hilb n = 0) := by
   sorry
+
+
+
 
 
 
