@@ -4,6 +4,14 @@ import Mathlib.Algebra.Module.GradedModule
 import Mathlib.RingTheory.Ideal.AssociatedPrime
 import Mathlib.RingTheory.Artinian
 import Mathlib.Order.Height
+import Mathlib.RingTheory.Ideal.Quotient
+import Mathlib.RingTheory.SimpleModule
+import CommAlg.krull
+
+
+#check Ideal.dim_field_eq_zero
+#check Ideal.domain_dim_zero.isField
+#check Ideal.Quotient.isDomain_iff_prime
 
 
 -- Setting for "library_search"
@@ -67,15 +75,17 @@ instance tada3 (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGr
 
 -- Definition of a Hilbert function of a graded module
 section
+
 noncomputable def hilbert_function (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
   [DirectSum.GCommRing 𝒜]
   [DirectSum.Gmodule 𝒜 𝓜] (hilb : ℤ → ℤ) := ∀ i, hilb i = (ENat.toNat (length (𝒜 0) (𝓜 i)))
 
-noncomputable def dimensionring { A: Type _}
- [CommRing A] := krullDim (PrimeSpectrum A)
-
 noncomputable def dimensionmodule ( A : Type _) (M : Type _)
- [CommRing A] [AddCommGroup M] [Module A M] := krullDim (PrimeSpectrum (A ⧸ ((⊤ : Submodule A M).annihilator)) )
+ [CommRing A] [AddCommGroup M] [Module A M] := Ideal.krullDim  (A ⧸ ((⊤ : Submodule A M).annihilator)) 
+
+
+lemma equaldim ( A : Type _) [CommRing A] (I : Ideal A): dimensionmodule (A) (A ⧸ I) = Ideal.krullDim (A ⧸ I) := by
+sorry
 end
 
 
@@ -121,39 +131,79 @@ def Component_of_graded_as_addsubgroup (𝒜 : ℤ → Type _)
   sorry
 
 
-def graded_morphism (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) (𝓝 : ℤ → Type _)
+def graded_ring_morphism (𝒜 : ℤ → Type _) (ℬ : ℤ → Type _)
+[∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (ℬ i)]
+[DirectSum.GCommRing 𝒜] [DirectSum.GCommRing ℬ] (f : (⨁ i, 𝒜 i) →+* (⨁ i, ℬ i)) := ∀ i, ∀ (r : 𝒜 i), ∀ j, (j ≠ i → f (DirectSum.of _ i r) j = 0)
+
+def graded_module_morphism (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) (𝓝 : ℤ → Type _)
 [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)] [∀ i, AddCommGroup (𝓝 i)]
-[DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜][DirectSum.Gmodule 𝒜 𝓝] (f : (⨁ i, 𝓜 i) → (⨁ i, 𝓝 i)) : ∀ i, ∀ (r : 𝓜 i), ∀ j, (j ≠ i → f (DirectSum.of _ i r) j = 0) ∧ (IsLinearMap (⨁ i, 𝒜 i) f) := by sorry
+[DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜][DirectSum.Gmodule 𝒜 𝓝] (f : (⨁ i, 𝓜 i) → (⨁ i, 𝓝 i)) := ∀ i, ∀ (r : 𝓜 i), ∀ j, (j ≠ i → f (DirectSum.of _ i r) j = 0) ∧ (IsLinearMap (⨁ i, 𝒜 i) f)
 
-
-def graded_submodule
-(𝒜 : ℤ → Type _) (𝓜 : ℤ → Type u) (𝓝 : ℤ → Type u)
+def graded_module_isomorphism (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) (𝓝 : ℤ → Type _)
 [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)] [∀ i, AddCommGroup (𝓝 i)]
 [DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜][DirectSum.Gmodule 𝒜 𝓝]
-(opn : Submodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i)) (opnis : opn = (⨁ i, 𝓝 i)) (i : ℤ )
- : ∃(piece : Submodule (𝒜 0) (𝓜 i)), piece = 𝓝 i := by
-  sorry
+(f : (⨁ i, 𝓜 i) →  (⨁ i, 𝓝 i))
+:= (graded_module_morphism 𝒜 𝓜 𝓝 f) ∧ (Function.Bijective f)
+
+def graded_ring_isomorphism (𝒜 : ℤ → Type _) (𝓑 : ℤ → Type _)
+[∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓑 i)]
+[DirectSum.GCommRing 𝒜] [DirectSum.GCommRing 𝓑]
+(f : (⨁ i, 𝒜 i) →+*  (⨁ i, 𝓑 i))
+:= (graded_ring_morphism 𝒜 𝓑 f) ∧ (Function.Bijective f)
+
+def graded_ring_isomorphic (𝒜 : ℤ → Type _) (𝓑 : ℤ → Type _)
+[∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓑 i)]
+[DirectSum.GCommRing 𝒜] [DirectSum.GCommRing 𝓑] := ∃ (f : (⨁ i, 𝒜 i) →+*  (⨁ i, 𝓑 i)),graded_ring_isomorphism 𝒜 𝓑 f
+
+
+
+-- def graded_submodule
+--     (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) (𝓝 : ℤ → Type _)
+--     [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)] [∀ i, AddCommGroup (𝓝 i)]
+--     [DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜][DirectSum.Gmodule 𝒜 𝓝]
+--     (h (⨁ i, 𝓝 i) : Submodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i)) :
+--     Prop :=
+--   ∃ (piece : Submodule (𝒜 0) (𝓜 i)), piece = 𝓝 i
 
 
 end
 
+class DirectSum.GalgebrA
+  (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
+  (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝓜 i)] [DirectSum.GCommRing 𝓜]
+  extends DirectSum.Gmodule 𝒜 𝓜
+
+def graded_algebra_morphism (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
+  (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝓜 i)] [DirectSum.GCommRing 𝓜] [DirectSum.GalgebrA 𝒜 𝓜]
+  (𝓝 : ℤ → Type _) [∀ i, AddCommGroup (𝓝 i)] [DirectSum.GCommRing 𝓝] [DirectSum.GalgebrA 𝒜 𝓝] 
+  (f : (⨁ i, 𝓜 i) →+*  (⨁ i, 𝓝 i)) := (graded_ring_morphism 𝓜 𝓝 f) ∧ (graded_module_morphism 𝒜 𝓜 𝓝 f)  
 
 
 
+-- @Quotient of a graded ring R by a graded ideal p is a graded R-alg, preserving each component
 
-
--- @Quotient of a graded ring R by a graded ideal p is a graded R-Mod, preserving each component
-instance Quotient_of_graded_is_graded
+instance Quotient_of_graded_gradedring
 (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
 (p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p)
-  : DirectSum.Gmodule 𝒜 (fun i => (𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)) := by
+  : DirectSum.GCommRing (fun i => (𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)) := by
+  sorry
+
+instance Quotient_of_graded_is_gradedalg
+(𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
+(p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p)
+  : DirectSum.GalgebrA 𝒜 (fun i => (𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)) := by
+  sorry
+
+lemma Quotient_of_graded_ringiso (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜](p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p)
+(hm : 𝓜 = (fun i => (𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)))
+: Nonempty ((⨁ i, (𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)) ≃+*  ((⨁ i, (𝒜 i))⧸p)) := by
   sorry
 
 
 -- If A_0 is Artinian and local, then A is graded local
 lemma Graded_local_if_zero_component_Artinian_and_local (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) 
 [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
-[DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜] (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) : ∃ ( I : Ideal ((⨁ i, 𝒜 i))),(HomogeneousMax 𝒜 I) := by
+[DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜] (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) : ∃! ( I : Ideal ((⨁ i, 𝒜 i))),(HomogeneousMax 𝒜 I) := by
   sorry
 
 
@@ -225,20 +275,67 @@ theorem Hilbert_polynomial_d_0 (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [
   sorry
 
 
--- (reduced version) [BH, 4.1.3] when d = 0
--- If M is a finite graed R-Mod of dimension zero, and M = R⧸ 𝓅 for a graded prime ideal 𝓅, then the Hilbert function H(M, n) = 0 for n >> 0 
+#check Ideal.dim_field_eq_zero
+#check Ideal.domain_dim_zero.isField
+--#check Quotient.isDomain_iff_prime
+
+#check DirectSum
+
+-- f (g a) = f (g b)
+
+-- DirectSum _ (fun i => ...) = DirectSum _ (fun i => ...)
+
 theorem Hilbert_polynomial_d_0_reduced
 (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
-[DirectSum.GCommRing 𝒜]
-[DirectSum.Gmodule 𝒜 𝓜] (st: StandardGraded 𝒜) (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) 
+[DirectSum.GCommRing 𝒜] [DirectSum.GCommRing 𝓜]
+[DirectSum.GalgebrA 𝒜 𝓜] (st: StandardGraded 𝒜) (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) 
 (fingen : IsNoetherian (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
 (findim :  dimensionmodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i) = 0)
 (hilb : ℤ → ℤ) (Hhilb : hilbert_function 𝒜 𝓜 hilb)
-(p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p)
-(hm : 𝓜 = (fun i => (𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)))
-: (∃ (N : ℤ), ∀ (n : ℤ), n ≥ N → hilb n = 0) := by
-  sorry
+(p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p) (hq : HomogeneousPrime 𝒜 p)
+(hm : ∀ i, 𝓜 i = ((𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)))
+: (∃ (N : ℤ), ∀ (n : ℤ), n ≥ N → hilb n = 0) := by 
+  let 𝓜' := fun i => (𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)
+  have h : 𝓜 = 𝓜' := by
+    ext i
+    exact hm i
+  subst h
+  set R := ⨁ i, 𝒜 i
+  have : (⨁ i, 𝓜' i )= ⨁ i, ((𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)) := by
+    rfl
+  
+--have h1 : Nonempty ((⨁ i, 𝓜 i) ≃+*  (R⧸p)) := by 
 
+--   apply Quotient_of_graded_ringiso 𝒜 p hp
+--  have : Ideal.krullDim (R ⧸ p) = 0 := by   
+--    calc 0 = dimensionmodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i) := by apply findim
+--        _ = dimensionmodule (R) (R ⧸ p) := by apply h1
+--        _ = Ideal.krullDim (R_mod_p) := by apply equaldim
+-- sorry
+
+lemma   
+
+-- (reduced version) [BH, 4.1.3] when d = 0
+-- If M is a finite graed R-Mod of dimension zero, and M = R⧸ 𝓅 for a graded prime ideal 𝓅, then the Hilbert function H(M, n) = 0 for n >> 0 
+-- theorem Hilbert_polynomial_d_0_reduced
+-- (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
+-- [DirectSum.GCommRing 𝒜] [DirectSum.GCommRing 𝓜]
+-- [DirectSum.GalgebrA 𝒜 𝓜] (st: StandardGraded 𝒜) (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) 
+-- (fingen : IsNoetherian (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
+-- (findim :  dimensionmodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i) = 0)
+-- (hilb : ℤ → ℤ) (Hhilb : hilbert_function 𝒜 𝓜 hilb)
+-- (p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p) (hq : HomogeneousPrime 𝒜 p)
+-- (hm : 𝓜 = (fun i => (𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)))
+-- : (∃ (N : ℤ), ∀ (n : ℤ), n ≥ N → hilb n = 0) := by 
+-- set R := ⨁ i, 𝒜 i
+-- have h := (Ideal.Quotient.isDomain_iff_prime p).mpr hq.1
+-- have h1 : Nonempty ((⨁ i, 𝓜 i)) ≃+*  (R⧸p)) := by 
+--   apply Quotient_of_graded_ringiso 𝒜 p hp
+--  have : Ideal.krullDim (R ⧸ p) = 0 := by   
+--    calc 0 = dimensionmodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i) := by apply findim
+--        _ = dimensionmodule (R) (R ⧸ p) := by apply h1
+--        _ = Ideal.krullDim (R_mod_p) := by apply equaldim
+-- sorry
 
 
 
