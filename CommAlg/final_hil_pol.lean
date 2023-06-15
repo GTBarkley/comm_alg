@@ -134,13 +134,11 @@ def graded_isomorphism (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) (𝓝 : �
 [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)] [∀ i, AddCommGroup (𝓝 i)]
 [DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜][DirectSum.Gmodule 𝒜 𝓝]
 (f : (⨁ i, 𝓜 i) →ₗ[(⨁ i, 𝒜 i)] (⨁ i, 𝓝 i))
-(hf : graded_morphism (fun i => (𝒜 i)) (fun i => (𝓜 i)) (fun i => (𝓝 i)) f)
-: (f : (⨁ i, 𝓜 i) ≃ₗ[(⨁ i, 𝒜 i)] (⨁ i, 𝓝 i)) := by
+: IsLinearEquiv f := by
   sorry
-
-
--- (⊕ i, 𝒜 i) (⨁ i, 𝓜 i) (⊕ i, 𝓝 i)
-
+-- f ∈ (⨁ i, 𝓜 i) ≃ₗ[(⨁ i, 𝒜 i)] (⨁ i, 𝓝 i)
+-- LinearEquivClass f (⨁ i, 𝒜 i) (⨁ i, 𝓜 i) (⨁ i, 𝓝 i)
+-- #print IsLinearEquiv
 #check graded_isomorphism
 
 
@@ -265,6 +263,8 @@ theorem Hilbert_polynomial_d_0_reduced
 (hm : 𝓜 = (fun i => (𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)))
 : (∃ (N : ℤ), ∀ (n : ℤ), n ≥ N → hilb n = 0) := by
   sorry
+
+
 
 
 
