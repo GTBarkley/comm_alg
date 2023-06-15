@@ -6,6 +6,7 @@ import Mathlib.RingTheory.Artinian
 import Mathlib.Order.Height
 
 
+
 -- Setting for "library_search"
 set_option maxHeartbeats 0
 macro "ls" : tactic => `(tactic|library_search)
@@ -43,7 +44,7 @@ noncomputable def length ( A : Type _) (M : Type _)
  [CommRing A] [AddCommGroup M] [Module A M] :=  Set.chainHeight {M' : Submodule A M | M' < ⊤}
 
 -- Make instance of M_i being an R_0-module
-instance tada1 (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]  [DirectSum.GCommRing 𝒜]
+instance tada1 (𝒜 : ℤ   → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]  [DirectSum.GCommRing 𝒜]
   [DirectSum.Gmodule 𝒜 𝓜] (i : ℤ ) : SMul (𝒜 0) (𝓜 i)
     where smul x y := @Eq.rec ℤ (0+i) (fun a _ => 𝓜 a) (GradedMonoid.GSmul.smul x y) i (zero_add i)
 
