@@ -19,6 +19,11 @@ import Mathlib.Order.ConditionallyCompleteLattice.Basic
   developed.
 -/
 
+lemma lt_bot_eq_WithBot_bot [PartialOrder α] [OrderBot α] {a : WithBot α} (h : a < (⊥ : α)) : a = ⊥ := by
+  cases a
+  . rfl
+  . cases h.not_le (WithBot.coe_le_coe.2 bot_le)
+
 namespace Ideal
 open LocalRing
 
@@ -46,15 +51,50 @@ lemma krullDim_le_iff (R : Type _) [CommRing R] (n : ℕ) :
 lemma krullDim_le_iff' (R : Type _) [CommRing R] (n : ℕ∞) :
   krullDim R ≤ n ↔ ∀ I : PrimeSpectrum R, (height I : WithBot ℕ∞) ≤ ↑n := iSup_le_iff (α := WithBot ℕ∞)
 
-lemma le_krullDim_iff (R : Type _) [CommRing R] (n : ℕ) :
-  n ≤ krullDim R ↔ ∃ I : PrimeSpectrum R, n ≤ (height I : WithBot ℕ∞) := by sorry
-
-lemma le_krullDim_iff' (R : Type _) [CommRing R] (n : ℕ∞) :
-  n ≤ krullDim R ↔ ∃ I : PrimeSpectrum R, n ≤ (height I : WithBot ℕ∞) := by sorry
-
 @[simp]
 lemma height_le_krullDim (I : PrimeSpectrum R) : height I ≤ krullDim R := 
   le_iSup (λ I : PrimeSpectrum R => (height I : WithBot ℕ∞)) I
+
+lemma le_krullDim_iff (R : Type _) [CommRing R] (n : ℕ) :
+  n ≤ krullDim R ↔ ∃ I : PrimeSpectrum R, n ≤ (height I : WithBot ℕ∞) := by
+  constructor
+  · unfold krullDim
+    intro H
+    by_contra H1
+    push_neg at H1
+    by_cases n ≤ 0
+    · rw [Nat.le_zero] at h
+      rw [h] at H H1
+      have : ∀ (I : PrimeSpectrum R), ↑(height I) = (⊥ : WithBot ℕ∞) := by
+        intro I
+        specialize H1 I
+        exact lt_bot_eq_WithBot_bot H1
+      rw [←iSup_eq_bot] at this
+      have := le_of_le_of_eq H this
+      rw [le_bot_iff] at this
+      exact WithBot.coe_ne_bot this
+    · push_neg at h
+      have : (n: ℕ∞) > 0 := Nat.cast_pos.mpr h
+      replace H1 : ∀ (I : PrimeSpectrum R), height I ≤ n - 1 := by
+        intro I
+        specialize H1 I
+        apply ENat.le_of_lt_add_one
+        rw [←ENat.coe_one, ←ENat.coe_sub, ←ENat.coe_add, tsub_add_cancel_of_le]
+        exact WithBot.coe_lt_coe.mp H1
+        exact h
+      replace H1 : ∀ (I : PrimeSpectrum R), (height I : WithBot ℕ∞) ≤ ↑(n - 1):=
+          fun _ ↦ (WithBot.coe_le rfl).mpr (H1 _)
+      rw [←iSup_le_iff] at H1
+      have : ((n : ℕ∞) : WithBot ℕ∞) ≤ (((n  - 1 : ℕ) : ℕ∞) : WithBot ℕ∞) := le_trans H H1
+      norm_cast at  this
+      have that : n - 1 < n := by refine Nat.sub_lt h (by norm_num)
+      apply lt_irrefl (n-1) (trans that this)
+  · rintro ⟨I, h⟩
+    have : height I ≤ krullDim R := by apply height_le_krullDim
+    exact le_trans h this
+
+lemma le_krullDim_iff' (R : Type _) [CommRing R] (n : ℕ∞) :
+  n ≤ krullDim R ↔ ∃ I : PrimeSpectrum R, n ≤ (height I : WithBot ℕ∞) := by sorry
 
 /-- The Krull dimension of a local ring is the height of its maximal ideal. -/
 lemma krullDim_eq_height [LocalRing R] : krullDim R = height (closedPoint R) := by
@@ -250,7 +290,7 @@ lemma domain_dim_eq_zero_iff_field {D: Type _} [CommRing D] [IsDomain D] : krull
   constructor
   · exact domain_dim_zero.isField
   · intro fieldD
-    let h : Field D := IsField.toField fieldD
+    let h : Field D := fieldD.toField
     exact dim_field_eq_zero
 
 #check Ring.DimensionLEOne
