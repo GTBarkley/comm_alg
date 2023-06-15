@@ -3,9 +3,11 @@ import Mathlib.Order.Height
 import Mathlib.RingTheory.PrincipalIdealDomain
 import Mathlib.RingTheory.DedekindDomain.Basic
 import Mathlib.RingTheory.Ideal.Quotient
+import Mathlib.RingTheory.Ideal.MinimalPrime
 import Mathlib.RingTheory.Localization.AtPrime
 import Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic
 import Mathlib.Order.ConditionallyCompleteLattice.Basic
+import Mathlib.Data.Set.Ncard
 
 namespace Ideal
 
@@ -23,6 +25,13 @@ lemma dim_le_dim_polynomial_add_one [Nontrivial R] :
   krullDim R + 1 ≤ krullDim (Polynomial R) := sorry -- Others are working on it
 
 lemma height_le_of_le {I J : PrimeSpectrum R} (I_le_J : I ≤ J) : height I ≤ height J := sorry -- Already done in main file
+
+lemma primeIdeal_finite_height_of_noetherianRing [Nontrivial R] [IsNoetherianRing R] (P: PrimeSpectrum R) : height P ≠ ⊤ := by
+  sorry
+
+lemma exist_elts_MinimalOver_of_primeIdeal_of_noetherianRing [Nontrivial R] [IsNoetherianRing R] (P: PrimeSpectrum R) :
+  ∃S : Set R, Set.ncard s = height P ∧ P.asIdeal ∈ Ideal.minimalPrimes (Ideal.span S) := by
+  sorry
 
 lemma dim_eq_dim_polynomial_add_one [Nontrivial R] [IsNoetherianRing R] :
   krullDim R + 1 = krullDim (Polynomial R) := by
@@ -43,6 +52,7 @@ lemma dim_eq_dim_polynomial_add_one [Nontrivial R] [IsNoetherianRing R] :
         have : height P ≤ height P' := height_le_of_le PleP'
         simp only [WithBot.coe_le_coe]
         have : ∃ (I : PrimeSpectrum R), height P' ≤ height I + 1 := by
+          -- Prime avoidance is called subset_union_prime
 
           sorry
         obtain ⟨I, h⟩ := this
