@@ -125,19 +125,23 @@ lemma Artinian_has_finite_max_ideal
     let m' : ℕ ↪ MaximalSpectrum R := Infinite.natEmbedding (MaximalSpectrum R)
     have m'inj := m'.injective
     let m'' : ℕ → Ideal R := fun n : ℕ ↦ ⨅ k ∈ range n, (m' k).asIdeal
+    let f : ℕ → Ideal R := fun n : ℕ ↦ (m' n).asIdeal
+    let F : Fin n → Ideal R := fun k ↦ (m' k).asIdeal
     have comaximal : ∀ i j : ℕ, i ≠ j → (m' i).asIdeal ⊔ (m' j).asIdeal =
       (⊤ : Ideal R) := by 
       intro i j distinct
       apply Ideal.IsMaximal.coprime_of_ne
-      sorry
-      sorry
-      --  by_contra equal
+      exact (m' i).IsMaximal
+      exact (m' j).IsMaximal
       have : (m' i) ≠ (m' j) := by 
         exact Function.Injective.ne m'inj distinct
       intro h
       apply this
       exact MaximalSpectrum.ext _ _ h
-    -- let g :`= Ideal.quotientInfRingEquivPiQuotient m' comaximal
+    have ∀ n : ℕ, (R ⧸ ⨅ (i : Fin n), (F n) i) ≃+* ((i : Fin n) → R ⧸ (F n) i) := by
+      sorry
+    -- (let F : Fin n → Ideal R := fun k : Fin n ↦ (m' k).asIdeal) 
+    -- let g := Ideal.quotientInfRingEquivPiQuotient f comaximal 
 
 
 -- Stacks Lemma 10.53.4: R Artinian => Jacobson ideal of R is nilpotent
@@ -193,7 +197,7 @@ lemma dim_zero_Noetherian_iff_Artinian (R : Type _) [CommRing R] :
     constructor
     apply finite_length_is_Noetherian
     rwa [IsArtinian_iff_finite_length] at RisArtinian
-    sorry
+    sorry -- can use Grant's lemma dim_eq_zero_iff
 
 
 
