@@ -198,6 +198,8 @@ lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N :
     have H22 := λ n=> (hh n).right
     have H2 : c ≠ 0 := by
       exact H22 0
+    have H2 : (c : ℚ) ≠ 0 := by
+      simp; tauto
     clear H22
     constructor
     · intro n Nn
@@ -206,47 +208,15 @@ lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N :
         tauto
       rw [this]
       have this2 : Polynomial.eval (n : ℚ) Poly = (c : ℚ) := by
-        have this3 : ∀ r : ℚ, (Polynomial.eval r Poly) = (c : ℚ) :=  (Poly_constant Poly (c : ℚ)).mp rfl
+        have this3 : ∀ r : ℚ, (Polynomial.eval r Poly) = (c : ℚ) := (Poly_constant Poly (c : ℚ)).mp rfl
         exact this3 n
       exact this2.symm
     
 
-    · sorry
-    -- intro n
-    -- specialize aaa n
-    -- have this1 : c ≠ 0 →  f n = c := by
-    --   sorry
-    -- rcases aaa with ⟨A, B⟩
-    -- have this1 : f n = c := by
-    --   tauto
-    -- constructor
-    -- clear A
-    -- · have this2 : ∀ (t : ℚ), (Polynomial.eval t Poly) = (c : ℚ) := by
-    --     rw [← Poly_constant Poly (c : ℚ)]
-    --     sorry
-    --   specialize this2 n
-    --   rw [this2]
-    --   tauto
-    -- · sorry
-
-
-
-    -- constructor
-    -- · intro n Nn
-    --   specialize aaa n
-    --   have this1 : c ≠ 0 →  f n = c := by
-    --     tauto
-    --   rcases aaa with ⟨A, B⟩
-    --   have this1 : f n = c := by
-    --     tauto
-    --   clear A
-    --   have this2 : ∀ (t : ℚ), (Polynomial.eval t Poly) = (c : ℚ) := by
-    --     rw [← Poly_constant Poly (c : ℚ)]
-    --     sorry
-    --   specialize this2 n
-    --   rw [this2]
-    --   tauto
-    -- · sorry
+    · have this : Polynomial.degree Poly = 0 := by
+        simp only [map_intCast]
+        exact Polynomial.degree_C H2
+      tauto
 
 
 
