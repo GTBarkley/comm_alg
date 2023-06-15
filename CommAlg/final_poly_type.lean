@@ -70,7 +70,7 @@ end section
 noncomputable section
 -- Polynomial type of degree d
 @[simp]
-def PolyType (f : ℤ → ℤ) (d : ℕ) := ∃ Poly : Polynomial ℚ, ∃ (N : ℤ), ∀ (n : ℤ), N ≤ n → f n = Polynomial.eval (n : ℚ) Poly ∧ d = Polynomial.degree Poly
+def PolyType (f : ℤ → ℤ) (d : ℕ) := ∃ Poly : Polynomial ℚ, ∃ (N : ℤ), ∀ (n : ℤ), (N ≤ n → f n = Polynomial.eval (n : ℚ) Poly) ∧ d = Polynomial.degree Poly
 section
 -- structure PolyType (f : ℤ → ℤ) where
 --   Poly : Polynomial ℤ
@@ -109,7 +109,7 @@ end section
 
 -- (NO NEED TO PROVE) Constant polynomial function = constant function
 lemma Poly_constant (F : Polynomial ℚ) (c : ℚ) : 
-  (F = Polynomial.C c) ↔ (∀ r : ℚ, (Polynomial.eval r F) = c) := by
+  (F = Polynomial.C (c : ℚ)) ↔ (∀ r : ℚ, (Polynomial.eval r F) = (c : ℚ)) := by
   constructor
   · intro h
     rintro r
@@ -134,13 +134,13 @@ lemma Poly_shifting (f : ℤ → ℤ) (g : ℤ → ℤ) (hf : PolyType f d) (s :
 
 -- set_option pp.all true in
 -- PolyType 0 = constant function
-lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N : ℤ), ∀ (n : ℤ), (N ≤ n → f n = c) ∧ c ≠ 0) := by
+lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N : ℤ), ∀ (n : ℤ), (N ≤ n → f n = c) ∧ (c ≠ 0)) := by
   constructor
   · intro h
     rcases h with ⟨Poly, hN⟩
     rcases hN with ⟨N, hh⟩
-    have H1 := λ n hn => (hh n hn).left
-    have H2 := λ n hn => (hh n hn).right
+    have H1 := λ n=> (hh n).left
+    have H2 := λ n=> (hh n).right
     clear hh
     specialize H2 (N + 1)
     have this1 : Polynomial.degree Poly = 0 := by
@@ -182,11 +182,10 @@ lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N :
     --
     
     · intro c0
-      have H7 := H2 (by norm_num)
+      -- have H7 := H2 (by norm_num)
       rw [hthis2] at this1
       rw [c0] at this1
       simp at this1
-    --   
 
 
   · intro h
@@ -194,14 +193,42 @@ lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N :
     let (Poly : Polynomial ℚ) := Polynomial.C (c : ℚ)
     use Poly
     use N
-    intro n Nn
+    intro n
     specialize aaa n
     have this1 : c ≠ 0 →  f n = c := by
       tauto
+    rcases aaa with ⟨A, B⟩
+    have this1 : f n = c := by
+      tauto
     constructor
-    · sorry
-    · sorry
+    clear A
+    · have this2 : ∀ (t : ℚ), (Polynomial.eval t Poly) = (c : ℚ) := by
+        rw [← Poly_constant Poly (c : ℚ)]
+        sorry
+      specialize this2 n
+      rw [this2]
+      tauto
+    · sorry 
       -- apply Polynomial.degree_C c
+
+
+
+    -- constructor
+    -- · intro n Nn
+    --   specialize aaa n
+    --   have this1 : c ≠ 0 →  f n = c := by
+    --     tauto
+    --   rcases aaa with ⟨A, B⟩
+    --   have this1 : f n = c := by
+    --     tauto
+    --   clear A
+    --   have this2 : ∀ (t : ℚ), (Polynomial.eval t Poly) = (c : ℚ) := by
+    --     rw [← Poly_constant Poly (c : ℚ)]
+    --     sorry
+    --   specialize this2 n
+    --   rw [this2]
+    --   tauto
+    -- · sorry
 
 
 
@@ -217,8 +244,8 @@ lemma Δ_PolyType_d_to_PolyType_0 (f : ℤ → ℤ) (d : ℕ): PolyType f d → 
   intro h
   rcases h with ⟨Poly, hN⟩
   rcases hN with ⟨N, hh⟩
-  have H1 := λ n hn => (hh n hn).left
-  have H2 := λ n hn => (hh n hn).right
+  have H1 := λ n => (hh n).left
+  have H2 := λ n => (hh n).right
   clear hh
   have HH2 : d = Polynomial.degree Poly := by
     sorry
