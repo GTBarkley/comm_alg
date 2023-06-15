@@ -29,11 +29,13 @@ macro "obviously" : tactic =>
 
 
 
+open GradedMonoid.GSmul
+open DirectSum
+
+
 
 -- @Definitions (to be classified)
 section
-open GradedMonoid.GSmul
-open DirectSum
 
 -- Definition of polynomail of type d 
 def PolyType (f : ℤ → ℤ) (d : ℕ) := ∃ Poly : Polynomial ℚ, ∃ (N : ℤ), ∀ (n : ℤ), N ≤ n → f n = Polynomial.eval (n : ℚ) Poly ∧ d = Polynomial.degree Poly
@@ -78,7 +80,6 @@ end
 
 
 
-
 -- Definition of homogeneous ideal
 def Ideal.IsHomogeneous' (𝒜 : ℤ → Type _) 
 [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜] 
@@ -99,10 +100,30 @@ def HomogeneousMax (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [Direc
 end
 
 
+-- Each component of a graded ring is an additive subgroup
+def Component_of_graded_as_addsubgroup (𝒜 : ℤ → Type _) 
+[∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
+(p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p) (i : ℤ) : AddSubgroup (𝒜 i) := by
+  sorry
+
+-- @Quotient of a graded ring R by a graded ideal p is a graded R-Mod, preserving each component
+instance Quotient_of_graded_is_graded
+(𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
+(p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p)
+  : DirectSum.Gmodule 𝒜 (fun i => (𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)) := by
+  sorry
+
+
+
+
 -- If A_0 is Artinian and local, then A is graded local
 lemma Graded_local_if_zero_component_Artinian_and_local (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) 
 [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
-[DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜] (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) : ∃ ( I : Ideal ((⨁ i, 𝒜 i))),(HomogeneousMax 𝒜 I) := sorry
+[DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜] (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) : ∃ ( I : Ideal ((⨁ i, 𝒜 i))),(HomogeneousMax 𝒜 I) := by
+  sorry
+
+
+
 
 
 
@@ -159,25 +180,11 @@ lemma Associated_prime_of_graded_is_graded
   sorry
 
 
--- instance gyhoiu
--- (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
--- (p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p)
---   : (𝒫 : ℤ → Type _) [∀ i, AddCommGroup (𝒫 i)] [DirectSum.GCommRing 𝒫] → Gmodule (⊕ i, 𝒜 i)   := by
---   sorry
 
 
--- Each component of a graded ring is an additive subgroup
-def Component_of_graded_as_addsubgroup (𝒜 : ℤ → Type _) 
-[∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
-(p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p) (i : ℤ) : AddSubgroup (𝒜 i) := by
+
+
+
+def Graded_homo : true := by
   sorry
-
-
--- @Quotient of a graded ring R by a graded ideal p is a graded R-Mod, preserving each component
-instance Quotient_of_graded_is_graded
-(𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
-(p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p)
-  : DirectSum.Gmodule 𝒜 (fun i => (𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)) := by
-  sorry
-
 

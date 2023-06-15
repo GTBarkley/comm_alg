@@ -110,7 +110,7 @@ def f (n : ℤ) := n
 end section
 
 
--- (NO need to prove) Constant polynomial function = constant function
+-- (NO NEED TO PROVE) Constant polynomial function = constant function
 lemma Poly_constant (F : Polynomial ℚ) (c : ℚ) : 
   (F = Polynomial.C c) ↔ (∀ r : ℚ, (Polynomial.eval r F) = c) := by
   constructor
@@ -123,9 +123,19 @@ lemma Poly_constant (F : Polynomial ℚ) (c : ℚ) :
   · sorry
 
 
+
+
+
+
+
 -- Shifting doesn't change the polynomial type
 lemma Poly_shifting (f : ℤ → ℤ) (g : ℤ → ℤ) (hf : PolyType f d) (s : ℤ) (hfg : ∀ (n : ℤ), f (n + s) = g (n)) : PolyType g d := by
+  simp only [PolyType]
+  rcases hf with ⟨F, hh⟩
+  rcases hh with ⟨N,ss⟩
   sorry
+
+
 
 -- PolyType 0 = constant function
 lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N : ℤ), ∀ (n : ℤ), (N ≤ n → f n = c) ∧ c ≠ 0) := by
@@ -188,6 +198,14 @@ lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N :
     · sorry
       -- apply Polynomial.degree_C c
 
+
+
+
+
+-- Δ of 0 times preserve the function
+lemma Δ_0 (f : ℤ → ℤ) : (Δ f 0) = f := by
+  tauto
+
 -- Δ of d times maps polynomial of degree d to polynomial of degree 0
 lemma Δ_PolyType_d_to_PolyType_0 (f : ℤ → ℤ) (d : ℕ): PolyType f d → PolyType (Δ f d) 0 := by
   intro h
@@ -202,6 +220,10 @@ lemma Δ_PolyType_d_to_PolyType_0 (f : ℤ → ℤ) (d : ℕ): PolyType f d → 
   · rw [PolyType_0]
     sorry
   · sorry
+
+
+
+
 
 -- [BH, 4.1.2] (a) => (b)
 -- Δ^d f (n) = c for some nonzero integer c for n >> 0 → f is of polynomial type d
