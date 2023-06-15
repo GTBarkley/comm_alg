@@ -4,6 +4,7 @@ import Mathlib.Order.Height
 import Mathlib.RingTheory.PrincipalIdealDomain
 import Mathlib.RingTheory.DedekindDomain.Basic
 import Mathlib.RingTheory.Ideal.Quotient
+import Mathlib.RingTheory.Ideal.MinimalPrime
 import Mathlib.RingTheory.Localization.AtPrime
 import Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic
 import Mathlib.Order.ConditionallyCompleteLattice.Basic
@@ -270,8 +271,12 @@ lemma dim_le_one_of_pid [IsDomain R] [IsPrincipalIdealRing R] : krullDim R ≤ 1
 lemma dim_le_dim_polynomial_add_one [Nontrivial R] :
   krullDim R + 1 ≤ krullDim (Polynomial R) := sorry
 
-lemma dim_eq_dim_polynomial_add_one [Nontrivial R] [IsNoetherianRing R] :
-  krullDim R + 1 = krullDim (Polynomial R) := sorry
+-- lemma dim_eq_dim_polynomial_add_one [Nontrivial R] [IsNoetherianRing R] :
+--   krullDim R + 1 = krullDim (Polynomial R) := sorry
+
+lemma krull_height_theorem [Nontrivial R] [IsNoetherianRing R] (P: PrimeSpectrum R) (S: Finset R)
+  (h: P.asIdeal ∈ Ideal.minimalPrimes (Ideal.span S)) : height P ≤ S.card := by
+  sorry
 
 lemma dim_mvPolynomial [Field K] (n : ℕ) : krullDim (MvPolynomial (Fin n) K) = n := sorry
 
