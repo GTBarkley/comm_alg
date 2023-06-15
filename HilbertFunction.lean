@@ -97,7 +97,21 @@ def HomogeneousMax (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [Direc
 -- rw [isNoetherian_iff_wellFounded, WellFounded.monotone_chain_condition]
 
 
-end
+instance {𝒜 : ℤ → Type _} [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜] :
+    Algebra (𝒜 0) (⨁ i, 𝒜 i) :=
+  Algebra.ofModule'
+  (by
+    intro r x
+    sorry)
+  (by
+    intro r x
+    sorry)
+
+
+
+class StandardGraded {𝒜 : ℤ → Type _} [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜] : Prop where
+  gen_in_first_piece :
+    Algebra.adjoin (𝒜 0) (DirectSum.of _ 1 : 𝒜 1 →+ ⨁ i, 𝒜 i).range = (⊤ : Subalgebra (𝒜 0) (⨁ i, 𝒜 i))
 
 
 -- Each component of a graded ring is an additive subgroup
@@ -106,13 +120,34 @@ def Component_of_graded_as_addsubgroup (𝒜 : ℤ → Type _)
 (p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p) (i : ℤ) : AddSubgroup (𝒜 i) := by
   sorry
 
+
+def graded_morphism (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) (𝓝 : ℤ → Type _)
+[∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)] [∀ i, AddCommGroup (𝓝 i)]
+[DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜][DirectSum.Gmodule 𝒜 𝓝] (f : (⨁ i, 𝓜 i) → (⨁ i, 𝓝 i)) : ∀ i, ∀ (r : 𝓜 i), ∀ j, (j ≠ i → f (DirectSum.of _ i r) j = 0) ∧ (IsLinearMap (⨁ i, 𝒜 i) f) := by sorry
+
+
+def graded_submodule
+(𝒜 : ℤ → Type _) (𝓜 : ℤ → Type u) (𝓝 : ℤ → Type u)
+[∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)] [∀ i, AddCommGroup (𝓝 i)]
+[DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜][DirectSum.Gmodule 𝒜 𝓝]
+(opn : Submodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i)) (opnis : opn = (⨁ i, 𝓝 i)) (i : ℤ )
+ : ∃(piece : Submodule (𝒜 0) (𝓜 i)), piece = 𝓝 i := by
+  sorry
+
+
+end
+
+
+
+
+
+
 -- @Quotient of a graded ring R by a graded ideal p is a graded R-Mod, preserving each component
 instance Quotient_of_graded_is_graded
 (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
 (p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p)
   : DirectSum.Gmodule 𝒜 (fun i => (𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)) := by
   sorry
-
 
 
 -- If A_0 is Artinian and local, then A is graded local
@@ -131,8 +166,6 @@ lemma Exist_chain_of_graded_submodules (𝒜 : ℤ → Type _) (𝓜 : ℤ → T
   sorry
 
 
-
-
 -- @[BH, 1.5.6 (b)(ii)]
 -- An associated prime of a graded R-Mod M is graded
 lemma Associated_prime_of_graded_is_graded
@@ -142,6 +175,8 @@ lemma Associated_prime_of_graded_is_graded
 (p : associatedPrimes (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
   : (Ideal.IsHomogeneous' 𝒜 p) ∧ ((∃ (i : ℤ ), ∃ (x :  𝒜 i), p = (Submodule.span (⨁ i, 𝒜 i) {DirectSum.of _ i x}).annihilator)) := by
   sorry
+
+
 
 
 
