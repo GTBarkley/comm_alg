@@ -98,33 +98,23 @@ lemma map_lt_adjoin_x (I : PrimeSpectrum R) : map_prime I < adjoin_x I := by
   simp
   rw [←Ideal.eq_top_iff_one]
   exact I.IsPrime.ne_top'
-  
-/- Given an ideal p in R, define the ideal p[x] in R[x] -/
+
 lemma ht_adjoin_x_eq_ht_add_one [Nontrivial R] (I : PrimeSpectrum R) : height I + 1 ≤ height (adjoin_x I) := by
   suffices H : height I + (1 : ℕ) ≤ height (adjoin_x I) + (0 : ℕ)
   . norm_cast at H; rw [add_zero] at H; exact H
   rw [height, height, Set.chainHeight_add_le_chainHeight_add {J | J < I} _ 1 0]
   intro l hl
   use ((l.map map_prime) ++ [map_prime I])
-  constructor
+  refine' ⟨_, by simp⟩
   . simp [Set.append_mem_subchain_iff]
-    refine' ⟨_,_,_⟩
-    . show (List.map map_prime l).Chain' (· < ·) ∧ ∀ i ∈ _, i ∈ _
-      constructor
-      . apply List.chain'_map_of_chain' map_prime
-        intro a b hab
-        apply map_strictmono
-        exact hab
-        exact hl.1
-      . intro i hi
-        rw [List.mem_map] at hi
+    refine' ⟨_, map_lt_adjoin_x I, fun a ha => _⟩
+    . refine' ⟨_, fun i hi => _⟩
+      . apply List.chain'_map_of_chain' map_prime (fun a b hab => map_strictmono hab) hl.1
+      . rw [List.mem_map] at hi
         obtain ⟨a, ha, rfl⟩ := hi
-        show map_prime a < adjoin_x I
         calc map_prime a < map_prime I := by apply map_strictmono; apply hl.2; apply ha
           _ < adjoin_x I := by apply map_lt_adjoin_x
-    . apply map_lt_adjoin_x
-    . intro a ha
-      have H : ∃ b : PrimeSpectrum R, b ∈ l ∧ map_prime b = a
+    . have H : ∃ b : PrimeSpectrum R, b ∈ l ∧ map_prime b = a
       . have H2 : l ≠ []
         . intro h
           rw [h] at ha
@@ -141,7 +131,7 @@ lemma ht_adjoin_x_eq_ht_add_one [Nontrivial R] (I : PrimeSpectrum R) : height I 
       apply map_strictmono
       apply hl.2
       exact hb
-  . simp
+
 
 /-
 dim R + 1 ≤ dim R[X]
