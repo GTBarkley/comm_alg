@@ -16,6 +16,7 @@ import Mathlib.Order.ConditionallyCompleteLattice.Basic
 import Mathlib.Algebra.Ring.Pi
 import Mathlib.RingTheory.Finiteness
 import Mathlib.Util.PiNotation
+import Mathlib.RingTheory.Ideal.MinimalPrime
 import CommAlg.krull
 
 open PiNotation
@@ -42,6 +43,8 @@ class IsLocallyNilpotent {R : Type _} [CommRing R] (I : Ideal R) : Prop :=
     h : ∀ x ∈ I, IsNilpotent x
 #check Ideal.IsLocallyNilpotent
 end Ideal
+
+def RingJacobson (R) [Ring R] := Ideal.jacobson (⊥ : Ideal R)
 
 -- Repeats the definition of the length of a module by Monalisa
 variable (R : Type _) [CommRing R] (I J : Ideal R)
@@ -169,15 +172,15 @@ abbrev Prod_of_localization :=
 def foo : Prod_of_localization R →+* R where
   toFun := sorry
   -- invFun := sorry
-  left_inv := sorry
-  right_inv := sorry
+  --left_inv := sorry
+  --right_inv := sorry
   map_mul' := sorry
   map_add' := sorry
 
 
 def product_of_localization_at_maximal_ideal [Finite (MaximalSpectrum R)]
-    (h : Ideal.IsLocallyNilpotent (Ideal.jacobson (⊥ : Ideal R))) :
-    Prod_of_localization R ≃+* R := by sorry
+    (h : Ideal.IsLocallyNilpotent (RingJacobson R)) :
+    R ≃+* Prod_of_localization R := by sorry
 
 -- Stacks Lemma 10.53.6: R is Artinian iff R has finite length as an R-mod
 lemma IsArtinian_iff_finite_length : 
@@ -193,18 +196,61 @@ lemma primes_of_Artinian_are_maximal
 
 -- Lemma: Krull dimension of a ring is the supremum of height of maximal ideals
 
+-- Lemma: X is an irreducible component of Spec(R) ↔ X = V(I) for I a minimal prime
+lemma irred_comp_minmimal_prime (X) : 
+    X ∈ irreducibleComponents (PrimeSpectrum R) 
+      ↔ ∃ (P : minimalPrimes R), X = PrimeSpectrum.zeroLocus P := by
+      sorry
+
+-- Lemma: localization of Noetherian ring is Noetherian
+-- lemma localization_of_Noetherian_at_prime [IsNoetherianRing R]
+--      (atprime: Ideal.IsPrime I) :
+--     IsNoetherianRing (Localization.AtPrime I) := by sorry
+
+
 -- Stacks Lemma 10.60.5: R is Artinian iff R is Noetherian of dimension 0
-lemma dim_le_zero_Noetherian_iff_Artinian (R : Type _) [CommRing R] : 
-    IsNoetherianRing R ∧ Ideal.krullDim R ≤ 0 ↔ IsArtinianRing R := by 
-    constructor
+lemma Artinian_if_dim_le_zero_Noetherian (R : Type _) [CommRing R] : 
+    IsNoetherianRing R ∧ Ideal.krullDim R ≤ 0 → IsArtinianRing R := by
     rintro ⟨RisNoetherian, dimzero⟩  
     rw [ring_Noetherian_iff_spec_Noetherian] at RisNoetherian
+    have := fun X => (irred_comp_minmimal_prime R X).mp
+    choose F hf using this
     let Z := irreducibleComponents (PrimeSpectrum R)
-    have Zfinite : Set.Finite Z := by
+    -- have Zfinite : Set.Finite Z := by
       -- apply TopologicalSpace.NoetherianSpace.finite_irreducibleComponents ?_
+      -- sorry
+    --let P := fun 
+    rw [← ring_Noetherian_iff_spec_Noetherian] at RisNoetherian
+    have PrimeIsMaximal : ∀ X : Z, Ideal.IsMaximal (F X X.2).1 := by
+      intro X
+      have prime : Ideal.IsPrime (F X X.2).1 := (F X X.2).2.1.1
+      rw [Ideal.dim_le_zero_iff] at dimzero
+      exact dimzero ⟨_, prime⟩
+    have JacLocallyNil : Ideal.IsLocallyNilpotent (RingJacobson R) := by sorry 
+    let Loc := fun X : Z ↦ Localization.AtPrime (F X.1 X.2).1 
+    have LocNoetherian : ∀ X, IsNoetherianRing (Loc X) := by 
+      intro X
       sorry
-    
-    sorry
+      -- apply IsLocalization.isNoetherianRing (F X.1 X.2).1 (Loc X) RisNoetherian
+    have Locdimzero : ∀ X, Ideal.krullDim (Loc X) ≤ 0 := by sorry
+    have powerannihilates : ∀ X, ∃ n : ℕ, 
+      ((F X.1 X.2).1) ^ n • (⊤: Submodule R (Loc X)) = 0 := by sorry
+    have LocFinitelength : ∀ X, ∃ n : ℕ, Module.length R (Loc X) ≤ n := by
+      intro X
+      have idealfg : Ideal.FG (F X.1 X.2).1 := by
+        rw [isNoetherianRing_iff_ideal_fg] at RisNoetherian
+        specialize RisNoetherian (F X.1 X.2).1
+        exact RisNoetherian
+      have modulefg : Module.Finite R (Loc X) := by sorry -- not sure if this is true
+      specialize PrimeIsMaximal X
+      specialize powerannihilates X
+      apply power_zero_finite_length R (F X.1 X.2).1 (Loc X) idealfg powerannihilates
+    have RingFinitelength : ∃ n : ℕ, Module.length R R ≤ n := by sorry
+    rw [IsArtinian_iff_finite_length]
+    exact RingFinitelength
+
+lemma dim_le_zero_Noetherian_if_Artinian (R : Type _) [CommRing R] : 
+    IsArtinianRing R → IsNoetherianRing R ∧ Ideal.krullDim R ≤ 0 := by 
     intro RisArtinian
     constructor
     apply finite_length_is_Noetherian
@@ -213,7 +259,6 @@ lemma dim_le_zero_Noetherian_iff_Artinian (R : Type _) [CommRing R] :
     intro I
     apply primes_of_Artinian_are_maximal
 
--- Use TopologicalSpace.NoetherianSpace.exists_finset_irreducible :
 
 
 
