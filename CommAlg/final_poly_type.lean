@@ -199,7 +199,9 @@ lemma foofoo (d : ℕ) : (f : ℤ → ℤ) → (PolyType f d) → (PolyType (Δ 
     have this1 : PolyType f (d + 1) := by tauto
     have this2 : PolyType (Δ f (d + 1)) 0 := by
       have this3 : PolyType (Δ f 1) d := by
-        sorry
+        have this4 : d + 1 > 0 := by positivity
+        have this5 : (d + 1) > 0 → PolyType f (d + 1) → PolyType (Δ f 1) d := Δ_1 f (d + 1)
+        exact this5 this4 this1
       clear hf
       specialize hd (Δ f 1)
       have this4 : PolyType (Δ (Δ f 1) d) 0 := by tauto
