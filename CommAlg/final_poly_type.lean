@@ -151,9 +151,11 @@ lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N :
   · rintro ⟨Poly, ⟨N, ⟨H1, H2⟩⟩⟩ 
     have this1 : Polynomial.degree Poly = 0 := by rw [← H2]; rfl
     have this2 : ∃ (c : ℤ), Poly = Polynomial.C (c : ℚ) := by
-      have HH : ∃ (c : ℚ), Poly = Polynomial.C (c : ℚ) := ⟨Poly.coeff 0, Polynomial.eq_C_of_degree_eq_zero (by rw[← H2]; rfl)⟩
+      have HH : ∃ (c : ℚ), Poly = Polynomial.C (c : ℚ) := 
+        ⟨Poly.coeff 0, Polynomial.eq_C_of_degree_eq_zero (by rw[← H2]; rfl)⟩
       cases' HH with c HHH
-      have HHHH : ∃ (d : ℤ), d = c := ⟨f N, by simp [(Poly_constant Poly c).mp HHH N, H1 N (le_refl N)]⟩
+      have HHHH : ∃ (d : ℤ), d = c := 
+        ⟨f N, by simp [(Poly_constant Poly c).mp HHH N, H1 N (le_refl N)]⟩
       cases' HHHH with d H5; exact ⟨d, by rw[← H5] at HHH; exact HHH⟩
     rcases this2 with ⟨c, hthis2⟩ 
     use c; use N; intro n
@@ -162,10 +164,13 @@ lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N :
         rw [hthis2]; simp only [map_intCast, Polynomial.eval_int_cast]
       exact fun HH1 => Iff.mp (Rat.coe_int_inj (f n) c) (by rw [←this4, H1 n HH1])
     · intro c0
-      simp only [hthis2, c0, Int.cast_zero, map_zero, Polynomial.degree_zero] at this1
+      simp only [hthis2, c0, Int.cast_zero, map_zero, Polynomial.degree_zero] 
+        at this1
   · rintro ⟨c, N, hh⟩
-    have H2 : (c : ℚ) ≠ 0 := by simp only [ne_eq, Int.cast_eq_zero]; exact (hh 0).2
-    exact ⟨Polynomial.C (c : ℚ), N, fun n Nn => by rw [(hh n).1 Nn]; exact (((Poly_constant (Polynomial.C (c : ℚ)) (c : ℚ)).mp rfl) n).symm, by rw [Polynomial.degree_C H2]; rfl⟩
+    have H2 : (c : ℚ) ≠ 0 := by simp only [ne_eq, Int.cast_eq_zero]; exact (hh 0).2 
+    exact ⟨Polynomial.C (c : ℚ), N, fun n Nn 
+      => by rw [(hh n).1 Nn]; exact (((Poly_constant (Polynomial.C (c : ℚ)) 
+      (c : ℚ)).mp rfl) n).symm, by rw [Polynomial.degree_C H2]; rfl⟩
 
 
 
