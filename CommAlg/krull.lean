@@ -49,10 +49,12 @@ lemma height_le_of_le {I J : PrimeSpectrum R} (I_le_J : I ≤ J) : height I ≤ 
   show J' < J
   exact lt_of_lt_of_le hJ' I_le_J
 
-lemma krullDim_le_iff (R : Type _) [CommRing R] (n : ℕ) :
+@[simp]
+lemma krullDim_le_iff {R : Type _} [CommRing R] {n : ℕ} :
   krullDim R ≤ n ↔ ∀ I : PrimeSpectrum R, (height I : WithBot ℕ∞) ≤ ↑n := iSup_le_iff (α := WithBot ℕ∞)
 
-lemma krullDim_le_iff' (R : Type _) [CommRing R] (n : ℕ∞) :
+@[simp]
+lemma krullDim_le_iff' {R : Type _} [CommRing R] {n : ℕ∞} :
   krullDim R ≤ n ↔ ∀ I : PrimeSpectrum R, (height I : WithBot ℕ∞) ≤ ↑n := iSup_le_iff (α := WithBot ℕ∞)
 
 @[simp]
@@ -61,11 +63,10 @@ lemma height_le_krullDim (I : PrimeSpectrum R) : height I ≤ krullDim R :=
 
 /-- In a domain, the height of a prime ideal is Bot (0 in this case) iff it's the Bot ideal. -/
 @[simp]
-lemma height_bot_iff_bot {D: Type _} [CommRing D] [IsDomain D] {P : PrimeSpectrum D} : height P = ⊥ ↔ P = ⊥ := by
+lemma height_zero_iff_bot {D: Type _} [CommRing D] [IsDomain D] {P : PrimeSpectrum D} : height P = 0 ↔ P = ⊥ := by
   constructor
   · intro h
     unfold height at h
-    rw [bot_eq_zero] at h
     simp only [Set.chainHeight_eq_zero_iff] at h
     apply eq_bot_of_minimal
     intro I
@@ -85,13 +86,10 @@ lemma height_bot_iff_bot {D: Type _} [CommRing D] [IsDomain D] {P : PrimeSpectru
     have := not_lt_of_lt JneP
     contradiction
 
-@[simp]
-lemma height_bot_eq {D: Type _} [CommRing D] [IsDomain D] : height (⊥ : PrimeSpectrum D) = ⊥ := by
-  rw [height_bot_iff_bot]
-
 /-- The Krull dimension of a ring being ≥ n is equivalent to there being an
     ideal of height ≥ n. -/
-lemma le_krullDim_iff (R : Type _) [CommRing R] (n : ℕ) :
+@[simp]
+lemma le_krullDim_iff {R : Type _} [CommRing R] {n : ℕ} :
   n ≤ krullDim R ↔ ∃ I : PrimeSpectrum R, n ≤ (height I : WithBot ℕ∞) := by
   constructor
   · unfold krullDim
@@ -233,7 +231,7 @@ lemma not_maximal_of_lt_prime {p : Ideal R} {q : Ideal R} (hq : IsPrime q) (h : 
 /-- Krull dimension is ≤ 0 if and only if all primes are maximal. -/
 lemma dim_le_zero_iff : krullDim R ≤ 0 ↔ ∀ I : PrimeSpectrum R, IsMaximal I.asIdeal := by
   show ((_ : WithBot ℕ∞) ≤ (0 : ℕ)) ↔ _
-  rw [krullDim_le_iff R 0]
+  rw [krullDim_le_iff]
   constructor <;> intro h I
   . contrapose! h
     have ⟨𝔪, h𝔪⟩ := I.asIdeal.exists_le_maximal (IsPrime.ne_top I.IsPrime)
@@ -288,16 +286,16 @@ lemma field_prime_bot {K: Type _} [Field K] {P : Ideal K} : IsPrime P ↔ P = �
         exact bot_prime
 
 /-- In a field, all primes have height 0. -/
-lemma field_prime_height_bot {K: Type _} [Nontrivial K] [Field K] (P : PrimeSpectrum K) : height P = ⊥ := by
+lemma field_prime_height_zero {K: Type _} [Nontrivial K] [Field K] (P : PrimeSpectrum K) : height P = 0 := by
     have : IsPrime P.asIdeal := P.IsPrime
     rw [field_prime_bot] at this
     have : P = ⊥ := PrimeSpectrum.ext P ⊥ this
-    rwa [height_bot_iff_bot]
+    rwa [height_zero_iff_bot]
 
 /-- The Krull dimension of a field is 0. -/
 lemma dim_field_eq_zero {K : Type _} [Field K] : krullDim K = 0 := by
   unfold krullDim
-  simp only [field_prime_height_bot, ciSup_unique]
+  simp only [field_prime_height_zero, ciSup_unique]
 
 /-- A domain with Krull dimension 0 is a field. -/
 lemma domain_dim_zero.isField {D: Type _} [CommRing D] [IsDomain D] (h: krullDim D = 0) : IsField D := by
@@ -337,7 +335,7 @@ lemma dim_le_one_iff : krullDim R ≤ 1 ↔ Ring.DimensionLEOne R := sorry
   applies only to dimension zero rings and domains of dimension 1. -/
 lemma dim_le_one_of_dimLEOne :  Ring.DimensionLEOne R → krullDim R ≤ 1 := by
   show _ → ((_ : WithBot ℕ∞) ≤ (1 : ℕ))
-  rw [krullDim_le_iff R 1]
+  rw [krullDim_le_iff]
   intro H p
   apply le_of_not_gt
   intro h
@@ -358,12 +356,67 @@ lemma dim_le_one_of_pid [IsDomain R] [IsPrincipalIdealRing R] : krullDim R ≤ 1
   rw [dim_le_one_iff]
   exact Ring.DimensionLEOne.principal_ideal_ring R
 
+private lemma singleton_chainHeight_le_one {α : Type _} {x : α} [Preorder α] : Set.chainHeight {x} ≤ 1 := by
+  unfold Set.chainHeight
+  simp only [iSup_le_iff, Nat.cast_le_one]
+  intro L h
+  unfold Set.subchain at h
+  simp only [Set.mem_singleton_iff, Set.mem_setOf_eq] at h
+  rcases L with (_ | ⟨a,L⟩)
+  . simp only [List.length_nil, zero_le]
+  rcases L with (_ | ⟨b,L⟩)
+  . simp only [List.length_singleton, le_refl]
+  simp only [List.chain'_cons, List.find?, List.mem_cons, forall_eq_or_imp] at h
+  rcases h with ⟨⟨h1, _⟩,  ⟨rfl, rfl, _⟩⟩
+  exact absurd h1 (lt_irrefl _)
+
 /-- The ring of polynomials over a field has dimension one. -/
 lemma polynomial_over_field_dim_one {K : Type} [Nontrivial K] [Field K] : krullDim (Polynomial K) = 1 := by
   rw [le_antisymm_iff]
   let X := @Polynomial.X K _
   constructor
-  · exact dim_le_one_of_pid
+  · unfold krullDim
+    apply @iSup_le (WithBot ℕ∞) _ _ _ _
+    intro I
+    have PIR : IsPrincipalIdealRing (Polynomial K) := by infer_instance
+    by_cases I = ⊥
+    · rw [← height_zero_iff_bot] at h
+      simp only [WithBot.coe_le_one, ge_iff_le]
+      rw [h]
+      exact bot_le
+    · push_neg at h
+      have : I.asIdeal ≠ ⊥ := by
+        by_contra a
+        have : I = ⊥ := PrimeSpectrum.ext I ⊥ a
+        contradiction
+      have maxI := IsPrime.to_maximal_ideal this
+      have sngletn : ∀P, P ∈ {J | J < I} ↔ P = ⊥ := by
+          intro P
+          constructor
+          · intro H
+            simp only [Set.mem_setOf_eq] at H
+            by_contra x
+            push_neg at x
+            have : P.asIdeal ≠ ⊥ := by
+              by_contra a
+              have : P = ⊥ := PrimeSpectrum.ext P ⊥ a
+              contradiction 
+            have maxP := IsPrime.to_maximal_ideal this
+            have IneTop := IsMaximal.ne_top maxI
+            have : P ≤ I := le_of_lt H
+            rw [←PrimeSpectrum.asIdeal_le_asIdeal] at this
+            have : P.asIdeal = I.asIdeal := Ideal.IsMaximal.eq_of_le maxP IneTop this
+            have : P = I := PrimeSpectrum.ext P I this
+            replace H : P ≠ I := ne_of_lt H
+            contradiction
+          · intro pBot
+            simp only [Set.mem_setOf_eq, pBot]
+            exact lt_of_le_of_ne bot_le h.symm
+      replace sngletn : {J | J < I} = {⊥} := Set.ext sngletn
+      unfold height
+      rw [sngletn]
+      simp only [WithBot.coe_le_one, ge_iff_le]
+      exact singleton_chainHeight_le_one
   · suffices : ∃I : PrimeSpectrum (Polynomial K), 1 ≤ (height I : WithBot ℕ∞)
     · obtain ⟨I, h⟩ := this
       have :  (height I : WithBot ℕ∞) ≤ ⨆ (I : PrimeSpectrum (Polynomial K)), ↑(height I) := by
