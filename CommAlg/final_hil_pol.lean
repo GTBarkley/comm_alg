@@ -6,7 +6,6 @@ import Mathlib.RingTheory.Artinian
 import Mathlib.Order.Height
 
 
-
 -- Setting for "library_search"
 set_option maxHeartbeats 0
 macro "ls" : tactic => `(tactic|library_search)
@@ -44,7 +43,7 @@ noncomputable def length ( A : Type _) (M : Type _)
  [CommRing A] [AddCommGroup M] [Module A M] :=  Set.chainHeight {M' : Submodule A M | M' < ⊤}
 
 -- Make instance of M_i being an R_0-module
-instance tada1 (𝒜 : ℤ   → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]  [DirectSum.GCommRing 𝒜]
+instance tada1 (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]  [DirectSum.GCommRing 𝒜]
   [DirectSum.Gmodule 𝒜 𝓜] (i : ℤ ) : SMul (𝒜 0) (𝓜 i)
     where smul x y := @Eq.rec ℤ (0+i) (fun a _ => 𝓜 a) (GradedMonoid.GSmul.smul x y) i (zero_add i)
 
@@ -109,8 +108,7 @@ instance {𝒜 : ℤ → Type _} [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GComm
     sorry)
 
 
-
-class StandardGraded {𝒜 : ℤ → Type _} [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜] : Prop where
+class StandardGraded (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜] : Prop where
   gen_in_first_piece :
     Algebra.adjoin (𝒜 0) (DirectSum.of _ 1 : 𝒜 1 →+ ⨁ i, 𝒜 i).range = (⊤ : Subalgebra (𝒜 0) (⨁ i, 𝒜 i))
 
@@ -124,7 +122,25 @@ def Component_of_graded_as_addsubgroup (𝒜 : ℤ → Type _)
 
 def graded_morphism (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) (𝓝 : ℤ → Type _)
 [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)] [∀ i, AddCommGroup (𝓝 i)]
-[DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜][DirectSum.Gmodule 𝒜 𝓝] (f : (⨁ i, 𝓜 i) → (⨁ i, 𝓝 i)) : ∀ i, ∀ (r : 𝓜 i), ∀ j, (j ≠ i → f (DirectSum.of _ i r) j = 0) ∧ (IsLinearMap (⨁ i, 𝒜 i) f) := by sorry
+[DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜][DirectSum.Gmodule 𝒜 𝓝]
+(f : (⨁ i, 𝓜 i) →ₗ[(⨁ i, 𝒜 i)] (⨁ i, 𝓝 i)) 
+: ∀ i, ∀ (r : 𝓜 i), ∀ j, (j ≠ i → f (DirectSum.of _ i r) j = 0) 
+∧ (IsLinearMap (⨁ i, 𝒜 i) f) := by
+  sorry
+
+#check graded_morphism
+
+def graded_isomorphism (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) (𝓝 : ℤ → Type _)
+[∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)] [∀ i, AddCommGroup (𝓝 i)]
+[DirectSum.GCommRing 𝒜] [DirectSum.Gmodule 𝒜 𝓜][DirectSum.Gmodule 𝒜 𝓝]
+(f : (⨁ i, 𝓜 i) →ₗ[(⨁ i, 𝒜 i)] (⨁ i, 𝓝 i))
+: IsLinearEquiv f := by
+  sorry
+-- f ∈ (⨁ i, 𝓜 i) ≃ₗ[(⨁ i, 𝒜 i)] (⨁ i, 𝓝 i)
+-- LinearEquivClass f (⨁ i, 𝒜 i) (⨁ i, 𝓜 i) (⨁ i, 𝓝 i)
+-- #print IsLinearEquiv
+#check graded_isomorphism
+
 
 
 def graded_submodule
@@ -143,12 +159,20 @@ end
 
 
 
+
 -- @Quotient of a graded ring R by a graded ideal p is a graded R-Mod, preserving each component
 instance Quotient_of_graded_is_graded
 (𝒜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [DirectSum.GCommRing 𝒜]
 (p : Ideal (⨁ i, 𝒜 i)) (hp : Ideal.IsHomogeneous' 𝒜 p)
   : DirectSum.Gmodule 𝒜 (fun i => (𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)) := by
   sorry
+
+-- 
+lemma sss
+  : true := by
+  sorry
+
+
 
 
 -- If A_0 is Artinian and local, then A is graded local
@@ -189,10 +213,11 @@ lemma Associated_prime_of_graded_is_graded
 -- If M is a finite graed R-Mod of dimension d ≥ 1, then the Hilbert function H(M, n) is of polynomial type (d - 1)
 theorem Hilbert_polynomial_d_ge_1 (d : ℕ) (d1 : 1 ≤ d) (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
 [DirectSum.GCommRing 𝒜]
-[DirectSum.Gmodule 𝒜 𝓜] (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) 
+[DirectSum.Gmodule 𝒜 𝓜] (st: StandardGraded 𝒜) (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) 
 (fingen : IsNoetherian (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
 (findim :  dimensionmodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i) = d)
 (hilb : ℤ → ℤ) (Hhilb: hilbert_function 𝒜 𝓜 hilb)
+
 : PolyType hilb (d - 1) := by
   sorry
 
@@ -203,7 +228,7 @@ theorem Hilbert_polynomial_d_ge_1_reduced
 (d : ℕ) (d1 : 1 ≤ d)
 (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
 [DirectSum.GCommRing 𝒜]
-[DirectSum.Gmodule 𝒜 𝓜] (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0))
+[DirectSum.Gmodule 𝒜 𝓜] (st: StandardGraded 𝒜) (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0))
 (fingen : IsNoetherian (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
 (findim :  dimensionmodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i) = d)
 (hilb : ℤ → ℤ) (Hhilb: hilbert_function 𝒜 𝓜 hilb)
@@ -217,7 +242,7 @@ theorem Hilbert_polynomial_d_ge_1_reduced
 -- If M is a finite graed R-Mod of dimension zero, then the Hilbert function H(M, n) = 0 for n >> 0 
 theorem Hilbert_polynomial_d_0 (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
 [DirectSum.GCommRing 𝒜]
-[DirectSum.Gmodule 𝒜 𝓜] (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) 
+[DirectSum.Gmodule 𝒜 𝓜] (st: StandardGraded 𝒜) (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) 
 (fingen : IsNoetherian (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
 (findim :  dimensionmodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i) = 0)
 (hilb : ℤ → ℤ) (Hhilb : hilbert_function 𝒜 𝓜 hilb)
@@ -230,7 +255,7 @@ theorem Hilbert_polynomial_d_0 (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [
 theorem Hilbert_polynomial_d_0_reduced
 (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
 [DirectSum.GCommRing 𝒜]
-[DirectSum.Gmodule 𝒜 𝓜] (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) 
+[DirectSum.Gmodule 𝒜 𝓜] (st: StandardGraded 𝒜) (art: IsArtinianRing (𝒜 0)) (loc : LocalRing (𝒜 0)) 
 (fingen : IsNoetherian (⨁ i, 𝒜 i) (⨁ i, 𝓜 i))
 (findim :  dimensionmodule (⨁ i, 𝒜 i) (⨁ i, 𝓜 i) = 0)
 (hilb : ℤ → ℤ) (Hhilb : hilbert_function 𝒜 𝓜 hilb)
@@ -238,6 +263,12 @@ theorem Hilbert_polynomial_d_0_reduced
 (hm : 𝓜 = (fun i => (𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 p hp i)))
 : (∃ (N : ℤ), ∀ (n : ℤ), n ≥ N → hilb n = 0) := by
   sorry
+
+
+
+
+
+
 
 
 

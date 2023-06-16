@@ -125,8 +125,32 @@ lemma le_krullDim_iff (R : Type _) [CommRing R] (n : ℕ) :
     have : height I ≤ krullDim R := by apply height_le_krullDim
     exact le_trans h this
 
-lemma le_krullDim_iff' (R : Type _) [CommRing R] (n : ℕ∞) :
-  n ≤ krullDim R ↔ ∃ I : PrimeSpectrum R, n ≤ (height I : WithBot ℕ∞) := by sorry
+#check ENat.recTopCoe
+
+/- terrible place for this lemma. Also this probably exists somewhere
+  Also this is a terrible proof
+-/
+lemma eq_top_iff (n : WithBot ℕ∞) : n = ⊤ ↔ ∀ m : ℕ, m ≤ n := by
+  aesop
+  induction' n using WithBot.recBotCoe with n
+  . exfalso
+    have := (a 0)
+    simp [not_lt_of_ge] at this
+  induction' n using ENat.recTopCoe with n
+  . rfl
+  . have := a (n + 1)
+    exfalso
+    change (((n + 1) : ℕ∞) : WithBot ℕ∞) ≤ _ at this
+    simp [WithBot.coe_le_coe] at this
+    change ((n + 1) : ℕ∞) ≤ (n : ℕ∞) at this
+    simp [ENat.add_one_le_iff] at this
+
+lemma krullDim_eq_top_iff (R : Type _) [CommRing R] :
+  krullDim R = ⊤ ↔ ∀ (n : ℕ), ∃ I : PrimeSpectrum R, n ≤ height I := by
+  simp [eq_top_iff, le_krullDim_iff]
+  change (∀ (m : ℕ), ∃ I, ((m : ℕ∞) : WithBot ℕ∞) ≤ height I) ↔ _
+  simp [WithBot.coe_le_coe]
+  
 
 /-- The Krull dimension of a local ring is the height of its maximal ideal. -/
 lemma krullDim_eq_height [LocalRing R] : krullDim R = height (closedPoint R) := by
@@ -142,31 +166,32 @@ lemma krullDim_eq_height [LocalRing R] : krullDim R = height (closedPoint R) := 
 /-- The height of a prime `𝔭` is greater than `n` if and only if there is a chain of primes less than `𝔭`
   with length `n + 1`. -/
 lemma lt_height_iff' {𝔭 : PrimeSpectrum R} {n : ℕ∞} : 
-height 𝔭 > n ↔ ∃ c : List (PrimeSpectrum R), c.Chain' (· < ·) ∧ (∀ 𝔮 ∈ c, 𝔮 < 𝔭) ∧ c.length = n + 1 := by
-  rcases n with _ | n
-  . constructor <;> intro h <;> exfalso
+n < height 𝔭 ↔ ∃ c : List (PrimeSpectrum R), c.Chain' (· < ·) ∧ (∀ 𝔮 ∈ c, 𝔮 < 𝔭) ∧ c.length = n + 1 := by
+  match n with
+  | ⊤ =>  
+    constructor <;> intro h <;> exfalso
     . exact (not_le.mpr h) le_top
     . tauto
-  have (m : ℕ∞) : m > some n ↔ m ≥ some (n + 1) := by
-    symm
-    show (n + 1 ≤ m ↔ _ )
-    apply ENat.add_one_le_iff
-    exact ENat.coe_ne_top _
-  rw [this]
-  unfold Ideal.height
-  show ((↑(n + 1):ℕ∞) ≤ _) ↔ ∃c, _ ∧ _ ∧ ((_ : WithTop ℕ) = (_:ℕ∞))
-  rw [{J | J < 𝔭}.le_chainHeight_iff]
-  show (∃ c, (List.Chain' _ c ∧ ∀𝔮, 𝔮 ∈ c → 𝔮 < 𝔭) ∧ _) ↔ _
-  constructor <;> rintro ⟨c, hc⟩ <;> use c
-  . tauto
-  . change _ ∧ _ ∧ (List.length c : ℕ∞) = n + 1 at hc
-    norm_cast at hc
-    tauto
+  | (n : ℕ) => 
+    have (m : ℕ∞) : n < m ↔ (n + 1 : ℕ∞) ≤ m := by
+      symm
+      show (n + 1 ≤ m ↔ _ )
+      apply ENat.add_one_le_iff
+      exact ENat.coe_ne_top _
+    rw [this]
+    unfold Ideal.height
+    show ((↑(n + 1):ℕ∞) ≤ _) ↔ ∃c, _ ∧ _ ∧ ((_ : WithTop ℕ) = (_:ℕ∞))
+    rw [{J | J < 𝔭}.le_chainHeight_iff]
+    show (∃ c, (List.Chain' _ c ∧ ∀𝔮, 𝔮 ∈ c → 𝔮 < 𝔭) ∧ _) ↔ _
+    constructor <;> rintro ⟨c, hc⟩ <;> use c
+    . tauto
+    . change _ ∧ _ ∧ (List.length c : ℕ∞) = n + 1 at hc
+      norm_cast at hc
+      tauto
 
 /-- Form of `lt_height_iff''` for rewriting with the height coerced to `WithBot ℕ∞`. -/
 lemma lt_height_iff'' {𝔭 : PrimeSpectrum R} {n : ℕ∞} : 
-height 𝔭 > (n : WithBot ℕ∞) ↔ ∃ c : List (PrimeSpectrum R), c.Chain' (· < ·) ∧ (∀ 𝔮 ∈ c, 𝔮 < 𝔭) ∧ c.length = n + 1 := by
-  show (_ < _) ↔ _
+(n : WithBot ℕ∞) < height 𝔭 ↔ ∃ c : List (PrimeSpectrum R), c.Chain' (· < ·) ∧ (∀ 𝔮 ∈ c, 𝔮 < 𝔭) ∧ c.length = n + 1 := by
   rw [WithBot.coe_lt_coe]
   exact lt_height_iff'
 
@@ -228,7 +253,7 @@ lemma dim_le_zero_iff : krullDim R ≤ 0 ↔ ∀ I : PrimeSpectrum R, IsMaximal 
       rw [hcontr] at h
       exact h h𝔪.1
     use 𝔪p
-    show (_ : WithBot ℕ∞) > (0 : ℕ∞)
+    show (0 : ℕ∞) < (_ : WithBot ℕ∞) 
     rw [lt_height_iff'']
     use [I]
     constructor
@@ -239,7 +264,7 @@ lemma dim_le_zero_iff : krullDim R ≤ 0 ↔ ∀ I : PrimeSpectrum R, IsMaximal 
         rwa [hI']
       . simp only [List.length_singleton, Nat.cast_one, zero_add]
   . contrapose! h
-    change (_ : WithBot ℕ∞) > (0 : ℕ∞) at h
+    change (0 : ℕ∞) < (_ : WithBot ℕ∞) at h
     rw [lt_height_iff''] at h
     obtain ⟨c, _, hc2, hc3⟩ := h
     norm_cast at hc3
