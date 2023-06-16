@@ -16,6 +16,7 @@ import Mathlib.Order.ConditionallyCompleteLattice.Basic
 import Mathlib.Algebra.Ring.Pi
 import Mathlib.RingTheory.Finiteness
 import Mathlib.Util.PiNotation
+import CommAlg.krull
 
 open PiNotation
 
@@ -23,10 +24,10 @@ namespace Ideal
 
 variable (R : Type _) [CommRing R] (P : PrimeSpectrum R)
 
-noncomputable def height : ℕ∞ := Set.chainHeight {J : PrimeSpectrum R | J < P}
+-- noncomputable def height : ℕ∞ := Set.chainHeight {J : PrimeSpectrum R | J < P}
 
-noncomputable def krullDim (R : Type) [CommRing R] :
-     WithBot ℕ∞ := ⨆ (I : PrimeSpectrum R), height R I
+-- noncomputable def krullDim (R : Type) [CommRing R] :
+--      WithBot ℕ∞ := ⨆ (I : PrimeSpectrum R), height R I
 
 --variable {R}
 
@@ -66,6 +67,8 @@ lemma ring_Noetherian_iff_spec_Noetherian : IsNoetherianRing R
     ↔ TopologicalSpace.NoetherianSpace (PrimeSpectrum R) := by
     constructor
     intro RisNoetherian
+    sorry
+    sorry
     -- how do I apply an instance to prove one direction?
 
 
@@ -99,9 +102,9 @@ lemma containment_radical_power_containment :
 
 -- Stacks Lemma 10.52.6: I is a maximal ideal and IM = 0. Then length of M is
 -- the same as the dimension as a vector space over R/I,
-lemma length_eq_dim_if_maximal_annihilates {I : Ideal R} [Ideal.IsMaximal I] 
-    : I • (⊤ : Submodule R M) = 0
-     → Module.length R M = Module.rank R⧸I M⧸(I • (⊤ : Submodule R M)) := by sorry
+-- lemma length_eq_dim_if_maximal_annihilates {I : Ideal R} [Ideal.IsMaximal I] 
+--     : I • (⊤ : Submodule R M) = 0
+--      → Module.length R M = Module.rank R⧸I M⧸(I • (⊤ : Submodule R M)) := by sorry
 
 -- Does lean know that M/IM is a R/I module?
 -- Use 10.52.5
@@ -125,30 +128,34 @@ lemma Artinian_has_finite_max_ideal
     let m' : ℕ ↪ MaximalSpectrum R := Infinite.natEmbedding (MaximalSpectrum R)
     have m'inj := m'.injective
     let m'' : ℕ → Ideal R := fun n : ℕ ↦ ⨅ k ∈ range n, (m' k).asIdeal
-    let f : ℕ → Ideal R := fun n : ℕ ↦ (m' n).asIdeal
-    let F : Fin n → Ideal R := fun k ↦ (m' k).asIdeal
-    have comaximal : ∀ i j : ℕ, i ≠ j → (m' i).asIdeal ⊔ (m' j).asIdeal =
-      (⊤ : Ideal R) := by 
-      intro i j distinct
-      apply Ideal.IsMaximal.coprime_of_ne
-      exact (m' i).IsMaximal
-      exact (m' j).IsMaximal
-      have : (m' i) ≠ (m' j) := by 
-        exact Function.Injective.ne m'inj distinct
-      intro h
-      apply this
-      exact MaximalSpectrum.ext _ _ h
-    have ∀ n : ℕ, (R ⧸ ⨅ (i : Fin n), (F n) i) ≃+* ((i : Fin n) → R ⧸ (F n) i) := by
+    -- let f : ℕ → MaximalSpectrum R := fun n : ℕ ↦ m' n
+    -- let F : (n : ℕ) → Fin n → MaximalSpectrum R := fun n k ↦ m' k
+    have DCC : ∃ n : ℕ, ∀ k : ℕ, n ≤ k → m'' n = m'' k := by
+      apply IsArtinian.monotone_stabilizes {
+        toFun := m''
+        monotone' := sorry
+      }
+    cases' DCC with n DCCn
+    specialize DCCn (n+1)
+    specialize DCCn (Nat.le_succ n)
+    have containment1 : m'' n < (m' (n + 1)).asIdeal := by sorry
+    have : ∀ (j : ℕ), (j ≠ n + 1) → ∃ x, x ∈ (m' j).asIdeal ∧ x ∉ (m' (n+1)).asIdeal := by
+      intro j jnotn
+      have notcontain : ¬ (m' j).asIdeal ≤ (m' (n+1)).asIdeal := by
+        -- apply Ideal.IsMaximal (m' j).asIdeal
+        sorry
       sorry
-    -- (let F : Fin n → Ideal R := fun k : Fin n ↦ (m' k).asIdeal) 
-    -- let g := Ideal.quotientInfRingEquivPiQuotient f comaximal 
-
+    sorry
+      -- have distinct : (m' j).asIdeal ≠ (m' (n+1)).asIdeal := by         
+      --   intro h
+      --   apply Function.Injective.ne m'inj jnotn
+      --   exact MaximalSpectrum.ext _ _ h      
+      -- simp
+      -- unfold 
+     
 
 -- Stacks Lemma 10.53.4: R Artinian => Jacobson ideal of R is nilpotent
-lemma Jacobson_of_Artinian_is_nilpotent 
-    [IsArtinianRing R] : IsNilpotent (Ideal.jacobson (⊥ : Ideal R)) := by 
-    have J := Ideal.jacobson (⊥ : Ideal R)
-    
+-- This is in mathlib: IsArtinianRing.isNilpotent_jacobson_bot
 
 -- Stacks Lemma 10.53.5: If R has finitely many maximal ideals and 
 -- locally nilpotent Jacobson radical, then R is the product of its localizations at 
@@ -187,21 +194,92 @@ lemma primes_of_Artinian_are_maximal
 
 -- Lemma: Krull dimension of a ring is the supremum of height of maximal ideals
 
-
 -- Stacks Lemma 10.60.5: R is Artinian iff R is Noetherian of dimension 0
-lemma dim_zero_Noetherian_iff_Artinian (R : Type _) [CommRing R] : 
-    IsNoetherianRing R ∧ Ideal.krullDim R = 0 ↔ IsArtinianRing R := by 
+lemma dim_le_zero_Noetherian_iff_Artinian (R : Type _) [CommRing R] : 
+    IsNoetherianRing R ∧ Ideal.krullDim R ≤ 0 ↔ IsArtinianRing R := by 
     constructor
     sorry
     intro RisArtinian
     constructor
     apply finite_length_is_Noetherian
     rwa [IsArtinian_iff_finite_length] at RisArtinian
-    sorry -- can use Grant's lemma dim_eq_zero_iff
+    rw [Ideal.dim_le_zero_iff]
+    intro I
+    apply primes_of_Artinian_are_maximal
 
 
 
 
+-- Trash bin
+-- lemma Artinian_has_finite_max_ideal 
+--     [IsArtinianRing R] : Finite (MaximalSpectrum R) := by 
+--     by_contra infinite
+--     simp only [not_finite_iff_infinite] at infinite
+--     let m' : ℕ ↪ MaximalSpectrum R := Infinite.natEmbedding (MaximalSpectrum R)
+--     have m'inj := m'.injective
+--     let m'' : ℕ → Ideal R := fun n : ℕ ↦ ⨅ k ∈ range n, (m' k).asIdeal
+--     let f : ℕ → Ideal R := fun n : ℕ ↦ (m' n).asIdeal
+--     have DCC : ∃ n : ℕ, ∀ k : ℕ, n ≤ k → m'' n = m'' k := by
+--       apply IsArtinian.monotone_stabilizes {
+--         toFun := m''
+--         monotone' := sorry
+--       }
+--     cases' DCC with n DCCn
+--     specialize DCCn (n+1)
+--     specialize DCCn (Nat.le_succ n)
+--     let F : Fin (n + 1) → MaximalSpectrum R := fun k ↦ m' k
+--     have comaximal : ∀ (i j : Fin (n + 1)), (i ≠ j) → (F i).asIdeal ⊔ (F j).asIdeal =
+--       (⊤ : Ideal R) := by 
+--       intro i j distinct
+--       apply Ideal.IsMaximal.coprime_of_ne
+--       exact (F i).IsMaximal
+--       exact (F j).IsMaximal
+--       have : (F i) ≠ (F j) := by         
+--         apply Function.Injective.ne m'inj
+--         contrapose! distinct
+--         exact Fin.ext distinct
+--       intro h
+--       apply this
+--       exact MaximalSpectrum.ext _ _ h
+--     let CRT1 : (R ⧸ ⨅ (i : Fin (n + 1)), ((F i).asIdeal)) 
+--         ≃+* ((i : Fin (n + 1)) → R ⧸ (F i).asIdeal) := 
+--         Ideal.quotientInfRingEquivPiQuotient 
+--           (fun i ↦ (F i).asIdeal) comaximal
+--     let CRT2 : (R ⧸ ⨅ (i : Fin (n + 1)), ((F i).asIdeal)) 
+--         ≃+* ((i : Fin (n + 1)) → R ⧸ (F i).asIdeal) := 
+--         Ideal.quotientInfRingEquivPiQuotient 
+--           (fun i ↦ (F i).asIdeal) comaximal
+
+
+
+
+    -- have comaximal : ∀ (n : ℕ) (i j : Fin n), (i ≠ j) → ((F n) i).asIdeal ⊔ ((F n) j).asIdeal =
+    --   (⊤ : Ideal R) := by 
+    --   intro n i j distinct
+    --   apply Ideal.IsMaximal.coprime_of_ne
+    --   exact (F n i).IsMaximal
+    --   exact (F n j).IsMaximal
+    --   have : (F n i) ≠ (F n j) := by         
+    --     apply Function.Injective.ne m'inj
+    --     contrapose! distinct
+    --     exact Fin.ext distinct
+    --   intro h
+    --   apply this
+    --   exact MaximalSpectrum.ext _ _ h
+    -- let CRT : (n : ℕ) → (R ⧸ ⨅ (i : Fin n), ((F n) i).asIdeal) 
+    --     ≃+* ((i : Fin n) → R ⧸ ((F n) i).asIdeal) := 
+    --    fun n ↦ Ideal.quotientInfRingEquivPiQuotient 
+    --       (fun i ↦ (F n i).asIdeal) (comaximal n)
+    -- have DCC : ∃ n : ℕ, ∀ k : ℕ, n ≤ k → m'' n = m'' k := by
+    --   apply IsArtinian.monotone_stabilizes {
+    --     toFun := m''
+    --     monotone' := sorry
+    --   }
+    -- cases' DCC with n DCCn
+    -- specialize DCCn (n+1)
+    -- specialize DCCn (Nat.le_succ n)
+    -- let CRT1 := CRT n
+    -- let CRT2 := CRT (n + 1)
     
 
 
