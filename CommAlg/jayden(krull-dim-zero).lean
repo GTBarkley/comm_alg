@@ -25,23 +25,10 @@ namespace Ideal
 
 variable (R : Type _) [CommRing R] (P : PrimeSpectrum R)
 
--- noncomputable def height : ℕ∞ := Set.chainHeight {J : PrimeSpectrum R | J < P}
-
--- noncomputable def krullDim (R : Type) [CommRing R] :
---      WithBot ℕ∞ := ⨆ (I : PrimeSpectrum R), height R I
-
---variable {R}
-
--- Stacks Lemma 10.26.1 (Should already exists)
--- (1) The closure of a prime P is V(P)
--- (2) the irreducible closed subsets are V(P) for P prime
--- (3) the irreducible components are V(P) for P minimal prime
-
 -- Stacks Definition 10.32.1: An ideal is locally nilpotent
 -- if every element is nilpotent
 class IsLocallyNilpotent {R : Type _} [CommRing R] (I : Ideal R) : Prop :=
     h : ∀ x ∈ I, IsNilpotent x
-#check Ideal.IsLocallyNilpotent
 end Ideal
 
 def RingJacobson (R) [Ring R] := Ideal.jacobson (⊥ : Ideal R)
@@ -108,7 +95,6 @@ lemma containment_radical_power_containment :
 --     : I • (⊤ : Submodule R M) = 0
 --      → Module.length R M = Module.rank R⧸I M⧸(I • (⊤ : Submodule R M)) := by sorry
 
--- Does lean know that M/IM is a R/I module?
 -- Use 10.52.5
 
 -- Stacks Lemma 10.52.8: I is a finitely generated maximal ideal of R.
@@ -118,7 +104,6 @@ lemma power_zero_finite_length [Ideal.IsMaximal I] (h₁ : Ideal.FG I) [Module.F
      (∃ m : ℕ, Module.length R M ≤ m) := by sorry
     -- intro IisFG IisMaximal MisFinite power
     -- rcases power with ⟨n, npower⟩
-    -- how do I get a generating set?
 
 open Finset
 
@@ -169,14 +154,13 @@ abbrev Prod_of_localization :=
 --   unfold Prod_of_localization
 --   infer_instance
      
-def foo : Prod_of_localization R →+* R where
-  toFun := sorry
-  -- invFun := sorry
-  --left_inv := sorry
-  --right_inv := sorry
-  map_mul' := sorry
-  map_add' := sorry
-
+-- def foo : Prod_of_localization R →+* R where
+--   toFun := sorry
+--   -- invFun := sorry
+--   --left_inv := sorry
+--   --right_inv := sorry
+--   map_mul' := sorry
+--   map_add' := sorry
 
 def product_of_localization_at_maximal_ideal [Finite (MaximalSpectrum R)]
     (h : Ideal.IsLocallyNilpotent (RingJacobson R)) :
@@ -196,16 +180,15 @@ lemma primes_of_Artinian_are_maximal
 
 -- Lemma: Krull dimension of a ring is the supremum of height of maximal ideals
 
+-- Stacks Lemma 10.26.1 (Should already exists)
+-- (1) The closure of a prime P is V(P)
+-- (2) the irreducible closed subsets are V(P) for P prime
+-- (3) the irreducible components are V(P) for P minimal prime
 -- Lemma: X is an irreducible component of Spec(R) ↔ X = V(I) for I a minimal prime
 lemma irred_comp_minmimal_prime (X) : 
     X ∈ irreducibleComponents (PrimeSpectrum R) 
       ↔ ∃ (P : minimalPrimes R), X = PrimeSpectrum.zeroLocus P := by
       sorry
-
--- Lemma: localization of Noetherian ring is Noetherian
--- lemma localization_of_Noetherian_at_prime [IsNoetherianRing R]
---      (atprime: Ideal.IsPrime I) :
---     IsNoetherianRing (Localization.AtPrime I) := by sorry
 
 
 -- Stacks Lemma 10.60.5: R is Artinian iff R is Noetherian of dimension 0
@@ -241,7 +224,7 @@ lemma Artinian_if_dim_le_zero_Noetherian (R : Type _) [CommRing R] :
         rw [isNoetherianRing_iff_ideal_fg] at RisNoetherian
         specialize RisNoetherian (F X.1 X.2).1
         exact RisNoetherian
-      have modulefg : Module.Finite R (Loc X) := by sorry -- not sure if this is true
+      have modulefg : Module.Finite R (Loc X) := by sorry -- this is wrong
       specialize PrimeIsMaximal X
       specialize powerannihilates X
       apply power_zero_finite_length R (F X.1 X.2).1 (Loc X) idealfg powerannihilates
