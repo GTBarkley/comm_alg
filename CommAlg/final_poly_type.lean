@@ -229,55 +229,49 @@ lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N :
 
 
 
--- Δ of 0 times preserve the function
-lemma Δ_0 (f : ℤ → ℤ) : (Δ f 0) = f := by
-  tauto
+-- Δ of 0 times preserves the function
+lemma Δ_0 (f : ℤ → ℤ) : (Δ f 0) = f := by tauto
+
+-- Δ of 1 times decreaes the polynomial type by one
+lemma Δ_1 (f : ℤ → ℤ) (d : ℕ): d > 0 → PolyType f d → PolyType (Δ f 1) (d - 1) := by
+  sorry
+
+
+lemma foo (f : ℤ → ℤ) (s : ℕ) : Δ (Δ f 1) s = (Δ f (s + 1)) := by
+  sorry
 
 
 
 
 
 -- Δ of d times maps polynomial of degree d to polynomial of degree 0
+lemma foofoo (d : ℕ) : (f : ℤ → ℤ) → (PolyType f d) → (PolyType (Δ f d) 0):= by
+  induction' d with d hd
+  · intro f h
+    rw [Δ_0]
+    tauto
+  · intro f hf
+    have this1 : PolyType f (d + 1) := by tauto
+    have this2 : PolyType (Δ f (d + 1)) 0 := by
+      have this3 : PolyType (Δ f 1) d := by
+        sorry
+      clear hf
+      specialize hd (Δ f 1)
+      have this4 : PolyType (Δ (Δ f 1) d) 0 := by tauto
+      rw [foo] at this4
+      tauto
+    tauto
+
+
+
 lemma Δ_d_PolyType_d_to_PolyType_0 (f : ℤ → ℤ) (d : ℕ): PolyType f d → PolyType (Δ f d) 0 := by
   intro h
-  rcases h with ⟨Poly, hN⟩
-  rcases hN with ⟨N, hh⟩
-  rcases hh with ⟨H1, H2⟩
-  have HH2 : d = Polynomial.degree Poly := by
-    tauto
-  have HH3 : Polynomial.degree Poly = d := by
-    tauto
-  induction' d with d hd
-  -- Base case
-  · rw [PolyType_0]
-    have this : Poly = Polynomial.C (Polynomial.coeff Poly 0) := by
-      exact Polynomial.eq_C_of_degree_eq_zero HH3
-    let d := Polynomial.coeff Poly 0
-    have this11 : ∃ (c : ℤ), c = d := by
-      sorry
-    rcases this11 with ⟨c, this1⟩
-    have this1 : c = Polynomial.coeff Poly 0 := by
-      tauto
-    use c; use N; intro n
-    constructor
-    · specialize H1 n
-      rw [Δ_0]
-      intro h
-      have this2 : f n = Polynomial.eval (n : ℚ) Poly := by
-        tauto
-      have this3 : f n = (c : ℚ) := by
-        rw [this2, this1]
-        let HHH := (Poly_constant Poly c).mp
-        sorry
-      exact Iff.mp (Rat.coe_int_inj (f n) c) this3
-    · intro c0
-      have this2 : (c : ℚ) = 0 := by
-        exact congrArg Int.cast c0
-      have this3 : Polynomial.coeff Poly 0 = 0 := by
-        rw [←this1, this2]
-      sorry
-  -- Induction step
-  · sorry
+  have this : ∀ (d : ℕ), ∀ (f :ℤ → ℤ), (PolyType f d) → (PolyType (Δ f d) 0) := by 
+    exact foofoo
+  specialize this d f
+  tauto
+
+
 
 
 
@@ -293,10 +287,13 @@ lemma a_to_b (f : ℤ → ℤ) (d : ℕ) : (∃ (c : ℤ), ∃ (N : ℤ), ∀ (n
   have H2 : c ≠ 0 := by
     tauto
   induction' d with d hd
+  -- Base case
   · rw [PolyType_0]
     use c
     use N
     tauto
+
+  -- Induction step
   · sorry
 
 
