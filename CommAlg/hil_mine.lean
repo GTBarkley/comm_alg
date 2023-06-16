@@ -31,7 +31,7 @@ theorem Hilbert_polynomial_d_0_reduced
   -- have h0 : m.IsMaximal := LocalRing.maximalIdeal.isMaximal (𝒜 0)
   -- have h9 : IsField ((𝒜 0)⧸m) := (Ideal.Quotient.maximal_ideal_iff_isField_quotient m).mp h0
   -- set k := ((𝒜 0)⧸m)
-  have hilb n 
+  -- have hilb n 
   sorry
 
   

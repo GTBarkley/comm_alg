@@ -48,9 +48,6 @@ section
 def PolyType (f : ℤ → ℤ) (d : ℕ) := ∃ Poly : Polynomial ℚ, ∃ (N : ℤ), ∀ (n : ℤ), N ≤ n → f n = Polynomial.eval (n : ℚ) Poly ∧ d = Polynomial.degree Poly
 
 
-noncomputable def length ( A : Type _) (M : Type _)
- [CommRing A] [AddCommGroup M] [Module A M] :=  Set.chainHeight {M' : Submodule A M | M' < ⊤}
-
 -- Make instance of M_i being an R_0-module
 instance tada1 (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]  [DirectSum.GCommRing 𝒜]
   [DirectSum.Gmodule 𝒜 𝓜] (i : ℤ ) : SMul (𝒜 0) (𝓜 i)
@@ -77,12 +74,16 @@ instance tada3 (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGr
 -- Definition of a Hilbert function of a graded module
 section
 
-noncomputable def hilbert_function (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
-  [DirectSum.GCommRing 𝒜]
-  [DirectSum.Gmodule 𝒜 𝓜] (hilb : ℤ → ℤ) := ∀ i, hilb i = (ENat.toNat (length (𝒜 0) (𝓜 i)))
+noncomputable def length ( A : Type _) (M : Type _)
+ [CommRing A] [AddCommGroup M] [Module A M] :=  Set.chainHeight {M' : Submodule A M | M' < ⊤}
 
 noncomputable def dimensionmodule ( A : Type _) (M : Type _)
  [CommRing A] [AddCommGroup M] [Module A M] := Ideal.krullDim  (A ⧸ ((⊤ : Submodule A M).annihilator))  
+
+
+noncomputable def hilbert_function (𝒜 : ℤ → Type _) (𝓜 : ℤ → Type _) [∀ i, AddCommGroup (𝒜 i)] [∀ i, AddCommGroup (𝓜 i)]
+  [DirectSum.GCommRing 𝒜]
+  [DirectSum.Gmodule 𝒜 𝓜] (hilb : ℤ → ℤ) := ∀ i, hilb i = (ENat.toNat (length (𝒜 0) (𝓜 i)))  
 
 
 lemma lengthfield ( k : Type _) [Field k] : length (k) (k) = 1 := by
@@ -226,9 +227,6 @@ instance : DirectSum.Gmodule 𝒜 (GradedOneComponent 𝒜) := by sorry
 
 lemma Graded_local [StandardGraded 𝒜] (I : Ideal (⨁ i, 𝒜 i)) (hp : (HomogeneousMax 𝒜 I)) [∀ i, Module (𝒜 0) ((𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 I hp.2 i))] (art: IsArtinianRing (𝒜 0)) : (∀ (i : ℤ ), (i ≠ 0 → Nonempty (((𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 I hp.2 i)) →ₗ[𝒜 0] (𝒜 i))) )  := by
   sorry
-
--- lemma Graded_local [StandardGraded 𝒜] (I : Ideal (⨁ i, 𝒜 i)) (hp : (HomogeneousMax 𝒜 I)) (art: IsArtinianRing (𝒜 0)) : (∀ (i : ℤ ), (i ≠ 0 →  (Nonempty (((𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 I hp.2 i)) →ₛₗ[𝒜 0] (𝒜 i)))) ∧ (i = 0 → Nonempty (((𝒜 i)⧸(Component_of_graded_as_addsubgroup 𝒜 I hp.2 i)) →ₛₗ[𝒜 0] (𝒜 0 ⧸ LocalRing.maximalIdeal (𝒜 0)))))  := by
---   sorry
 
 end
 
