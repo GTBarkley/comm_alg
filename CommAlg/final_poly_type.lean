@@ -145,8 +145,8 @@ lemma Poly_shifting (f : ℤ → ℤ) (g : ℤ → ℤ) (hf : PolyType f d) (s :
 
 -- set_option pp.all true in
 -- PolyType 0 = constant function
-lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N : ℤ), ∀ (n : ℤ), 
-    (N ≤ n → f n = c) ∧ c ≠ 0) := by
+lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N : ℤ), (∀ (n : ℤ), 
+    (N ≤ n → f n = c)) ∧ c ≠ 0) := by
   constructor
   · rintro ⟨Poly, ⟨N, ⟨H1, H2⟩⟩⟩ 
     have this1 : Polynomial.degree Poly = 0 := by rw [← H2]; rfl
@@ -182,14 +182,11 @@ lemma Δ_1 (f : ℤ → ℤ) (d : ℕ): d > 0 → PolyType f d → PolyType (Δ 
 
 
 
-lemma foo (f : ℤ → ℤ) (s : ℕ) : Δ (Δ f 1) s = (Δ f (s + 1)) := by
-  sorry
-
-
-
 
 
 -- Δ of d times maps polynomial of degree d to polynomial of degree 0
+lemma Δ_1_s_equiv_Δ_s_1 (f : ℤ → ℤ) (s : ℕ) : Δ (Δ f 1) s = (Δ f (s + 1)) := by
+  sorry
 lemma foofoo (d : ℕ) : (f : ℤ → ℤ) → (PolyType f d) → (PolyType (Δ f d) 0):= by
   induction' d with d hd
   · intro f h
@@ -205,12 +202,9 @@ lemma foofoo (d : ℕ) : (f : ℤ → ℤ) → (PolyType f d) → (PolyType (Δ 
       clear hf
       specialize hd (Δ f 1)
       have this4 : PolyType (Δ (Δ f 1) d) 0 := by tauto
-      rw [foo] at this4
+      rw [Δ_1_s_equiv_Δ_s_1] at this4
       tauto
     tauto
-
-
-
 lemma Δ_d_PolyType_d_to_PolyType_0 (f : ℤ → ℤ) (d : ℕ): PolyType f d → PolyType (Δ f d) 0 := by
   intro h
   have this : ∀ (d : ℕ), ∀ (f :ℤ → ℤ), (PolyType f d) → (PolyType (Δ f d) 0) := by 
@@ -222,37 +216,60 @@ lemma Δ_d_PolyType_d_to_PolyType_0 (f : ℤ → ℤ) (d : ℕ): PolyType f d �
 
 
 
-
--- [BH, 4.1.2] (a) => (b)
--- Δ^d f (n) = c for some nonzero integer c for n >> 0 → f is of polynomial type d
-lemma a_to_b (f : ℤ → ℤ) (d : ℕ) : (∃ (c : ℤ), ∃ (N : ℤ), ∀ (n : ℤ), ((N ≤ n → (Δ f d) (n) = c) ∧ c ≠ 0)) → PolyType f d := by
-  intro h
-  rcases h with ⟨c, N, hh⟩
-  have H1 := λ n => (hh n).left
-  have H2 := λ n => (hh n).right
-  clear hh
-  have H2 : c ≠ 0 := by
-    tauto
+lemma foofoofoo (d : ℕ) : (f : ℤ → ℤ) → (∃ (c : ℤ), ∃ (N : ℤ), (∀ (n : ℤ), N ≤ n → (Δ f d) (n) = c) ∧ c ≠ 0) → (PolyType f d)  := by
   induction' d with d hd
+
   -- Base case
-  · rw [PolyType_0]
+  · intro f
+    intro h
+    rcases h with ⟨c, N, hh⟩
+    rw [PolyType_0]
     use c
     use N
     tauto
 
   -- Induction step
-  · sorry
+  · intro f
+    intro h
+    rcases h with ⟨c, N, h⟩
+    have this : PolyType f (d + 1) := by
+      sorry
+    tauto
+
+
+
+-- [BH, 4.1.2] (a) => (b)
+-- Δ^d f (n) = c for some nonzero integer c for n >> 0 → f is of polynomial type d
+lemma a_to_b (f : ℤ → ℤ) (d : ℕ) : (∃ (c : ℤ), ∃ (N : ℤ), (∀ (n : ℤ), N ≤ n → (Δ f d) (n) = c) ∧ c ≠ 0) → PolyType f d := by
+  sorry
+  -- intro h
+  -- rcases h with ⟨c, N, hh⟩
+  -- have H1 := λ n => (hh n).left
+  -- have H2 := λ n => (hh n).right
+  -- clear hh
+  -- have H2 : c ≠ 0 := by
+  --   tauto
+  -- induction' d with d hd
+
+  -- -- Base case
+  -- · rw [PolyType_0]
+  --   use c
+  --   use N
+  --   tauto
+
+  -- -- Induction step
+  -- · sorry
 
 
 
 -- [BH, 4.1.2] (a) <= (b)
 -- f is of polynomial type d → Δ^d f (n) = c for some nonzero integer c for n >> 0
-lemma b_to_a (f : ℤ → ℤ) (d : ℕ) : PolyType f d → (∃ (c : ℤ), ∃ (N : ℤ), ∀ (n : ℤ), ((N ≤ n → (Δ f d) (n) = c) ∧ c ≠ 0)) := by
+lemma b_to_a (f : ℤ → ℤ) (d : ℕ) : PolyType f d → (∃ (c : ℤ), ∃ (N : ℤ), (∀ (n : ℤ), N ≤ n → (Δ f d) (n) = c) ∧ c ≠ 0) := by
   intro h
   have : PolyType (Δ f d) 0 := by
     apply Δ_d_PolyType_d_to_PolyType_0
     exact h
-  have this1 : (∃ (c : ℤ), ∃ (N : ℤ), ∀ (n : ℤ), ((N ≤ n → (Δ f d) n = c) ∧ c ≠ 0)) := by
+  have this1 : (∃ (c : ℤ), ∃ (N : ℤ), (∀ (n : ℤ), (N ≤ n → (Δ f d) n = c)) ∧ c ≠ 0) := by
     rw [←PolyType_0]
     exact this
   exact this1
