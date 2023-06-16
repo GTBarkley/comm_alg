@@ -49,10 +49,12 @@ lemma height_le_of_le {I J : PrimeSpectrum R} (I_le_J : I ≤ J) : height I ≤ 
   show J' < J
   exact lt_of_lt_of_le hJ' I_le_J
 
-lemma krullDim_le_iff (R : Type _) [CommRing R] (n : ℕ) :
+@[simp]
+lemma krullDim_le_iff {R : Type _} [CommRing R] {n : ℕ} :
   krullDim R ≤ n ↔ ∀ I : PrimeSpectrum R, (height I : WithBot ℕ∞) ≤ ↑n := iSup_le_iff (α := WithBot ℕ∞)
 
-lemma krullDim_le_iff' (R : Type _) [CommRing R] (n : ℕ∞) :
+@[simp]
+lemma krullDim_le_iff' {R : Type _} [CommRing R] {n : ℕ∞} :
   krullDim R ≤ n ↔ ∀ I : PrimeSpectrum R, (height I : WithBot ℕ∞) ≤ ↑n := iSup_le_iff (α := WithBot ℕ∞)
 
 @[simp]
@@ -91,7 +93,8 @@ lemma height_bot_eq {D: Type _} [CommRing D] [IsDomain D] : height (⊥ : PrimeS
 
 /-- The Krull dimension of a ring being ≥ n is equivalent to there being an
     ideal of height ≥ n. -/
-lemma le_krullDim_iff (R : Type _) [CommRing R] (n : ℕ) :
+@[simp]
+lemma le_krullDim_iff {R : Type _} [CommRing R] {n : ℕ} :
   n ≤ krullDim R ↔ ∃ I : PrimeSpectrum R, n ≤ (height I : WithBot ℕ∞) := by
   constructor
   · unfold krullDim
@@ -246,7 +249,7 @@ lemma not_maximal_of_lt_prime {p : Ideal R} {q : Ideal R} (hq : IsPrime q) (h : 
 /-- Krull dimension is ≤ 0 if and only if all primes are maximal. -/
 lemma dim_le_zero_iff : krullDim R ≤ 0 ↔ ∀ I : PrimeSpectrum R, IsMaximal I.asIdeal := by
   show ((_ : WithBot ℕ∞) ≤ (0 : ℕ)) ↔ _
-  rw [krullDim_le_iff R 0]
+  rw [krullDim_le_iff]
   constructor <;> intro h I
   . contrapose! h
     have ⟨𝔪, h𝔪⟩ := I.asIdeal.exists_le_maximal (IsPrime.ne_top I.IsPrime)
@@ -353,7 +356,7 @@ lemma dim_le_one_iff : krullDim R ≤ 1 ↔ Ring.DimensionLEOne R := sorry
   applies only to dimension zero rings and domains of dimension 1. -/
 lemma dim_le_one_of_dimLEOne :  Ring.DimensionLEOne R → krullDim R ≤ 1 := by
   show _ → ((_ : WithBot ℕ∞) ≤ (1 : ℕ))
-  rw [krullDim_le_iff R 1]
+  rw [krullDim_le_iff]
   intro H p
   apply le_of_not_gt
   intro h
@@ -375,7 +378,7 @@ lemma dim_le_one_of_pid [IsDomain R] [IsPrincipalIdealRing R] : krullDim R ≤ 1
   exact Ring.DimensionLEOne.principal_ideal_ring R
 
 /-- The ring of polynomials over a field has dimension one. -/
-lemma polynomial_over_field_dim_one {K : Type} [Nontrivial K] [Field K] : krullDim (Polynomial K) = 1 := by
+lemma polynomial_over_field_dim_one {K : Type _} [Nontrivial K] [Field K] : krullDim (Polynomial K) = 1 := by
   rw [le_antisymm_iff]
   let X := @Polynomial.X K _
   constructor
