@@ -15,6 +15,7 @@ macro "obviously" : tactic =>
         | simp; tauto; done; dbg_trace "it was simp tauto"
         | rfl; done; dbg_trace "it was rfl"
         | norm_num; done; dbg_trace "it was norm_num"
+        | norm_cast; done; dbg_trace "it was norm_cast"
         | /-change (@Eq ℝ _ _);-/ linarith; done; dbg_trace "it was linarith"
         -- | gcongr; done
         | ring; done; dbg_trace "it was ring"
@@ -84,7 +85,7 @@ lemma Polynomial_shifting (F : Polynomial ℚ) (s : ℚ) : ∃ (G : Polynomial �
   sorry
 
 -- Shifting doesn't change the polynomial type
-lemma Poly_shifting (f : ℤ → ℤ) (g : ℤ → ℤ) (hf : PolyType f d) (s : ℤ) (hfg : ∀ (n : ℤ), f (n + s) = g (n)) : PolyType g d := by
+lemma Poly_shifting (f : ℤ → ℤ) (g : ℤ → ℤ) (hf : PolyType f d) (s : ℕ) (hfg : ∀ (n : ℤ), f (n + s) = g (n)) : PolyType g d := by
   simp only [PolyType]
   rcases hf with ⟨F, hh⟩
   rcases hh with ⟨N,s1, s2⟩
@@ -97,9 +98,15 @@ lemma Poly_shifting (f : ℤ → ℤ) (g : ℤ → ℤ) (hf : PolyType f d) (s :
   · intro n
     specialize s1 (n + s)
     intro hN
-    have this1 : f (n + s) = Polynomial.eval (n + s : ℚ) F := by
-      sorry
-    sorry
+    have this1 : f (n + s) = Polynomial.eval (n + (s : ℚ)) F := by
+      have this2 : N ≤ n + s := by linarith
+      have this3 : ↑(f (n + ↑s)) = Polynomial.eval (↑(n + ↑s)) F := by tauto
+      rw [this3]
+      norm_cast
+    specialize hfg n
+    rw [←hfg, this1]
+    specialize h1 n
+    tauto
   · rw [h2, s2]
 
 -- PolyType 0 = constant function
@@ -241,6 +248,9 @@ lemma b_to_a (f : ℤ → ℤ) (d : ℕ) (poly : PolyType f d) :
   rw [←PolyType_0]; exact Δ_d_PolyType_d_to_PolyType_0 f d poly
 
 end
+
+
+
 -- @Additive lemma of length for a SES
 -- Given a SES 0 → A → B → C → 0, then length (A) - length (B) + length (C) = 0 
 section
