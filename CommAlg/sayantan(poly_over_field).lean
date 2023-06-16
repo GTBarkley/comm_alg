@@ -22,7 +22,8 @@ private lemma singleton_bot_chainHeight_one {α : Type} [Preorder α] [Bot α] :
   exact absurd h1 (lt_irrefl _)
 
 /-- The ring of polynomials over a field has dimension one. -/
-lemma polynomial_over_field_dim_one {K : Type} [Nontrivial K] [Field K] : krullDim (Polynomial K) = 1 := by
+-- It's the exact same lemma as in krull.lean, added ' to avoid conflict
+lemma polynomial_over_field_dim_one' {K : Type} [Nontrivial K] [Field K] : krullDim (Polynomial K) = 1 := by
   rw [le_antisymm_iff]
   let X := @Polynomial.X K _
   constructor
