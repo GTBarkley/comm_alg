@@ -7,7 +7,7 @@ import Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic
 
 namespace Ideal
 
-private lemma singleton_chainHeight_one {α : Type} [Preorder α] [Bot α] : Set.chainHeight {(⊥ : α)} ≤ 1 := by
+private lemma singleton_bot_chainHeight_one {α : Type} [Preorder α] [Bot α] : Set.chainHeight {(⊥ : α)} ≤ 1 := by
   unfold Set.chainHeight
   simp only [iSup_le_iff, Nat.cast_le_one]
   intro L h
@@ -67,7 +67,7 @@ lemma polynomial_over_field_dim_one {K : Type} [Nontrivial K] [Field K] : krullD
       unfold height
       rw [sngletn]
       simp only [WithBot.coe_le_one, ge_iff_le]
-      exact singleton_chainHeight_one
+      exact singleton_bot_chainHeight_one
   · suffices : ∃I : PrimeSpectrum (Polynomial K), 1 ≤ (height I : WithBot ℕ∞)
     · obtain ⟨I, h⟩ := this
       have :  (height I : WithBot ℕ∞) ≤ ⨆ (I : PrimeSpectrum (Polynomial K)), ↑(height I) := by
