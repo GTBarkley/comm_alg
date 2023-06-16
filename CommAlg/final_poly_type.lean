@@ -65,7 +65,13 @@ example : Polynomial.eval (100 : ℚ) F = (2 : ℚ) := by
 end section
 
 
+
+
+
 -- @[BH, 4.1.2]
+
+
+
 -- All the polynomials are in ℚ[X], all the functions are considered as ℤ → ℤ
 noncomputable section
 -- Polynomial type of degree d
@@ -107,6 +113,10 @@ def f (n : ℤ) := n
 end section
 
 
+
+
+
+
 -- (NO need to prove another direction) Constant polynomial function = constant function
 lemma Poly_constant (F : Polynomial ℚ) (c : ℚ) : 
   (F = Polynomial.C (c : ℚ)) ↔ (∀ r : ℚ, (Polynomial.eval r F) = (c : ℚ)) := by
@@ -128,7 +138,6 @@ lemma Poly_shifting (f : ℤ → ℤ) (g : ℤ → ℤ) (hf : PolyType f d) (s :
   rcases hf with ⟨F, hh⟩
   rcases hh with ⟨N,ss⟩
   sorry
-
 
 
 
@@ -162,17 +171,50 @@ lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N :
 lemma Δ_0 (f : ℤ → ℤ) : (Δ f 0) = f := by
   tauto
 
+
+
+
+
 -- Δ of d times maps polynomial of degree d to polynomial of degree 0
-lemma Δ_PolyType_d_to_PolyType_0 (f : ℤ → ℤ) (d : ℕ): PolyType f d → PolyType (Δ f d) 0 := by
+lemma Δ_d_PolyType_d_to_PolyType_0 (f : ℤ → ℤ) (d : ℕ): PolyType f d → PolyType (Δ f d) 0 := by
   intro h
   rcases h with ⟨Poly, hN⟩
   rcases hN with ⟨N, hh⟩
   rcases hh with ⟨H1, H2⟩
   have HH2 : d = Polynomial.degree Poly := by
-    sorry
+    tauto
+  have HH3 : Polynomial.degree Poly = d := by
+    tauto
   induction' d with d hd
+  -- Base case
   · rw [PolyType_0]
-    sorry
+    have this : Poly = Polynomial.C (Polynomial.coeff Poly 0) := by
+      exact Polynomial.eq_C_of_degree_eq_zero HH3
+    let d := Polynomial.coeff Poly 0
+    have this11 : ∃ (c : ℤ), c = d := by
+      sorry
+    rcases this11 with ⟨c, this1⟩
+    have this1 : c = Polynomial.coeff Poly 0 := by
+      tauto
+    use c; use N; intro n
+    constructor
+    · specialize H1 n
+      rw [Δ_0]
+      intro h
+      have this2 : f n = Polynomial.eval (n : ℚ) Poly := by
+        tauto
+      have this3 : f n = (c : ℚ) := by
+        rw [this2, this1]
+        let HHH := (Poly_constant Poly c).mp
+        sorry
+      exact Iff.mp (Rat.coe_int_inj (f n) c) this3
+    · intro c0
+      have this2 : (c : ℚ) = 0 := by
+        exact congrArg Int.cast c0
+      have this3 : Polynomial.coeff Poly 0 = 0 := by
+        rw [←this1, this2]
+      sorry
+  -- Induction step
   · sorry
 
 
@@ -195,18 +237,23 @@ lemma a_to_b (f : ℤ → ℤ) (d : ℕ) : (∃ (c : ℤ), ∃ (N : ℤ), ∀ (n
     tauto
   · sorry
 
+
+
 -- [BH, 4.1.2] (a) <= (b)
 -- f is of polynomial type d → Δ^d f (n) = c for some nonzero integer c for n >> 0
 lemma b_to_a (f : ℤ → ℤ) (d : ℕ) : PolyType f d → (∃ (c : ℤ), ∃ (N : ℤ), ∀ (n : ℤ), ((N ≤ n → (Δ f d) (n) = c) ∧ c ≠ 0)) := by
   intro h
   have : PolyType (Δ f d) 0 := by
-    apply Δ_PolyType_d_to_PolyType_0
+    apply Δ_d_PolyType_d_to_PolyType_0
     exact h
   have this1 : (∃ (c : ℤ), ∃ (N : ℤ), ∀ (n : ℤ), ((N ≤ n → (Δ f d) n = c) ∧ c ≠ 0)) := by
     rw [←PolyType_0]
     exact this
   exact this1
 end
+
+
+
 
 
 
