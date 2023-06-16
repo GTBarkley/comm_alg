@@ -145,89 +145,27 @@ lemma Poly_shifting (f : ℤ → ℤ) (g : ℤ → ℤ) (hf : PolyType f d) (s :
 
 -- set_option pp.all true in
 -- PolyType 0 = constant function
-lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N : ℤ), ∀ (n : ℤ), (N ≤ n → f n = c) ∧ (c ≠ 0)) := by
+lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N : ℤ), ∀ (n : ℤ), 
+    (N ≤ n → f n = c) ∧ c ≠ 0) := by
   constructor
-  · intro h
-    rcases h with ⟨Poly, hN⟩
-    rcases hN with ⟨N, hh⟩
-    rcases hh with ⟨H1, H2⟩
-    -- have H1 := λ n=> (hh n).left
-    -- have H2 := λ n=> (hh n).right
-    have this1 : Polynomial.degree Poly = 0 := by
-      have : N ≤ N + 1 := by
-        norm_num
-      tauto
+  · rintro ⟨Poly, ⟨N, ⟨H1, H2⟩⟩⟩ 
+    have this1 : Polynomial.degree Poly = 0 := by rw [← H2]; rfl
     have this2 : ∃ (c : ℤ), Poly = Polynomial.C (c : ℚ) := by
-      have HH : ∃ (c : ℚ), Poly = Polynomial.C (c : ℚ) := by
-        use Poly.coeff 0
-        apply Polynomial.eq_C_of_degree_eq_zero
-        exact this1
+      have HH : ∃ (c : ℚ), Poly = Polynomial.C (c : ℚ) := ⟨Poly.coeff 0, Polynomial.eq_C_of_degree_eq_zero (by rw[← H2]; rfl)⟩
       cases' HH with c HHH
-      have HHHH : ∃ (d : ℤ), d = c := by
-        have H3 := (Poly_constant Poly c).mp HHH N
-        have H4 := H1 N (le_refl N)
-        rw[H3] at H4
-        exact ⟨f N, H4⟩
-      cases' HHHH with d H5
-      use d
-      rw [H5]
-      exact HHH
-    rcases this2 with ⟨c, hthis2⟩
-    use c 
-    use N
-    intro n
-    specialize H1 n
+      have HHHH : ∃ (d : ℤ), d = c := ⟨f N, by simp [(Poly_constant Poly c).mp HHH N, H1 N (le_refl N)]⟩
+      cases' HHHH with d H5; exact ⟨d, by rw[← H5] at HHH; exact HHH⟩
+    rcases this2 with ⟨c, hthis2⟩ 
+    use c; use N; intro n
     constructor
-    · intro HH1
-      -- have H6 := H1 HH1
-      have this3 : f n = Polynomial.eval (n : ℚ) Poly := by
-        tauto
-      have this4 : Polynomial.eval (n : ℚ) Poly = c := by
-        rw [hthis2]
-        simp
-      have this5 : f n = (c : ℚ) := by
-        rw [←this4, this3]
-      exact Iff.mp (Rat.coe_int_inj (f n) c) this5
-    
+    · have this4 : Polynomial.eval (n : ℚ) Poly = c := by
+        rw [hthis2]; simp only [map_intCast, Polynomial.eval_int_cast]
+      exact fun HH1 => Iff.mp (Rat.coe_int_inj (f n) c) (by rw [←this4, H1 n HH1])
     · intro c0
-      -- have H7 := H2 (by norm_num)
-      rw [hthis2] at this1
-      rw [c0] at this1
-      simp at this1
-
-
-  · intro h
-    rcases h with ⟨c, N, hh⟩
-    let Poly := Polynomial.C (c : ℚ)
-    --unfold PolyType
-    use Poly
-    --simp at Poly
-    use N
-    have H1 := λ n=> (hh n).left
-    have H22 := λ n=> (hh n).right
-    have H2 : c ≠ 0 := by
-      exact H22 0
-    have H2 : (c : ℚ) ≠ 0 := by
-      simp; tauto
-    clear H22
-    constructor
-    · intro n Nn
-      specialize H1 n
-      have this : f n = c := by
-        tauto
-      rw [this]
-      have this2 : Polynomial.eval (n : ℚ) Poly = (c : ℚ) := by
-        have this3 : ∀ r : ℚ, (Polynomial.eval r Poly) = (c : ℚ) := (Poly_constant Poly (c : ℚ)).mp rfl
-        exact this3 n
-      exact this2.symm
-
-    · have this : Polynomial.degree Poly = 0 := by
-        simp only [map_intCast]
-        exact Polynomial.degree_C H2
-      tauto
-
-
-
+      simp only [hthis2, c0, Int.cast_zero, map_zero, Polynomial.degree_zero] at this1
+  · rintro ⟨c, N, hh⟩
+    have H2 : (c : ℚ) ≠ 0 := by simp only [ne_eq, Int.cast_eq_zero]; exact (hh 0).2
+    exact ⟨Polynomial.C (c : ℚ), N, fun n Nn => by rw [(hh n).1 Nn]; exact (((Poly_constant (Polynomial.C (c : ℚ)) (c : ℚ)).mp rfl) n).symm, by rw [Polynomial.degree_C H2]; rfl⟩
 
 -- Δ of 0 times preserves the function
 lemma Δ_0 (f : ℤ → ℤ) : (Δ f 0) = f := by tauto
