@@ -95,8 +95,32 @@ lemma le_krullDim_iff (R : Type _) [CommRing R] (n : ℕ) :
     have : height I ≤ krullDim R := by apply height_le_krullDim
     exact le_trans h this
 
-lemma le_krullDim_iff' (R : Type _) [CommRing R] (n : ℕ∞) :
-  n ≤ krullDim R ↔ ∃ I : PrimeSpectrum R, n ≤ (height I : WithBot ℕ∞) := by sorry
+#check ENat.recTopCoe
+
+/- terrible place for this lemma. Also this probably exists somewhere
+  Also this is a terrible proof
+-/
+lemma eq_top_iff (n : WithBot ℕ∞) : n = ⊤ ↔ ∀ m : ℕ, m ≤ n := by
+  aesop
+  induction' n using WithBot.recBotCoe with n
+  . exfalso
+    have := (a 0)
+    simp [not_lt_of_ge] at this
+  induction' n using ENat.recTopCoe with n
+  . rfl
+  . have := a (n + 1)
+    exfalso
+    change (((n + 1) : ℕ∞) : WithBot ℕ∞) ≤ _ at this
+    simp [WithBot.coe_le_coe] at this
+    change ((n + 1) : ℕ∞) ≤ (n : ℕ∞) at this
+    simp [ENat.add_one_le_iff] at this
+
+lemma krullDim_eq_top_iff (R : Type _) [CommRing R] :
+  krullDim R = ⊤ ↔ ∀ (n : ℕ), ∃ I : PrimeSpectrum R, n ≤ height I := by
+  simp [eq_top_iff, le_krullDim_iff]
+  change (∀ (m : ℕ), ∃ I, ((m : ℕ∞) : WithBot ℕ∞) ≤ height I) ↔ _
+  simp [WithBot.coe_le_coe]
+  
 
 /-- The Krull dimension of a local ring is the height of its maximal ideal. -/
 lemma krullDim_eq_height [LocalRing R] : krullDim R = height (closedPoint R) := by
