@@ -66,13 +66,6 @@ end section
 def Δ : (ℤ → ℤ) → ℕ → (ℤ → ℤ)
   | f, 0 => f
   | f, d + 1 => fun (n : ℤ) ↦ (Δ f d) (n + 1) - (Δ f d) (n)  
-section
-
-#check Δ
-def f (n : ℤ) := n
-#eval (Δ f 1) 100
--- #check (by (show_term unfold Δ) : Δ f 0=0)
-end section
 
 -- (NO need to prove another direction) Constant polynomial function = constant function
 lemma Poly_constant (F : Polynomial ℚ) (c : ℚ) : 
@@ -86,12 +79,28 @@ lemma Poly_constant (F : Polynomial ℚ) (c : ℚ) :
     simp
   · sorry
 
+-- Get the polynomial G (X) = F (X + s) from the polynomial F(X)
+lemma Polynomial_shifting (F : Polynomial ℚ) (s : ℚ) : ∃ (G : Polynomial ℚ), (∀ (x : ℚ), Polynomial.eval x G = Polynomial.eval (x + s) F) ∧ (Polynomial.degree G = Polynomial.degree F) := by  
+  sorry
+
 -- Shifting doesn't change the polynomial type
 lemma Poly_shifting (f : ℤ → ℤ) (g : ℤ → ℤ) (hf : PolyType f d) (s : ℤ) (hfg : ∀ (n : ℤ), f (n + s) = g (n)) : PolyType g d := by
   simp only [PolyType]
   rcases hf with ⟨F, hh⟩
-  rcases hh with ⟨N,ss⟩
-  sorry
+  rcases hh with ⟨N,s1, s2⟩
+  have this : ∃ (G : Polynomial ℚ), (∀ (x : ℚ), Polynomial.eval x G = Polynomial.eval (x + s) F) ∧ (Polynomial.degree G = Polynomial.degree F) := by
+    exact Polynomial_shifting F s
+  rcases this with ⟨Poly, h1, h2⟩
+  use Poly
+  use N
+  constructor
+  · intro n
+    specialize s1 (n + s)
+    intro hN
+    have this1 : f (n + s) = Polynomial.eval (n + s : ℚ) F := by
+      sorry
+    sorry
+  · rw [h2, s2]
 
 -- PolyType 0 = constant function
 lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N : ℤ), (∀ (n : ℤ), 
@@ -125,12 +134,44 @@ lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N :
 lemma Δ_0 (f : ℤ → ℤ) : (Δ f 0) = f := by rfl
   --simp only [Δ]
 -- Δ of 1 times decreaes the polynomial type by one
-lemma Δ_1 (f : ℤ → ℤ) (d : ℕ): PolyType f (d + 1) → PolyType (Δ f 1) d := by
-  sorry
+lemma Δ_1 (f : ℤ → ℤ) (d : ℕ) : PolyType f (d + 1) → PolyType (Δ f 1) d := by
+  intro h
+  simp only [PolyType, Δ, Int.cast_sub, exists_and_right]
+  rcases h with ⟨F, N, h⟩
+  rcases h with ⟨h1, h2⟩
+  have this : ∃ (G : Polynomial ℚ), (∀ (x : ℚ), Polynomial.eval x G = Polynomial.eval (x + 1) F) ∧ (Polynomial.degree G = Polynomial.degree F) := by
+    exact Polynomial_shifting F 1
+  rcases this with ⟨G, hG, hGG⟩
+  let Poly := G - F
+  use Poly
+  constructor
+  · use N
+    intro n hn
+    specialize hG n
+    norm_num
+    rw [hG]
+    let h3 := h1
+    specialize h3 n
+    have this1 : f n = Polynomial.eval (n : ℚ) F := by tauto
+    have this2 : f (n + 1) = Polynomial.eval ((n + 1) : ℚ) F := by
+      specialize h1 (n + 1)
+      have this3 : N ≤ n + 1 := by linarith
+      aesop
+    rw [←this1, ←this2]
+  · have this1 : Polynomial.degree Poly = d := by
+      have this2 : Polynomial.degree Poly ≤ d := by
+        sorry
+      have this3 : Polynomial.degree Poly ≥ d := by
+        sorry
+      sorry
+    tauto
 
 -- Δ of d times maps polynomial of degree d to polynomial of degree 0
 lemma Δ_1_s_equiv_Δ_s_1 (f : ℤ → ℤ) (s : ℕ) : Δ (Δ f 1) s = (Δ f (s + 1)) := by
-  sorry
+  induction' s with s hs
+  · norm_num
+  · aesop
+
 lemma foofoo (d : ℕ) : (f : ℤ → ℤ) → (PolyType f d) → (PolyType (Δ f d) 0):= by
   induction' d with d hd
   · intro f h
@@ -143,7 +184,17 @@ lemma foofoo (d : ℕ) : (f : ℤ → ℤ) → (PolyType f d) → (PolyType (Δ 
 lemma Δ_d_PolyType_d_to_PolyType_0 (f : ℤ → ℤ) (d : ℕ): PolyType f d → PolyType (Δ f d) 0 := 
   fun h => (foofoo d f) h
 
-lemma foofoofoo (d : ℕ) : (f : ℤ → ℤ) → (∃ (c : ℤ), ∃ (N : ℤ), (∀ (n : ℤ), N ≤ n → (Δ f d) (n) = c) ∧ c ≠ 0) → (PolyType f d)  := by
+-- The "reverse" of Δ of 1 times increases the polynomial type by one
+lemma Δ_1_ (f : ℤ → ℤ) (d : ℕ) : PolyType (Δ f 1) d → PolyType f (d + 1) := by
+  intro h
+  simp only [PolyType, Nat.cast_add, Nat.cast_one, exists_and_right]
+  rcases h with ⟨P, N, h⟩
+  rcases h with ⟨h1, h2⟩
+  let G := fun (q : ℤ) => f (N)
+  sorry
+
+
+lemma foo (d : ℕ) : (f : ℤ → ℤ) → (∃ (c : ℤ), ∃ (N : ℤ), (∀ (n : ℤ), N ≤ n → (Δ f d) (n) = c) ∧ c ≠ 0) → (PolyType f d)  := by
   induction' d with d hd
 
   -- Base case
@@ -160,8 +211,23 @@ lemma foofoofoo (d : ℕ) : (f : ℤ → ℤ) → (∃ (c : ℤ), ∃ (N : ℤ),
     intro h
     rcases h with ⟨c, N, h⟩
     have this : PolyType f (d + 1) := by
-      sorry
-    tauto
+      rcases h with ⟨H,c0⟩
+      let g := (Δ f 1)
+      have this1 : (∃ (c : ℤ), ∃ (N : ℤ), (∀ (n : ℤ), N ≤ n → (Δ g d) (n) = c) ∧ c ≠ 0) := by
+        use c; use N
+        constructor
+        · intro n
+          specialize H n
+          intro h
+          have this : Δ f (d + 1) n = c := by tauto
+          rw [←this]
+          rw [Δ_1_s_equiv_Δ_s_1] 
+        · tauto 
+      have this2 : PolyType g d := by
+        apply hd
+        tauto
+      exact Δ_1_ f d this2
+    exact this
 
 -- [BH, 4.1.2] (a) => (b)
 -- Δ^d f (n) = c for some nonzero integer c for n >> 0 → f is of polynomial type d

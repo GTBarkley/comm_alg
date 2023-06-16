@@ -1,13 +1,3 @@
-import Mathlib.RingTheory.Ideal.Operations
-import Mathlib.RingTheory.FiniteType
-import Mathlib.Order.Height
-import Mathlib.RingTheory.Polynomial.Quotient
-import Mathlib.RingTheory.PrincipalIdealDomain
-import Mathlib.RingTheory.DedekindDomain.Basic
-import Mathlib.RingTheory.Ideal.Quotient
-import Mathlib.RingTheory.Localization.AtPrime
-import Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic
-import Mathlib.Order.ConditionallyCompleteLattice.Basic
 import CommAlg.krull
 
 section ChainLemma
@@ -132,7 +122,6 @@ lemma ht_adjoin_x_eq_ht_add_one [Nontrivial R] (I : PrimeSpectrum R) : height I 
       apply hl.2
       exact hb
 
-#check (⊤ : ℕ∞)
 /-
 dim R + 1 ≤ dim R[X]
 -/
