@@ -60,7 +60,8 @@ lemma height_le_krullDim (I : PrimeSpectrum R) : height I ≤ krullDim R :=
   le_iSup (λ I : PrimeSpectrum R => (height I : WithBot ℕ∞)) I
 
 /-- In a domain, the height of a prime ideal is Bot (0 in this case) iff it's the Bot ideal. -/
-lemma height_bot_iff_bot {D: Type} [CommRing D] [IsDomain D] (P : PrimeSpectrum D) : height P = ⊥ ↔ P = ⊥ := by
+@[simp]
+lemma height_bot_iff_bot {D: Type} [CommRing D] [IsDomain D] {P : PrimeSpectrum D} : height P = ⊥ ↔ P = ⊥ := by
   constructor
   · intro h
     unfold height at h
@@ -263,7 +264,7 @@ lemma dim_eq_zero_iff [Nontrivial R] : krullDim R = 0 ↔ ∀ I : PrimeSpectrum 
 
 /-- In a field, the unique prime ideal is the zero ideal. -/
 @[simp]
-lemma field_prime_bot {K: Type _} [Field K] (P : Ideal K) : IsPrime P ↔ P = ⊥ := by
+lemma field_prime_bot {K: Type _} [Field K] {P : Ideal K} : IsPrime P ↔ P = ⊥ := by
       constructor
       · intro primeP
         obtain T := eq_bot_or_top P
@@ -274,9 +275,13 @@ lemma field_prime_bot {K: Type _} [Field K] (P : Ideal K) : IsPrime P ↔ P = �
         exact bot_prime
 
 /-- In a field, all primes have height 0. -/
-lemma field_prime_height_bot {K: Type _} [Field K] (P : PrimeSpectrum K) : height P = ⊥ := by
-    -- This should be doable by using field_prime_height_bot
-    -- and height_bot_iff_bot
+lemma field_prime_height_bot {K: Type _} [Nontrivial K] [Field K] {P : PrimeSpectrum K} : height P = ⊥ := by
+    -- This should be doable by
+    -- have : IsPrime P.asIdeal := P.IsPrime
+    -- rw [field_prime_bot] at this
+    -- have : P = ⊥ := PrimeSpectrum.ext P ⊥ this
+    -- rw [height_bot_iff_bot]
+    -- Need to check what's happening
     rw [bot_eq_zero]
     unfold height
     simp only [Set.chainHeight_eq_zero_iff]
