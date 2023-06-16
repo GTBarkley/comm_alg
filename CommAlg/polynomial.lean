@@ -132,7 +132,7 @@ lemma ht_adjoin_x_eq_ht_add_one [Nontrivial R] (I : PrimeSpectrum R) : height I 
       apply hl.2
       exact hb
 
-
+#check (⊤ : ℕ∞)
 /-
 dim R + 1 ≤ dim R[X]
 -/
@@ -142,12 +142,26 @@ lemma dim_le_dim_polynomial_add_one [Nontrivial R] :
   rw [hn]
   change ↑(n + 1) ≤ krullDim R[X]
   have := le_of_eq hn.symm
-  rw [le_krullDim_iff'] at this ⊢
+  induction' n using ENat.recTopCoe with n
+  . change krullDim R = ⊤ at hn
+    change ⊤ ≤ krullDim R[X] 
+    rw [krullDim_eq_top_iff] at hn
+    rw [top_le_iff, krullDim_eq_top_iff]
+    intro n
+    obtain ⟨I, hI⟩ := hn n
+    use adjoin_x I
+    calc n ≤ height I := hI
+      _ ≤ height I + 1 := le_self_add
+      _ ≤ height (adjoin_x I) := ht_adjoin_x_eq_ht_add_one I
+  change n ≤ krullDim R at this
+  change (n + 1 : ℕ) ≤ krullDim R[X]
+  rw [le_krullDim_iff] at this ⊢
   obtain ⟨I, hI⟩ := this
   use adjoin_x I
   apply WithBot.coe_mono
   calc n + 1 ≤ height I + 1 := by
         apply add_le_add_right
+        change ((n : ℕ∞) : WithBot ℕ∞) ≤ (height I) at hI
         rw [WithBot.coe_le_coe] at hI
         exact hI
     _ ≤ height (adjoin_x I) := ht_adjoin_x_eq_ht_add_one I
