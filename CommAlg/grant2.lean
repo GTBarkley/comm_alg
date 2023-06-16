@@ -54,9 +54,20 @@ def symbolicIdeal(Q : Ideal R) {hin : Q.IsPrime} (I : Ideal R) : Ideal R where
     rw [←mul_assoc, mul_comm s, mul_assoc]
     exact Ideal.mul_mem_left _ _ hs2
 
+
+theorem WF_interval_le_prime (I : Ideal R) (P : Ideal R) [P.IsPrime] 
+  (h : ∀ J ∈ (Set.Icc I P), J.IsPrime → J = P ):
+  WellFounded ((· < ·) : (Set.Icc I P) → (Set.Icc I P) → Prop ) := sorry 
+
 protected lemma LocalRing.height_le_one_of_minimal_over_principle
-  [LocalRing R] (q : PrimeSpectrum R) {x : R} 
+  [LocalRing R] {x : R} 
   (h : (closedPoint R).asIdeal ∈ (Ideal.span {x}).minimalPrimes) :
-  q = closedPoint R ∨ Ideal.height q = 0 := by
-  
+  Ideal.height (closedPoint R) ≤ 1 := by
+  -- by_contra hcont
+  -- push_neg at hcont
+  -- rw [Ideal.lt_height_iff'] at hcont
+  -- rcases hcont with ⟨c, hc1, hc2, hc3⟩
+  apply height_le_of_gt_height_lt
+  intro p hp
+
   sorry
