@@ -59,10 +59,6 @@ theorem WF_interval_le_prime [IsNoetherianRing R] (I : Ideal R) (P : Ideal R) [P
   (h : ∀ J ∈ (Set.Icc I P), J.IsPrime → J = P ):
   WellFounded ((· < ·) : (Set.Icc I P) → (Set.Icc I P) → Prop ) := sorry 
 
-theorem WF_interval_of_no_primes [IsNoetherianRing R] (I : Ideal R) (J : Ideal R)
-  (h : ∀ K ∈ (Set.Icc I J), ¬ K.IsPrime) :
-  WellFounded ((· < ·) : (Set.Icc I J) → (Set.Icc I J) → Prop ) := sorry
-
 protected lemma LocalRing.height_le_one_of_minimal_over_principle
   [LocalRing R] {x : R} 
   (h : (closedPoint R).asIdeal ∈ (Ideal.span {x}).minimalPrimes) :
