@@ -80,7 +80,33 @@ lemma Poly_constant (F : Polynomial ℚ) (c : ℚ) :
 
 -- Get the polynomial G (X) = F (X + s) from the polynomial F(X)
 lemma Polynomial_shifting (F : Polynomial ℚ) (s : ℚ) : ∃ (G : Polynomial ℚ), (∀ (x : ℚ), Polynomial.eval x G = Polynomial.eval (x + s) F) ∧ (Polynomial.degree G = Polynomial.degree F) := by  
-  sorry
+  let Shift := (Polynomial.monomial 1 (1 : ℚ)) + (Polynomial.C s)
+  let G := Polynomial.comp Shift F
+  use G
+  constructor
+  · intro t
+    have this : Polynomial.eval t G = Polynomial.eval (Polynomial.eval t Shift) F:= by
+      sorry
+    have this1 : Polynomial.eval t Shift = t + s := by
+      dsimp; simp
+    rw [this1] at this
+    exact this
+  · have this : Polynomial.degree G = (Polynomial.degree F) * (Polynomial.degree Shift) := by
+      sorry
+    have Shift_degree : Polynomial.degree Shift = 1 := by
+      have this2 : Polynomial.degree (Polynomial.monomial 1 (1 : ℚ)) = 1 := by
+        have this3 : (1 : ℚ) ≠ 0 := by norm_num
+        exact Polynomial.degree_monomial 1 this3
+      have this1 : Polynomial.degree Shift = (Polynomial.degree (Polynomial.monomial 1 (1 : ℚ))) + (Polynomial.degree (Polynomial.C s)) := by
+        sorry
+      have this3 : Polynomial.degree (Polynomial.C s) = 0 := by
+        sorry
+      rw [this1, this2, this3]
+      trivial
+    rw [Shift_degree] at this
+    rw [this]
+    norm_num
+
 
 -- Shifting doesn't change the polynomial type
 lemma Poly_shifting (f : ℤ → ℤ) (g : ℤ → ℤ) (hf : PolyType f d) (s : ℕ) (hfg : ∀ (n : ℤ), f (n + s) = g (n)) : PolyType g d := by
