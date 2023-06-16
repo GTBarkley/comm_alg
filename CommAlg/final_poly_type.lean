@@ -6,6 +6,7 @@ set_option maxHeartbeats 0
 macro "ls" : tactic => `(tactic|library_search)
 
 -- From Kyle : New tactic "obviously"
+-- From Kyle : New tactic "obviously"
 macro "obviously" : tactic =>
   `(tactic| (
       first
@@ -79,9 +80,7 @@ lemma Poly_constant (F : Polynomial ℚ) (c : ℚ) :
   · sorry
 
 -- Get the polynomial G (X) = F (X + s) from the polynomial F(X)
-lemma Polynomial_shifting (F : Polynomial ℚ) (s : ℚ) : ∃ (G : Polynomial ℚ), (∀ (x : ℚ), 
-    Polynomial.eval x G = Polynomial.eval (x + s) F) ∧ 
-    (Polynomial.degree G = Polynomial.degree F) := by  
+lemma Polynomial_shifting (F : Polynomial ℚ) (s : ℚ) : ∃ (G : Polynomial ℚ), (∀ (x : ℚ), Polynomial.eval x G = Polynomial.eval (x + s) F) ∧ (Polynomial.degree G = Polynomial.degree F) := by  
   sorry
 
 -- Shifting doesn't change the polynomial type
