@@ -66,13 +66,6 @@ end section
 def Δ : (ℤ → ℤ) → ℕ → (ℤ → ℤ)
   | f, 0 => f
   | f, d + 1 => fun (n : ℤ) ↦ (Δ f d) (n + 1) - (Δ f d) (n)  
-section
-
-#check Δ
-def f (n : ℤ) := n
-#eval (Δ f 1) 100
--- #check (by (show_term unfold Δ) : Δ f 0=0)
-end section
 
 -- (NO need to prove another direction) Constant polynomial function = constant function
 lemma Poly_constant (F : Polynomial ℚ) (c : ℚ) : 
@@ -109,7 +102,6 @@ lemma Poly_shifting (f : ℤ → ℤ) (g : ℤ → ℤ) (hf : PolyType f d) (s :
     sorry
   · rw [h2, s2]
 
-
 -- PolyType 0 = constant function
 lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N : ℤ), (∀ (n : ℤ), 
     (N ≤ n → f n = c)) ∧ c ≠ 0) := by
@@ -142,12 +134,44 @@ lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N :
 lemma Δ_0 (f : ℤ → ℤ) : (Δ f 0) = f := by rfl
   --simp only [Δ]
 -- Δ of 1 times decreaes the polynomial type by one
-lemma Δ_1 (f : ℤ → ℤ) (d : ℕ): PolyType f (d + 1) → PolyType (Δ f 1) d := by
-  sorry
+lemma Δ_1 (f : ℤ → ℤ) (d : ℕ) : PolyType f (d + 1) → PolyType (Δ f 1) d := by
+  intro h
+  simp only [PolyType, Δ, Int.cast_sub, exists_and_right]
+  rcases h with ⟨F, N, h⟩
+  rcases h with ⟨h1, h2⟩
+  have this : ∃ (G : Polynomial ℚ), (∀ (x : ℚ), Polynomial.eval x G = Polynomial.eval (x + 1) F) ∧ (Polynomial.degree G = Polynomial.degree F) := by
+    exact Polynomial_shifting F 1
+  rcases this with ⟨G, hG, hGG⟩
+  let Poly := G - F
+  use Poly
+  constructor
+  · use N
+    intro n hn
+    specialize hG n
+    norm_num
+    rw [hG]
+    let h3 := h1
+    specialize h3 n
+    have this1 : f n = Polynomial.eval (n : ℚ) F := by tauto
+    have this2 : f (n + 1) = Polynomial.eval ((n + 1) : ℚ) F := by
+      specialize h1 (n + 1)
+      have this3 : N ≤ n + 1 := by linarith
+      aesop
+    rw [←this1, ←this2]
+  · have this1 : Polynomial.degree Poly = d := by
+      have this2 : Polynomial.degree Poly ≤ d := by
+        sorry
+      have this3 : Polynomial.degree Poly ≥ d := by
+        sorry
+      sorry
+    tauto
 
 -- Δ of d times maps polynomial of degree d to polynomial of degree 0
 lemma Δ_1_s_equiv_Δ_s_1 (f : ℤ → ℤ) (s : ℕ) : Δ (Δ f 1) s = (Δ f (s + 1)) := by
-  sorry
+  induction' s with s hs
+  · norm_num
+  · aesop
+
 lemma foofoo (d : ℕ) : (f : ℤ → ℤ) → (PolyType f d) → (PolyType (Δ f d) 0):= by
   induction' d with d hd
   · intro f h
@@ -189,7 +213,6 @@ lemma foo (d : ℕ) : (f : ℤ → ℤ) → (∃ (c : ℤ), ∃ (N : ℤ), (∀ 
     have this : PolyType f (d + 1) := by
       rcases h with ⟨H,c0⟩
       let g := (Δ f 1)
-      -- let g := fun (x : ℤ) => (f (x + 1) - f (x))
       have this1 : (∃ (c : ℤ), ∃ (N : ℤ), (∀ (n : ℤ), N ≤ n → (Δ g d) (n) = c) ∧ c ≠ 0) := by
         use c; use N
         constructor
@@ -204,7 +227,7 @@ lemma foo (d : ℕ) : (f : ℤ → ℤ) → (∃ (c : ℤ), ∃ (N : ℤ), (∀ 
         apply hd
         tauto
       exact Δ_1_ f d this2
-    tauto
+    exact this
 
 -- [BH, 4.1.2] (a) => (b)
 -- Δ^d f (n) = c for some nonzero integer c for n >> 0 → f is of polynomial type d
