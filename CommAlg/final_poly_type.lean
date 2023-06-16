@@ -22,34 +22,20 @@ macro "obviously" : tactic =>
         -- | nlinarith; done
         | fail "No, this is not obvious."))
 
-
 -- Testing of Polynomial
 section Polynomial
 noncomputable section
-#check Polynomial 
-#check Polynomial (ℚ)
-#check Polynomial.eval
-
 
 example (f : Polynomial ℚ) (hf : f = Polynomial.C (1 : ℚ)) : Polynomial.eval 2 f = 1 := by
   have : ∀ (q : ℚ), Polynomial.eval q f = 1 := by
     sorry
-  obviously
-
--- example (f : ℤ → ℤ) (hf : ∀ x, f x = x ^ 2) : Polynomial.eval 2 f = 4 := by
---   sorry
 
 -- degree of a constant function is ⊥ (is this same as -1 ???)
 #print Polynomial.degree_zero
 
 def F : Polynomial ℚ := Polynomial.C (2 : ℚ)
-#print F
-#check F
-#check Polynomial.degree F
-#check Polynomial.degree 0
-#check WithBot ℕ
+
 -- #eval Polynomial.degree F
-#check Polynomial.eval 1 F
 example : Polynomial.eval (100 : ℚ) F = (2 : ℚ) := by
   refine Iff.mpr (Rat.ext_iff (Polynomial.eval 100 F) 2) ?_
   simp only [Rat.ofNat_num, Rat.ofNat_den]
@@ -57,20 +43,8 @@ example : Polynomial.eval (100 : ℚ) F = (2 : ℚ) := by
   simp
 
 -- Treat polynomial f ∈ ℚ[X] as a function f : ℚ → ℚ
-#check CoeFun
-
-
-
 
 end section
-
-
-
-
-
--- @[BH, 4.1.2]
-
-
 
 -- All the polynomials are in ℚ[X], all the functions are considered as ℤ → ℤ
 noncomputable section
@@ -78,21 +52,13 @@ noncomputable section
 @[simp]
 def PolyType (f : ℤ → ℤ) (d : ℕ) := ∃ Poly : Polynomial ℚ, ∃ (N : ℤ), (∀ (n : ℤ), N ≤ n → f n = Polynomial.eval (n : ℚ) Poly) ∧ d = Polynomial.degree Poly
 section
--- structure PolyType (f : ℤ → ℤ) where
---   Poly : Polynomial ℤ
---   d : 
---   N : ℤ
---   Poly_equal : ∀ n ∈ ℤ → f n = Polynomial.eval n : ℤ Poly
 
 #check PolyType
 
 example (f : ℤ → ℤ) (hf : ∀ x, f x = x ^ 2) : PolyType f 2 := by
   unfold PolyType
   sorry
-  -- use Polynomial.monomial (2 : ℤ) (1 : ℤ)
-  -- have' := hf 0; ring_nf at this
-  -- exact this
-
+ 
 end section
 
 -- Δ operator (of d times)
@@ -101,21 +67,12 @@ def Δ : (ℤ → ℤ) → ℕ → (ℤ → ℤ)
   | f, 0 => f
   | f, d + 1 => fun (n : ℤ) ↦ (Δ f d) (n + 1) - (Δ f d) (n)  
 section
--- def Δ (f : ℤ → ℤ) (d : ℕ) := fun (n : ℤ) ↦ f (n + 1) - f n
--- def add' : ℕ → ℕ → ℕ
---   | 0, m => m 
---   | n+1, m => (add' n m) + 1
--- #eval add' 5 10
+
 #check Δ
 def f (n : ℤ) := n
 #eval (Δ f 1) 100
 -- #check (by (show_term unfold Δ) : Δ f 0=0)
 end section
-
-
-
-
-
 
 -- (NO need to prove another direction) Constant polynomial function = constant function
 lemma Poly_constant (F : Polynomial ℚ) (c : ℚ) : 
@@ -128,9 +85,6 @@ lemma Poly_constant (F : Polynomial ℚ) (c : ℚ) :
     rw [h]
     simp
   · sorry
-
-
-
 
 -- Shifting doesn't change the polynomial type
 lemma Poly_shifting (f : ℤ → ℤ) (g : ℤ → ℤ) (hf : PolyType f d) (s : ℤ) (hfg : ∀ (n : ℤ), f (n + s) = g (n)) : PolyType g d := by
@@ -208,25 +162,6 @@ lemma foofoofoo (d : ℕ) : (f : ℤ → ℤ) → (∃ (c : ℤ), ∃ (N : ℤ),
     have this : PolyType f (d + 1) := by
       sorry
     tauto
-
- -- intro h
-  -- rcases h with ⟨c, N, hh⟩
-  -- have H1 := λ n => (hh n).left
-  -- have H2 := λ n => (hh n).right
-  -- clear hh
-  -- have H2 : c ≠ 0 := by
-  --   tauto
-  -- induction' d with d hd
-
-  -- -- Base case
-  -- · rw [PolyType_0]
-  --   use c
-  --   use N
-  --   tauto
-
-  -- -- Induction step
-  -- · sorry
-
 
 -- [BH, 4.1.2] (a) => (b)
 -- Δ^d f (n) = c for some nonzero integer c for n >> 0 → f is of polynomial type d
