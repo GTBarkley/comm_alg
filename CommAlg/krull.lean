@@ -19,6 +19,7 @@ import Mathlib.Order.ConditionallyCompleteLattice.Basic
   developed.
 -/
 
+/-- If something is smaller that Bot of a PartialOrder after attaching another Bot, it must be Bot. -/
 lemma lt_bot_eq_WithBot_bot [PartialOrder α] [OrderBot α] {a : WithBot α} (h : a < (⊥ : α)) : a = ⊥ := by
   cases a
   . rfl
@@ -29,18 +30,19 @@ open LocalRing
 
 variable {R : Type _} [CommRing R] (I : PrimeSpectrum R)
 
+/-- Definitions -/
 noncomputable def height : ℕ∞ := Set.chainHeight {J : PrimeSpectrum R | J < I}
-
 noncomputable def krullDim (R : Type _) [CommRing R] : WithBot ℕ∞ := ⨆ (I : PrimeSpectrum R), height I
-
 noncomputable def codimension (J : Ideal R) : WithBot ℕ∞ := ⨅ I ∈ {I : PrimeSpectrum R | J ≤ I.asIdeal}, height I
 
 lemma height_def : height I = Set.chainHeight {J : PrimeSpectrum R | J < I} := rfl
 lemma krullDim_def (R : Type _) [CommRing R] : krullDim R = (⨆ (I : PrimeSpectrum R), height I : WithBot ℕ∞) := rfl
 lemma krullDim_def' (R : Type _) [CommRing R] : krullDim R = iSup (λ I : PrimeSpectrum R => (height I : WithBot ℕ∞)) := rfl
 
+/-- A lattice structure on WithBot ℕ∞. -/
 noncomputable instance : CompleteLattice (WithBot (ℕ∞)) := WithBot.WithTop.completeLattice
 
+/-- Height of ideals is monotonic. -/
 lemma height_le_of_le {I J : PrimeSpectrum R} (I_le_J : I ≤ J) : height I ≤ height J := by
   apply Set.chainHeight_mono
   intro J' hJ'
@@ -57,6 +59,8 @@ lemma krullDim_le_iff' (R : Type _) [CommRing R] (n : ℕ∞) :
 lemma height_le_krullDim (I : PrimeSpectrum R) : height I ≤ krullDim R := 
   le_iSup (λ I : PrimeSpectrum R => (height I : WithBot ℕ∞)) I
 
+/-- The Krull dimension of a ring being ≥ n is equivalent to there being an
+    ideal of height ≥ n. -/
 lemma le_krullDim_iff (R : Type _) [CommRing R] (n : ℕ) :
   n ≤ krullDim R ↔ ∃ I : PrimeSpectrum R, n ≤ (height I : WithBot ℕ∞) := by
   constructor
