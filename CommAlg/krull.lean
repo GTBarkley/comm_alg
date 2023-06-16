@@ -88,7 +88,7 @@ lemma le_krullDim_iff (R : Type _) [CommRing R] (n : ℕ) :
           fun _ ↦ (WithBot.coe_le rfl).mpr (H1 _)
       rw [←iSup_le_iff] at H1
       have : ((n : ℕ∞) : WithBot ℕ∞) ≤ (((n  - 1 : ℕ) : ℕ∞) : WithBot ℕ∞) := le_trans H H1
-      norm_cast at  this
+      norm_cast at this
       have that : n - 1 < n := by refine Nat.sub_lt h (by norm_num)
       apply lt_irrefl (n-1) (trans that this)
   · rintro ⟨I, h⟩
@@ -280,7 +280,7 @@ lemma domain_dim_zero.isField {D: Type _} [CommRing D] [IsDomain D] (h: krullDim
     have : {J | J < P'}.Nonempty := Set.nonempty_of_mem this
     unfold height
     rw [←Set.one_le_chainHeight_iff] at this
-    exact not_le_of_gt (Iff.mp ENat.one_le_iff_pos this)
+    exact not_le_of_gt (ENat.one_le_iff_pos.mp this)
   have nonpos_height : height P' ≤ 0 := by
     have := height_le_krullDim P'
     rw [h] at this
