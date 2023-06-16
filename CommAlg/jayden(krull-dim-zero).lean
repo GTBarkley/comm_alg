@@ -16,18 +16,18 @@ import Mathlib.Order.ConditionallyCompleteLattice.Basic
 import Mathlib.Algebra.Ring.Pi
 import Mathlib.RingTheory.Finiteness
 import Mathlib.Util.PiNotation
+import CommAlg.krull
 
 open PiNotation
-
 
 namespace Ideal
 
 variable (R : Type _) [CommRing R] (P : PrimeSpectrum R)
 
-noncomputable def height : ℕ∞ := Set.chainHeight {J : PrimeSpectrum R | J < P}
+-- noncomputable def height : ℕ∞ := Set.chainHeight {J : PrimeSpectrum R | J < P}
 
-noncomputable def krullDim (R : Type) [CommRing R] :
-     WithBot ℕ∞ := ⨆ (I : PrimeSpectrum R), height R I
+-- noncomputable def krullDim (R : Type) [CommRing R] :
+--      WithBot ℕ∞ := ⨆ (I : PrimeSpectrum R), height R I
 
 --variable {R}
 
@@ -42,7 +42,6 @@ class IsLocallyNilpotent {R : Type _} [CommRing R] (I : Ideal R) : Prop :=
     h : ∀ x ∈ I, IsNilpotent x
 #check Ideal.IsLocallyNilpotent
 end Ideal
-
 
 -- Repeats the definition of the length of a module by Monalisa
 variable (R : Type _) [CommRing R] (I J : Ideal R)
@@ -67,9 +66,11 @@ lemma ring_Noetherian_iff_spec_Noetherian : IsNoetherianRing R
     ↔ TopologicalSpace.NoetherianSpace (PrimeSpectrum R) := by
     constructor
     intro RisNoetherian
+    sorry
+    sorry
     -- how do I apply an instance to prove one direction?
 
-
+-- Stacks Lemma 5.9.2: 
 -- Use TopologicalSpace.NoetherianSpace.exists_finset_irreducible :
 -- Every closed subset of a noetherian space is a finite union 
 -- of irreducible closed subsets.
@@ -100,9 +101,9 @@ lemma containment_radical_power_containment :
 
 -- Stacks Lemma 10.52.6: I is a maximal ideal and IM = 0. Then length of M is
 -- the same as the dimension as a vector space over R/I,
-lemma length_eq_dim_if_maximal_annihilates {I : Ideal R} [Ideal.IsMaximal I] 
-    : I • (⊤ : Submodule R M) = 0
-     → Module.length R M = Module.rank R⧸I M⧸(I • (⊤ : Submodule R M)) := by sorry
+-- lemma length_eq_dim_if_maximal_annihilates {I : Ideal R} [Ideal.IsMaximal I] 
+--     : I • (⊤ : Submodule R M) = 0
+--      → Module.length R M = Module.rank R⧸I M⧸(I • (⊤ : Submodule R M)) := by sorry
 
 -- Does lean know that M/IM is a R/I module?
 -- Use 10.52.5
@@ -116,19 +117,44 @@ lemma power_zero_finite_length [Ideal.IsMaximal I] (h₁ : Ideal.FG I) [Module.F
     -- rcases power with ⟨n, npower⟩
     -- how do I get a generating set?
 
+open Finset
 
 -- Stacks Lemma 10.53.3: R is Artinian iff R has finitely many maximal ideals
 lemma Artinian_has_finite_max_ideal 
     [IsArtinianRing R] : Finite (MaximalSpectrum R) := by 
     by_contra infinite
     simp only [not_finite_iff_infinite] at infinite
-    
+    let m' : ℕ ↪ MaximalSpectrum R := Infinite.natEmbedding (MaximalSpectrum R)
+    have m'inj := m'.injective
+    let m'' : ℕ → Ideal R := fun n : ℕ ↦ ⨅ k ∈ range n, (m' k).asIdeal
+    -- let f : ℕ → MaximalSpectrum R := fun n : ℕ ↦ m' n
+    -- let F : (n : ℕ) → Fin n → MaximalSpectrum R := fun n k ↦ m' k
+    have DCC : ∃ n : ℕ, ∀ k : ℕ, n ≤ k → m'' n = m'' k := by
+      apply IsArtinian.monotone_stabilizes {
+        toFun := m''
+        monotone' := sorry
+      }
+    cases' DCC with n DCCn
+    specialize DCCn (n+1)
+    specialize DCCn (Nat.le_succ n)
+    have containment1 : m'' n < (m' (n + 1)).asIdeal := by sorry
+    have : ∀ (j : ℕ), (j ≠ n + 1) → ∃ x, x ∈ (m' j).asIdeal ∧ x ∉ (m' (n+1)).asIdeal := by
+      intro j jnotn
+      have notcontain : ¬ (m' j).asIdeal ≤ (m' (n+1)).asIdeal := by
+        -- apply Ideal.IsMaximal (m' j).asIdeal
+        sorry
+      sorry
+    sorry
+      -- have distinct : (m' j).asIdeal ≠ (m' (n+1)).asIdeal := by         
+      --   intro h
+      --   apply Function.Injective.ne m'inj jnotn
+      --   exact MaximalSpectrum.ext _ _ h      
+      -- simp
+      -- unfold 
+     
 
 -- Stacks Lemma 10.53.4: R Artinian => Jacobson ideal of R is nilpotent
-lemma Jacobson_of_Artinian_is_nilpotent 
-    [IsArtinianRing R] : IsNilpotent (Ideal.jacobson (⊥ : Ideal R)) := by 
-    have J := Ideal.jacobson (⊥ : Ideal R)
-    
+-- This is in mathlib: IsArtinianRing.isNilpotent_jacobson_bot
 
 -- Stacks Lemma 10.53.5: If R has finitely many maximal ideals and 
 -- locally nilpotent Jacobson radical, then R is the product of its localizations at 
@@ -142,7 +168,7 @@ abbrev Prod_of_localization :=
      
 def foo : Prod_of_localization R →+* R where
   toFun := sorry
-  invFun := sorry
+  -- invFun := sorry
   left_inv := sorry
   right_inv := sorry
   map_mul' := sorry
@@ -167,23 +193,27 @@ lemma primes_of_Artinian_are_maximal
 
 -- Lemma: Krull dimension of a ring is the supremum of height of maximal ideals
 
-
 -- Stacks Lemma 10.60.5: R is Artinian iff R is Noetherian of dimension 0
-lemma dim_zero_Noetherian_iff_Artinian (R : Type _) [CommRing R] : 
-    IsNoetherianRing R ∧ Ideal.krullDim R = 0 ↔ IsArtinianRing R := by 
+lemma dim_le_zero_Noetherian_iff_Artinian (R : Type _) [CommRing R] : 
+    IsNoetherianRing R ∧ Ideal.krullDim R ≤ 0 ↔ IsArtinianRing R := by 
     constructor
+    rintro ⟨RisNoetherian, dimzero⟩  
+    rw [ring_Noetherian_iff_spec_Noetherian] at RisNoetherian
+    let Z := irreducibleComponents (PrimeSpectrum R)
+    have Zfinite : Set.Finite Z := by
+      -- apply TopologicalSpace.NoetherianSpace.finite_irreducibleComponents ?_
+      sorry
+    
     sorry
     intro RisArtinian
     constructor
     apply finite_length_is_Noetherian
     rwa [IsArtinian_iff_finite_length] at RisArtinian
-    sorry
+    rw [Ideal.dim_le_zero_iff]
+    intro I
+    apply primes_of_Artinian_are_maximal
 
-
-
-
-    
-
+-- Use TopologicalSpace.NoetherianSpace.exists_finset_irreducible :
 
 
 
