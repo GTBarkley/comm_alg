@@ -5,7 +5,7 @@ import Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic
 set_option maxHeartbeats 0
 macro "ls" : tactic => `(tactic|library_search)
 
--- New tactic "obviously"
+-- From Kyle : New tactic "obviously"
 macro "obviously" : tactic =>
   `(tactic| (
       first
@@ -41,7 +41,7 @@ example : Polynomial.eval (100 : ℚ) F = (2 : ℚ) := by
   refine Iff.mpr (Rat.ext_iff (Polynomial.eval 100 F) 2) ?_
   simp only [Rat.ofNat_num, Rat.ofNat_den]
   rw [F]
-  simp
+  simp [simp]
 
 -- Treat polynomial f ∈ ℚ[X] as a function f : ℚ → ℚ
 
@@ -51,7 +51,9 @@ end section
 noncomputable section
 -- Polynomial type of degree d
 @[simp]
-def PolyType (f : ℤ → ℤ) (d : ℕ) := ∃ Poly : Polynomial ℚ, ∃ (N : ℤ), (∀ (n : ℤ), N ≤ n → f n = Polynomial.eval (n : ℚ) Poly) ∧ d = Polynomial.degree Poly
+def PolyType (f : ℤ → ℤ) (d : ℕ) := 
+  ∃ Poly : Polynomial ℚ, ∃ (N : ℤ), (∀ (n : ℤ), N ≤ n → f n = Polynomial.eval (n : ℚ) Poly) ∧ 
+    d = Polynomial.degree Poly
 section
 
 example (f : ℤ → ℤ) (hf : ∀ x, f x = x ^ 2) : PolyType f 2 := by
@@ -68,43 +70,30 @@ def Δ : (ℤ → ℤ) → ℕ → (ℤ → ℤ)
 
 -- (NO need to prove another direction) Constant polynomial function = constant function
 lemma Poly_constant (F : Polynomial ℚ) (c : ℚ) : 
-  (F = Polynomial.C (c : ℚ)) ↔ (∀ r : ℚ, (Polynomial.eval r F) = (c : ℚ)) := by
+    (F = Polynomial.C (c : ℚ)) ↔ (∀ r : ℚ, (Polynomial.eval r F) = (c : ℚ)) := by
   constructor
-  · intro h
-    rintro r
+  · intro h r
     refine Iff.mpr (Rat.ext_iff (Polynomial.eval r F) c) ?_
     simp only [Rat.ofNat_num, Rat.ofNat_den]
-    rw [h]
-    simp
+    simp [h]
   · sorry
 
 -- Get the polynomial G (X) = F (X + s) from the polynomial F(X)
-lemma Polynomial_shifting (F : Polynomial ℚ) (s : ℚ) : ∃ (G : Polynomial ℚ), (∀ (x : ℚ), Polynomial.eval x G = Polynomial.eval (x + s) F) ∧ (Polynomial.degree G = Polynomial.degree F) := by  
+lemma Polynomial_shifting (F : Polynomial ℚ) (s : ℚ) : ∃ (G : Polynomial ℚ), (∀ (x : ℚ), 
+    Polynomial.eval x G = Polynomial.eval (x + s) F) ∧ 
+    (Polynomial.degree G = Polynomial.degree F) := by  
   sorry
 
 -- Shifting doesn't change the polynomial type
-lemma Poly_shifting (f : ℤ → ℤ) (g : ℤ → ℤ) (hf : PolyType f d) (s : ℕ) (hfg : ∀ (n : ℤ), f (n + s) = g (n)) : PolyType g d := by
-  simp only [PolyType]
-  rcases hf with ⟨F, hh⟩
-  rcases hh with ⟨N,s1, s2⟩
-  have this : ∃ (G : Polynomial ℚ), (∀ (x : ℚ), Polynomial.eval x G = Polynomial.eval (x + s) F) ∧ (Polynomial.degree G = Polynomial.degree F) := by
-    exact Polynomial_shifting F s
-  rcases this with ⟨Poly, h1, h2⟩
-  use Poly
-  use N
-  constructor
-  · intro n
-    specialize s1 (n + s)
-    intro hN
+lemma Poly_shifting (f : ℤ → ℤ) (g : ℤ → ℤ) (hf : PolyType f d) (s : ℕ) 
+    (hfg : ∀ (n : ℤ), f (n + s) = g (n)) : PolyType g d := by
+  rcases hf with ⟨F, ⟨N, s1, s2⟩⟩
+  rcases (Polynomial_shifting F s) with ⟨Poly, h1, h2⟩
+  use Poly, N; constructor
+  · intro n hN
     have this1 : f (n + s) = Polynomial.eval (n + (s : ℚ)) F := by
-      have this2 : N ≤ n + s := by linarith
-      have this3 : ↑(f (n + ↑s)) = Polynomial.eval (↑(n + ↑s)) F := by tauto
-      rw [this3]
-      norm_cast
-    specialize hfg n
-    rw [←hfg, this1]
-    specialize h1 n
-    tauto
+      rw [s1 (n + s) (by linarith)]; norm_cast
+    rw [←hfg n, this1]; exact (h1 n).symm
   · rw [h2, s2]
 
 -- PolyType 0 = constant function
@@ -214,8 +203,6 @@ lemma b_to_a (f : ℤ → ℤ) (d : ℕ) (poly : PolyType f d) :
   rw [←PolyType_0]; exact Δ_d_PolyType_d_to_PolyType_0 f d poly
 
 end
-
-
 
 -- @Additive lemma of length for a SES
 -- Given a SES 0 → A → B → C → 0, then length (A) - length (B) + length (C) = 0 
