@@ -59,6 +59,31 @@ lemma krullDim_le_iff' (R : Type _) [CommRing R] (n : ℕ∞) :
 lemma height_le_krullDim (I : PrimeSpectrum R) : height I ≤ krullDim R := 
   le_iSup (λ I : PrimeSpectrum R => (height I : WithBot ℕ∞)) I
 
+/-- In a domain, the height of a prime ideal is Bot (0 in this case) iff it's the Bot ideal. -/
+lemma height_bot_iff_bot {D: Type} [CommRing D] [IsDomain D] (P : PrimeSpectrum D) : height P = ⊥ ↔ P = ⊥ := by
+  constructor
+  · intro h
+    unfold height at h
+    rw [bot_eq_zero] at h
+    simp only [Set.chainHeight_eq_zero_iff] at h
+    apply eq_bot_of_minimal
+    intro I
+    by_contra x
+    have : I ∈ {J | J < P} := x
+    rw [h] at this
+    contradiction
+  · intro h
+    unfold height
+    simp only [bot_eq_zero', Set.chainHeight_eq_zero_iff]
+    by_contra spec
+    change _ ≠ _ at spec
+    rw [← Set.nonempty_iff_ne_empty] at spec
+    obtain ⟨J, JlP : J < P⟩ := spec
+    have JneP : J ≠ P := ne_of_lt JlP
+    rw [h, ←bot_lt_iff_ne_bot, ←h] at JneP
+    have := not_lt_of_lt JneP
+    contradiction
+
 /-- The Krull dimension of a ring being ≥ n is equivalent to there being an
     ideal of height ≥ n. -/
 lemma le_krullDim_iff (R : Type _) [CommRing R] (n : ℕ) :
@@ -209,9 +234,9 @@ lemma dim_le_zero_iff : krullDim R ≤ 0 ↔ ∀ I : PrimeSpectrum R, IsMaximal 
     . exact List.chain'_singleton _
     . constructor
       . intro I' hI'
-        simp at hI'
+        simp only [List.mem_singleton] at hI' 
         rwa [hI']
-      . simp
+      . simp only [List.length_singleton, Nat.cast_one, zero_add]
   . contrapose! h
     change (_ : WithBot ℕ∞) > (0 : ℕ∞) at h
     rw [lt_height_iff''] at h
@@ -249,9 +274,12 @@ lemma field_prime_bot {K: Type _} [Field K] (P : Ideal K) : IsPrime P ↔ P = �
         exact bot_prime
 
 /-- In a field, all primes have height 0. -/
-lemma field_prime_height_zero {K: Type _} [Field K] (P : PrimeSpectrum K) : height P = 0 := by
+lemma field_prime_height_bot {K: Type _} [Field K] (P : PrimeSpectrum K) : height P = ⊥ := by
+    -- This should be doable by using field_prime_height_bot
+    -- and height_bot_iff_bot
+    rw [bot_eq_zero]
     unfold height
-    simp
+    simp only [Set.chainHeight_eq_zero_iff]
     by_contra spec
     change _ ≠ _ at spec
     rw [← Set.nonempty_iff_ne_empty] at spec
@@ -267,7 +295,7 @@ lemma field_prime_height_zero {K: Type _} [Field K] (P : PrimeSpectrum K) : heig
 /-- The Krull dimension of a field is 0. -/
 lemma dim_field_eq_zero {K : Type _} [Field K] : krullDim K = 0 := by
   unfold krullDim
-  simp [field_prime_height_zero]
+  simp only [field_prime_height_bot, ciSup_unique]
 
 /-- A domain with Krull dimension 0 is a field. -/
 lemma domain_dim_zero.isField {D: Type _} [CommRing D] [IsDomain D] (h: krullDim D = 0) : IsField D := by
@@ -314,7 +342,7 @@ lemma dim_le_one_of_dimLEOne :  Ring.DimensionLEOne R → krullDim R ≤ 1 := by
   rcases (lt_height_iff''.mp h) with ⟨c, ⟨hc1, hc2, hc3⟩⟩
   norm_cast at hc3
   rw [List.chain'_iff_get] at hc1
-  specialize hc1 0 (by rw [hc3]; simp)
+  specialize hc1 0 (by rw [hc3]; simp only)
   set q0 : PrimeSpectrum R := List.get c { val := 0, isLt := _ }
   set q1 : PrimeSpectrum R := List.get c { val := 1, isLt := _ } 
   specialize hc2 q1 (List.get_mem _ _ _)
