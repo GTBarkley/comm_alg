@@ -6,7 +6,6 @@ set_option maxHeartbeats 0
 macro "ls" : tactic => `(tactic|library_search)
 
 -- From Kyle : New tactic "obviously"
--- From Kyle : New tactic "obviously"
 macro "obviously" : tactic =>
   `(tactic| (
       first
