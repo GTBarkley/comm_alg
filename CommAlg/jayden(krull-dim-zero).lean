@@ -43,7 +43,6 @@ class IsLocallyNilpotent {R : Type _} [CommRing R] (I : Ideal R) : Prop :=
 #check Ideal.IsLocallyNilpotent
 end Ideal
 
-
 -- Repeats the definition of the length of a module by Monalisa
 variable (R : Type _) [CommRing R] (I J : Ideal R)
 variable (M : Type _) [AddCommMonoid M] [Module R M]
@@ -71,7 +70,7 @@ lemma ring_Noetherian_iff_spec_Noetherian : IsNoetherianRing R
     sorry
     -- how do I apply an instance to prove one direction?
 
-
+-- Stacks Lemma 5.9.2: 
 -- Use TopologicalSpace.NoetherianSpace.exists_finset_irreducible :
 -- Every closed subset of a noetherian space is a finite union 
 -- of irreducible closed subsets.
@@ -169,7 +168,7 @@ abbrev Prod_of_localization :=
      
 def foo : Prod_of_localization R →+* R where
   toFun := sorry
-  invFun := sorry
+  -- invFun := sorry
   left_inv := sorry
   right_inv := sorry
   map_mul' := sorry
@@ -198,6 +197,13 @@ lemma primes_of_Artinian_are_maximal
 lemma dim_le_zero_Noetherian_iff_Artinian (R : Type _) [CommRing R] : 
     IsNoetherianRing R ∧ Ideal.krullDim R ≤ 0 ↔ IsArtinianRing R := by 
     constructor
+    rintro ⟨RisNoetherian, dimzero⟩  
+    rw [ring_Noetherian_iff_spec_Noetherian] at RisNoetherian
+    let Z := irreducibleComponents (PrimeSpectrum R)
+    have Zfinite : Set.Finite Z := by
+      -- apply TopologicalSpace.NoetherianSpace.finite_irreducibleComponents ?_
+      sorry
+    
     sorry
     intro RisArtinian
     constructor
@@ -207,81 +213,7 @@ lemma dim_le_zero_Noetherian_iff_Artinian (R : Type _) [CommRing R] :
     intro I
     apply primes_of_Artinian_are_maximal
 
-
-
-
--- Trash bin
--- lemma Artinian_has_finite_max_ideal 
---     [IsArtinianRing R] : Finite (MaximalSpectrum R) := by 
---     by_contra infinite
---     simp only [not_finite_iff_infinite] at infinite
---     let m' : ℕ ↪ MaximalSpectrum R := Infinite.natEmbedding (MaximalSpectrum R)
---     have m'inj := m'.injective
---     let m'' : ℕ → Ideal R := fun n : ℕ ↦ ⨅ k ∈ range n, (m' k).asIdeal
---     let f : ℕ → Ideal R := fun n : ℕ ↦ (m' n).asIdeal
---     have DCC : ∃ n : ℕ, ∀ k : ℕ, n ≤ k → m'' n = m'' k := by
---       apply IsArtinian.monotone_stabilizes {
---         toFun := m''
---         monotone' := sorry
---       }
---     cases' DCC with n DCCn
---     specialize DCCn (n+1)
---     specialize DCCn (Nat.le_succ n)
---     let F : Fin (n + 1) → MaximalSpectrum R := fun k ↦ m' k
---     have comaximal : ∀ (i j : Fin (n + 1)), (i ≠ j) → (F i).asIdeal ⊔ (F j).asIdeal =
---       (⊤ : Ideal R) := by 
---       intro i j distinct
---       apply Ideal.IsMaximal.coprime_of_ne
---       exact (F i).IsMaximal
---       exact (F j).IsMaximal
---       have : (F i) ≠ (F j) := by         
---         apply Function.Injective.ne m'inj
---         contrapose! distinct
---         exact Fin.ext distinct
---       intro h
---       apply this
---       exact MaximalSpectrum.ext _ _ h
---     let CRT1 : (R ⧸ ⨅ (i : Fin (n + 1)), ((F i).asIdeal)) 
---         ≃+* ((i : Fin (n + 1)) → R ⧸ (F i).asIdeal) := 
---         Ideal.quotientInfRingEquivPiQuotient 
---           (fun i ↦ (F i).asIdeal) comaximal
---     let CRT2 : (R ⧸ ⨅ (i : Fin (n + 1)), ((F i).asIdeal)) 
---         ≃+* ((i : Fin (n + 1)) → R ⧸ (F i).asIdeal) := 
---         Ideal.quotientInfRingEquivPiQuotient 
---           (fun i ↦ (F i).asIdeal) comaximal
-
-
-
-
-    -- have comaximal : ∀ (n : ℕ) (i j : Fin n), (i ≠ j) → ((F n) i).asIdeal ⊔ ((F n) j).asIdeal =
-    --   (⊤ : Ideal R) := by 
-    --   intro n i j distinct
-    --   apply Ideal.IsMaximal.coprime_of_ne
-    --   exact (F n i).IsMaximal
-    --   exact (F n j).IsMaximal
-    --   have : (F n i) ≠ (F n j) := by         
-    --     apply Function.Injective.ne m'inj
-    --     contrapose! distinct
-    --     exact Fin.ext distinct
-    --   intro h
-    --   apply this
-    --   exact MaximalSpectrum.ext _ _ h
-    -- let CRT : (n : ℕ) → (R ⧸ ⨅ (i : Fin n), ((F n) i).asIdeal) 
-    --     ≃+* ((i : Fin n) → R ⧸ ((F n) i).asIdeal) := 
-    --    fun n ↦ Ideal.quotientInfRingEquivPiQuotient 
-    --       (fun i ↦ (F n i).asIdeal) (comaximal n)
-    -- have DCC : ∃ n : ℕ, ∀ k : ℕ, n ≤ k → m'' n = m'' k := by
-    --   apply IsArtinian.monotone_stabilizes {
-    --     toFun := m''
-    --     monotone' := sorry
-    --   }
-    -- cases' DCC with n DCCn
-    -- specialize DCCn (n+1)
-    -- specialize DCCn (Nat.le_succ n)
-    -- let CRT1 := CRT n
-    -- let CRT2 := CRT (n + 1)
-    
-
+-- Use TopologicalSpace.NoetherianSpace.exists_finset_irreducible :
 
 
 
