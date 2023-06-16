@@ -20,6 +20,7 @@ macro "obviously" : tactic =>
         | ring; done; dbg_trace "it was ring"
         | trivial; done; dbg_trace "it was trivial"
         | aesop; done; dbg_trace "it was aesop"
+        | assumption; done; dbg_trace "it was assumption"
         -- | nlinarith; done
         | fail "No, this is not obvious."))
 
@@ -164,6 +165,9 @@ lemma Δ_0 (f : ℤ → ℤ) : (Δ f 0) = f := by tauto
 
 -- Δ of 1 times decreaes the polynomial type by one
 lemma Δ_1 (f : ℤ → ℤ) (d : ℕ) : PolyType f (d + 1) → PolyType (Δ f 1) d := by
+  intro h
+  simp only [PolyType, Δ, Int.cast_sub, exists_and_right]
+  rcases h with ⟨Poly, N, h⟩
   sorry
 
 -- The "reverse" of Δ of 1 times increases the polynomial type by one
@@ -172,7 +176,9 @@ lemma Δ_1_ (f : ℤ → ℤ) (d : ℕ) : PolyType (Δ f 1) d → PolyType f (d 
 
 -- Δ of d times maps polynomial of degree d to polynomial of degree 0
 lemma Δ_1_s_equiv_Δ_s_1 (f : ℤ → ℤ) (s : ℕ) : Δ (Δ f 1) s = (Δ f (s + 1)) := by
-  sorry
+  induction' s with s hs
+  · norm_num
+  · aesop
 lemma foofoo (d : ℕ) : (f : ℤ → ℤ) → (PolyType f d) → (PolyType (Δ f d) 0):= by
   induction' d with d hd
   · intro f h
@@ -231,8 +237,6 @@ lemma foo (d : ℕ) : (f : ℤ → ℤ) → (∃ (c : ℤ), ∃ (N : ℤ), (∀ 
       exact Δ_1_ f d this2
     tauto
 lemma a_to_b (f : ℤ → ℤ) (d : ℕ) : (∃ (c : ℤ), ∃ (N : ℤ), (∀ (n : ℤ), N ≤ n → (Δ f d) (n) = c) ∧ c ≠ 0) → PolyType f d := fun h => (foo d f) h
-
-  
 
 
 
