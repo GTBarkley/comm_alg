@@ -442,8 +442,6 @@ lemma polynomial_over_field_dim_one {K : Type} [Nontrivial K] [Field K] : krullD
     have : {J | J < P}.Nonempty := Set.nonempty_of_mem this
     rwa [←Set.one_le_chainHeight_iff, ←WithBot.one_le_coe] at this
 
-lemma dim_le_dim_polynomial_add_one [Nontrivial R] :
-  krullDim R + 1 ≤ krullDim (Polynomial R) := sorry
 
 -- lemma dim_eq_dim_polynomial_add_one [Nontrivial R] [IsNoetherianRing R] :
 --   krullDim R + 1 = krullDim (Polynomial R) := sorry
@@ -456,7 +454,5 @@ lemma dim_mvPolynomial [Field K] (n : ℕ) : krullDim (MvPolynomial (Fin n) K) =
 
 lemma height_eq_dim_localization :
   height I = krullDim (Localization.AtPrime I.asIdeal) := sorry
-
-lemma dim_quotient_le_dim : height I + krullDim (R ⧸ I.asIdeal) ≤ krullDim R := sorry
 
 lemma height_add_dim_quotient_le_dim : height I + krullDim (R ⧸ I.asIdeal) ≤ krullDim R := sorry
