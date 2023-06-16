@@ -6,10 +6,20 @@ import Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic
 import Mathlib.RingTheory.DedekindDomain.DVR
 
 
-lemma FieldisArtinian (R : Type _) [CommRing R] (h: IsField R) : 
-  IsArtinianRing R := by sorry
-
-
+lemma FieldisArtinian (R : Type _) [CommRing R] (h : IsField R) : 
+    IsArtinianRing R := by
+  let inst := h.toField
+  rw [isArtinianRing_iff, isArtinian_iff_wellFounded]
+  apply WellFounded.intro
+  intro I
+  constructor
+  intro J hJI
+  constructor
+  intro K hKJ
+  exfalso
+  rcases Ideal.eq_bot_or_top J with rfl | rfl
+  . exact not_lt_bot hKJ
+  . exact not_top_lt hJI
 
 lemma ArtinianDomainIsField (R : Type _) [CommRing R] [IsDomain R]
 (IsArt : IsArtinianRing R) : IsField (R) := by 
