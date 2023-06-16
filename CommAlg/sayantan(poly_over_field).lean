@@ -7,6 +7,20 @@ import Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic
 
 namespace Ideal
 
+private lemma singleton_bot_chainHeight_one {α : Type} [Preorder α] [Bot α] : Set.chainHeight {(⊥ : α)} ≤ 1 := by
+  unfold Set.chainHeight
+  simp only [iSup_le_iff, Nat.cast_le_one]
+  intro L h
+  unfold Set.subchain at h
+  simp only [Set.mem_singleton_iff, Set.mem_setOf_eq] at h
+  rcases L with (_ | ⟨a,L⟩)
+  . simp only [List.length_nil, zero_le]
+  rcases L with (_ | ⟨b,L⟩)
+  . simp only [List.length_singleton, le_refl]
+  simp only [List.chain'_cons, List.find?, List.mem_cons, forall_eq_or_imp] at h
+  rcases h with ⟨⟨h1, _⟩,  ⟨rfl, rfl, _⟩⟩
+  exact absurd h1 (lt_irrefl _)
+
 /-- The ring of polynomials over a field has dimension one. -/
 lemma polynomial_over_field_dim_one {K : Type} [Nontrivial K] [Field K] : krullDim (Polynomial K) = 1 := by
   rw [le_antisymm_iff]
@@ -27,7 +41,7 @@ lemma polynomial_over_field_dim_one {K : Type} [Nontrivial K] [Field K] : krullD
         have : I = ⊥ := PrimeSpectrum.ext I ⊥ a
         contradiction
       have maxI := IsPrime.to_maximal_ideal this
-      have singleton : ∀P, P ∈ {J | J < I} ↔ P = ⊥ := by
+      have sngletn : ∀P, P ∈ {J | J < I} ↔ P = ⊥ := by
           intro P
           constructor
           · intro H
@@ -49,9 +63,11 @@ lemma polynomial_over_field_dim_one {K : Type} [Nontrivial K] [Field K] : krullD
           · intro pBot
             simp only [Set.mem_setOf_eq, pBot]
             exact lt_of_le_of_ne bot_le h.symm
-      replace singleton : {J | J < I} = {⊥} := Set.ext singleton
+      replace sngletn : {J | J < I} = {⊥} := Set.ext sngletn
       unfold height
-      sorry
+      rw [sngletn]
+      simp only [WithBot.coe_le_one, ge_iff_le]
+      exact singleton_bot_chainHeight_one
   · suffices : ∃I : PrimeSpectrum (Polynomial K), 1 ≤ (height I : WithBot ℕ∞)
     · obtain ⟨I, h⟩ := this
       have :  (height I : WithBot ℕ∞) ≤ ⨆ (I : PrimeSpectrum (Polynomial K)), ↑(height I) := by
