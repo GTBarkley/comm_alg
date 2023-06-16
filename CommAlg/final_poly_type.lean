@@ -167,12 +167,19 @@ lemma PolyType_0 (f : ℤ → ℤ) : (PolyType f 0) ↔ (∃ (c : ℤ), ∃ (N :
     have H2 : (c : ℚ) ≠ 0 := by simp only [ne_eq, Int.cast_eq_zero]; exact (hh 0).2
     exact ⟨Polynomial.C (c : ℚ), N, fun n Nn => by rw [(hh n).1 Nn]; exact (((Poly_constant (Polynomial.C (c : ℚ)) (c : ℚ)).mp rfl) n).symm, by rw [Polynomial.degree_C H2]; rfl⟩
 
+
+
+
 -- Δ of 0 times preserves the function
 lemma Δ_0 (f : ℤ → ℤ) : (Δ f 0) = f := by tauto
+
+
 
 -- Δ of 1 times decreaes the polynomial type by one
 lemma Δ_1 (f : ℤ → ℤ) (d : ℕ): d > 0 → PolyType f d → PolyType (Δ f 1) (d - 1) := by
   sorry
+
+
 
 
 lemma foo (f : ℤ → ℤ) (s : ℕ) : Δ (Δ f 1) s = (Δ f (s + 1)) := by
