@@ -26,7 +26,7 @@ macro "obviously" : tactic =>
 -- Testing of Polynomial
 section Polynomial
 noncomputable section
-
+ 
 example (f : Polynomial ℚ) (hf : f = Polynomial.C (1 : ℚ)) : Polynomial.eval 2 f = 1 := by
   have : ∀ (q : ℚ), Polynomial.eval q f = 1 := by
     sorry
