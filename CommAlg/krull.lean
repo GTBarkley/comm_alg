@@ -386,7 +386,6 @@ lemma polynomial_over_field_dim_one {K : Type} [Nontrivial K] [Field K] : krullD
   · unfold krullDim
     apply @iSup_le (WithBot ℕ∞) _ _ _ _
     intro I
-    have PIR : IsPrincipalIdealRing (Polynomial K) := by infer_instance
     by_cases I = ⊥
     · rw [← height_zero_iff_bot] at h
       simp only [WithBot.coe_le_one, ge_iff_le]
