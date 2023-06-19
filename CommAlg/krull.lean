@@ -190,6 +190,14 @@ lemma lt_height_iff'' {𝔭 : PrimeSpectrum R} {n : ℕ∞} :
   rw [WithBot.coe_lt_coe]
   exact lt_height_iff'
 
+/-- Convert elements in Ideal.minimalPrimes to PrimeSpectrum -/
+lemma minimalPrimes.toPrimeSpectrum {R : Type _} [CommRing R] {I P : Ideal R} : P ∈ Ideal.minimalPrimes I → PrimeSpectrum R := by
+  unfold Ideal.minimalPrimes
+  intro Pmin
+  obtain ⟨L, _⟩ := Pmin
+  simp only [Set.mem_setOf_eq] at L
+  exact PrimeSpectrum.mk P L.1
+
 #check height_le_krullDim
 --some propositions that would be nice to be able to eventually
 
