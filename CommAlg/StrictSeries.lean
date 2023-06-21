@@ -71,12 +71,20 @@ section LT
 
 variable {X : Type u} [LT X]
 
+instance IsEmpty [IsEmpty X] : IsEmpty (StrictSeries X) :=
+  ⟨fun s => IsEmpty.false <| s.toFun 0⟩
+
 instance coeFun : CoeFun (StrictSeries X) fun x => Fin (x.length + 1) → X where
   coe := StrictSeries.toFun
 
 instance inhabited [Inhabited X] : Inhabited (StrictSeries X) :=
   ⟨{  length := 0
       toFun := default
+      step' := fun x => x.elim0 }⟩
+
+instance Nonempty [Nonempty X] : Nonempty (StrictSeries X) :=
+  ⟨{  length := 0
+      toFun := Nonempty.some inferInstance
       step' := fun x => x.elim0 }⟩
 
 theorem step (s : StrictSeries X) :
@@ -168,6 +176,58 @@ theorem toList_ofList (l : List X) (hl : l ≠ []) (hc : List.Chain' (· < ·) l
     rw [List.get_ofFn]
     rfl
 
+theorem toList_injective : Function.Injective (@StrictSeries.toList X _) :=
+  fun s₁ s₂ (h : List.ofFn s₁ = List.ofFn s₂) => by
+  have h₁ : s₁.length = s₂.length :=
+    Nat.succ_injective
+      ((List.length_ofFn s₁).symm.trans <| (congr_arg List.length h).trans <| List.length_ofFn s₂)
+  have h₂ : ∀ i : Fin s₁.length.succ, s₁ i = s₂ (Fin.cast (congr_arg Nat.succ h₁) i) :=
+    congr_fun <| List.ofFn_injective <| h.trans <| List.ofFn_congr (congr_arg Nat.succ h₁).symm _
+  cases s₁
+  cases s₂
+  dsimp at h h₁ h₂
+  subst h₁
+  simp only [mk.injEq, heq_eq_eq, true_and]
+  simp only [Fin.cast_refl] at h₂
+  exact funext h₂
+
+theorem ext_list {s₁ s₂ : StrictSeries X} (h : toList s₁ = toList s₂) : s₁ = s₂ := 
+  toList_injective h
+
+def ofElement (x : X) : StrictSeries X where
+  length := 0
+  toFun _ := x
+  step' := by simp
+
+theorem length_ofElement (x : X) :
+    (ofElement x).length = 0 := rfl
+
+theorem toList_ofElement (x : X) : toList (ofElement x) = [x] := by 
+    obtain ⟨a, ha⟩ := List.length_eq_one.mp (length_ofElement x ▸ length_toList <| ofElement x)
+    have := List.eq_of_mem_singleton <| ha ▸ (mem_toList.mpr ⟨0, rfl⟩ : x ∈ toList (ofElement x))
+    rw [(ha : toList (ofElement x) = _), this]
+
+theorem mem_ofElement (x : X) {y : X} : y ∈ (ofElement x) ↔ y = x := by
+  rw [←mem_toList, toList_ofElement, List.mem_singleton]
+
+theorem ofList_singleton {x : X} {hne} {hch} : ofList [x] hne hch = ofElement x := by
+  apply ext_list
+  rw [toList_ofList, toList_ofElement]
+
+theorem length_eq_zero {s : StrictSeries X} :
+  s.length = 0 ↔ ∃ x, s = ofElement x := 
+  ⟨fun h =>  
+    have ⟨a, ha⟩ := List.length_eq_one.mp (h ▸ (length_toList s))
+    ⟨a, by apply ext_list; rw [ha, toList_ofElement]⟩, 
+  fun ⟨x, h⟩ => h.symm ▸ length_ofElement x⟩
+
+theorem ofElement_of_length_zero {s : StrictSeries X} (h : s.length = 0) (hx : x ∈ s) :
+  s = ofElement x := by
+  have ⟨y, hy⟩ := length_eq_zero.mp h
+  -- bug? can't inline this
+  have := mem_ofElement y |>.mp <| hy ▸ hx
+  rwa [this]
+
 /-- The last element of a `StrictSeries` -/
 def top (s : StrictSeries X) : X :=
   s (Fin.last _)
@@ -175,12 +235,18 @@ def top (s : StrictSeries X) : X :=
 theorem top_mem (s : StrictSeries X) : s.top ∈ s :=
   mem_def.2 (Set.mem_range.2 ⟨Fin.last _, rfl⟩)
 
+theorem length_eq_zero_top {s : StrictSeries X} : s.length = 0 ↔ s = ofElement s.top :=
+  ⟨fun h => ofElement_of_length_zero h (top_mem s), fun h => h.symm ▸ length_ofElement _⟩
+
 /-- The first element of a `StrictSeries` -/
 def bot (s : StrictSeries X) : X :=
   s 0
 
 theorem bot_mem (s : StrictSeries X) : s.bot ∈ s :=
   mem_def.2 (Set.mem_range.2 ⟨0, rfl⟩)
+
+theorem length_eq_zero_bot {s : StrictSeries X} : s.length = 0 ↔ s = ofElement s.bot :=
+  ⟨fun h => ofElement_of_length_zero h (bot_mem s), fun h => h.symm ▸ length_ofElement _⟩
 
 /-- Remove the largest element from a `StrictSeries`. If the toFun `s`
 has length zero, then `s.eraseTop = s` -/
@@ -323,21 +389,6 @@ theorem total {s : StrictSeries X} {x y : X} (hx : x ∈ s) (hy : y ∈ s) : x �
   rw [s.strictMono.le_iff_le, s.strictMono.le_iff_le]
   exact le_total i j
 
-theorem toList_injective : Function.Injective (@StrictSeries.toList X _) :=
-  fun s₁ s₂ (h : List.ofFn s₁ = List.ofFn s₂) => by
-  have h₁ : s₁.length = s₂.length :=
-    Nat.succ_injective
-      ((List.length_ofFn s₁).symm.trans <| (congr_arg List.length h).trans <| List.length_ofFn s₂)
-  have h₂ : ∀ i : Fin s₁.length.succ, s₁ i = s₂ (Fin.cast (congr_arg Nat.succ h₁) i) :=
-    congr_fun <| List.ofFn_injective <| h.trans <| List.ofFn_congr (congr_arg Nat.succ h₁).symm _
-  cases s₁
-  cases s₂
-  dsimp at h h₁ h₂
-  subst h₁
-  simp only [mk.injEq, heq_eq_eq, true_and]
-  simp only [Fin.cast_refl] at h₂
-  exact funext h₂
-
 theorem toList_sorted (s : StrictSeries X) : s.toList.Sorted (· < ·) :=
   List.pairwise_iff_get.2 fun i j h => by
     dsimp [toList]
@@ -347,7 +398,8 @@ theorem toList_sorted (s : StrictSeries X) : s.toList.Sorted (· < ·) :=
 theorem toList_nodup (s : StrictSeries X) : s.toList.Nodup :=
   s.toList_sorted.nodup
 
-/-- Two `StrictSeries` on a preorder are equal if they have the same elements. See also `ext_fun`. -/
+/-- Two `StrictSeries` on a preorder are equal if they have the same elements. 
+See also `ext_fun` and `ext_list`. -/
 @[ext]
 theorem ext {s₁ s₂ : StrictSeries X} (h : ∀ x, x ∈ s₁ ↔ x ∈ s₂) : s₁ = s₂ :=
   toList_injective <|
