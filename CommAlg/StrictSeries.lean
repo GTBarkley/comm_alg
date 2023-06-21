@@ -1,8 +1,7 @@
 /-
-Modified by Grant Barkley.
-Most of this file is Copyright (c) 2021 Chris Hughes. All rights reserved.
+Copyright (c) 2021 Chris Hughes. All rights reserved.
 Released under Apache 2.0 license as described in the Mathlib file LICENSE.
-Authors: Chris Hughes
+Authors: Chris Hughes, Grant Barkley
 -/
 import Mathlib.Order.Lattice
 import Mathlib.Data.List.Sort
