@@ -16,6 +16,18 @@ structure StrictSeries (X : Type u) [LT X] : Type u where
   step' : ∀ i : Fin length, (toFun (Fin.castSucc i)) < (toFun (Fin.succ i))
   --StrictMono toFun
 
+section List
+
+-- TODO: move this to Mathlib.Data.List.Basic
+@[simp]
+theorem List.getLast_tail {X : Type _} {l : List X} {h : l.tail ≠ []} :
+l.tail.getLast h = l.getLast (fun c => (c ▸ h) List.tail_nil) := by
+  cases l
+  . simp
+  . rw [List.getLast_cons]; simp; assumption
+
+end List
+
 namespace StrictSeries
 
 section FinLemmas
@@ -198,17 +210,21 @@ def ofElement (x : X) : StrictSeries X where
   toFun _ := x
   step' := by simp
 
+@[simp]
 theorem length_ofElement (x : X) :
     (ofElement x).length = 0 := rfl
 
+@[simp]
 theorem toList_ofElement (x : X) : toList (ofElement x) = [x] := by 
     obtain ⟨a, ha⟩ := List.length_eq_one.mp (length_ofElement x ▸ length_toList <| ofElement x)
     have := List.eq_of_mem_singleton <| ha ▸ (mem_toList.mpr ⟨0, rfl⟩ : x ∈ toList (ofElement x))
     rw [(ha : toList (ofElement x) = _), this]
 
+@[simp]
 theorem mem_ofElement (x : X) {y : X} : y ∈ (ofElement x) ↔ y = x := by
   rw [←mem_toList, toList_ofElement, List.mem_singleton]
 
+@[simp]
 theorem ofList_singleton {x : X} {hne} {hch} : ofList [x] hne hch = ofElement x := by
   apply ext_list
   rw [toList_ofList, toList_ofElement]
@@ -234,6 +250,17 @@ def top (s : StrictSeries X) : X :=
 theorem top_mem (s : StrictSeries X) : s.top ∈ s :=
   mem_def.2 (Set.mem_range.2 ⟨Fin.last _, rfl⟩)
 
+@[simp]
+theorem ofElement_top {x : X} : (ofElement x).top = x := rfl
+
+@[simp]
+theorem getLast_toList_eq_top (s : StrictSeries X) : s.toList.getLast s.toList_ne_nil = s.top := by
+  erw [List.last_ofFn]; rfl
+
+@[simp]
+theorem top_ofList {l : List X} {hnn} {hcn} : (ofList l hnn hcn).top = l.getLast hnn := by
+  rw [←getLast_toList_eq_top]; simp
+
 theorem length_eq_zero_top {s : StrictSeries X} : s.length = 0 ↔ s = ofElement s.top :=
   ⟨fun h => ofElement_of_length_zero h (top_mem s), fun h => h.symm ▸ length_ofElement _⟩
 
@@ -243,6 +270,9 @@ def bot (s : StrictSeries X) : X :=
 
 theorem bot_mem (s : StrictSeries X) : s.bot ∈ s :=
   mem_def.2 (Set.mem_range.2 ⟨0, rfl⟩)
+
+@[simp]
+theorem ofElement_bot {x : X} : (ofElement x).bot = x := rfl
 
 theorem length_eq_zero_bot {s : StrictSeries X} : s.length = 0 ↔ s = ofElement s.bot :=
   ⟨fun h => ofElement_of_length_zero h (bot_mem s), fun h => h.symm ▸ length_ofElement _⟩
@@ -271,6 +301,18 @@ theorem top_eraseTop (s : StrictSeries X) :
 @[simp]
 theorem bot_eraseTop (s : StrictSeries X) : s.eraseTop.bot = s.bot :=
   rfl
+
+def eraseBot (s : StrictSeries X) : StrictSeries X :=
+  if h : s.length = 0 then s
+  else
+    ofList (s.toList.tail) 
+    (fun hc => h <| s.length_toList ▸ hc ▸ s.toList.length_tail |>.symm) s.chain'_toList.tail
+
+#check Function.invFun
+
+theorem top_eraseBot (s : StrictSeries X) : s.eraseBot.top = s.top :=
+  if h : s.length = 0 then by rw [eraseBot, dif_pos h]
+  else by rw [eraseBot, dif_neg h]; simp
 
 /-- Append two composition toFun `s₁` and `s₂` such that
 the least element of `s₁` is the maximum element of `s₂`. -/
