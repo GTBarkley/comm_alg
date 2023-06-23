@@ -190,6 +190,14 @@ lemma lt_height_iff'' {𝔭 : PrimeSpectrum R} {n : ℕ∞} :
   rw [WithBot.coe_lt_coe]
   exact lt_height_iff'
 
+/-- Convert elements in Ideal.minimalPrimes to PrimeSpectrum -/
+lemma minimalPrimes.toPrimeSpectrum {R : Type _} [CommRing R] {I P : Ideal R} : P ∈ Ideal.minimalPrimes I → PrimeSpectrum R := by
+  unfold Ideal.minimalPrimes
+  intro Pmin
+  obtain ⟨L, _⟩ := Pmin
+  simp only [Set.mem_setOf_eq] at L
+  exact PrimeSpectrum.mk P L.1
+
 #check height_le_krullDim
 --some propositions that would be nice to be able to eventually
 
@@ -356,19 +364,27 @@ lemma dim_le_one_of_pid [IsDomain R] [IsPrincipalIdealRing R] : krullDim R ≤ 1
   rw [dim_le_one_iff]
   exact Ring.DimensionLEOne.principal_ideal_ring R
 
-private lemma singleton_chainHeight_le_one {α : Type _} {x : α} [Preorder α] : Set.chainHeight {x} ≤ 1 := by
-  unfold Set.chainHeight
-  simp only [iSup_le_iff, Nat.cast_le_one]
-  intro L h
-  unfold Set.subchain at h
-  simp only [Set.mem_singleton_iff, Set.mem_setOf_eq] at h
-  rcases L with (_ | ⟨a,L⟩)
-  . simp only [List.length_nil, zero_le]
-  rcases L with (_ | ⟨b,L⟩)
-  . simp only [List.length_singleton, le_refl]
-  simp only [List.chain'_cons, List.find?, List.mem_cons, forall_eq_or_imp] at h
-  rcases h with ⟨⟨h1, _⟩,  ⟨rfl, rfl, _⟩⟩
-  exact absurd h1 (lt_irrefl _)
+/-- Singleton sets have chainHeight 1 -/
+lemma singleton_chainHeight_one {α : Type _} {x : α} [Preorder α] : Set.chainHeight {x} = 1 := by
+  have le : Set.chainHeight {x} ≤ 1 := by
+    unfold Set.chainHeight
+    simp only [iSup_le_iff, Nat.cast_le_one]
+    intro L h
+    unfold Set.subchain at h
+    simp only [Set.mem_singleton_iff, Set.mem_setOf_eq] at h
+    rcases L with (_ | ⟨a,L⟩)
+    . simp only [List.length_nil, zero_le]
+    rcases L with (_ | ⟨b,L⟩)
+    . simp only [List.length_singleton, le_refl]
+    simp only [List.chain'_cons, List.find?, List.mem_cons, forall_eq_or_imp] at h
+    rcases h with ⟨⟨h1, _⟩,  ⟨rfl, rfl, _⟩⟩
+    exact absurd h1 (lt_irrefl _)
+  suffices : Set.chainHeight {x} > 0
+  · change _ < _ at this
+    rw [←ENat.one_le_iff_pos] at this
+    apply le_antisymm <;> trivial
+  by_contra x
+  simp only [gt_iff_lt, not_lt, nonpos_iff_eq_zero, Set.chainHeight_eq_zero_iff, Set.singleton_ne_empty] at x 
 
 /-- The ring of polynomials over a field has dimension one. -/
 lemma polynomial_over_field_dim_one {K : Type} [Nontrivial K] [Field K] : krullDim (Polynomial K) = 1 := by
@@ -378,7 +394,6 @@ lemma polynomial_over_field_dim_one {K : Type} [Nontrivial K] [Field K] : krullD
   · unfold krullDim
     apply @iSup_le (WithBot ℕ∞) _ _ _ _
     intro I
-    have PIR : IsPrincipalIdealRing (Polynomial K) := by infer_instance
     by_cases I = ⊥
     · rw [← height_zero_iff_bot] at h
       simp only [WithBot.coe_le_one, ge_iff_le]
@@ -416,7 +431,7 @@ lemma polynomial_over_field_dim_one {K : Type} [Nontrivial K] [Field K] : krullD
       unfold height
       rw [sngletn]
       simp only [WithBot.coe_le_one, ge_iff_le]
-      exact singleton_chainHeight_le_one
+      exact le_of_eq singleton_chainHeight_one
   · suffices : ∃I : PrimeSpectrum (Polynomial K), 1 ≤ (height I : WithBot ℕ∞)
     · obtain ⟨I, h⟩ := this
       have :  (height I : WithBot ℕ∞) ≤ ⨆ (I : PrimeSpectrum (Polynomial K)), ↑(height I) := by
